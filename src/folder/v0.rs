@@ -14,6 +14,8 @@ pub struct Folder {
 impl Entity for Folder {
   const NAME: &'static str = "folder";
 
+  type Action = ();
+
   fn dependencies<'a>(&'a self, set: &mut HashSet<&'a Reference>) {
     for (_, link) in &self.links {
       set.insert(link);

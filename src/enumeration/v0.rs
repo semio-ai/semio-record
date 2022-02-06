@@ -26,6 +26,8 @@ pub struct Enumeration {
 impl Entity for Enumeration {
   const NAME: &'static str = "enumeration";
 
+  type Action = ();
+
   fn dependencies<'a>(&'a self, set: &mut HashSet<&'a Reference>) {
     for (_, variant) in &self.variants {
       variant.dependencies(set);

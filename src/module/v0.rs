@@ -187,6 +187,8 @@ impl Default for Module {
 impl Entity for Module {
   const NAME: &'static str = "module";
 
+  type Action = action::Action;
+
   fn dependencies<'a>(&'a self, set: &mut HashSet<&'a Reference>) {
     for export in self.exports.values() {
       export.dependencies(set);

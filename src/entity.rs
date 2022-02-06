@@ -31,6 +31,8 @@ pub struct UnresolvedReference {
 pub trait Entity {
   const NAME: &'static str;
 
+  type Action;
+
   fn children<'a>(&'a self, _map: &mut HashMap<&'a str, &'a Uuid>) {}
   fn dependencies<'a>(&'a self, _set: &mut HashSet<&'a Reference>) {}
 }
