@@ -3,11 +3,12 @@ use std::collections::HashSet;
 use serde::Deserialize;
 use serde::Serialize;
 
-use crate::entity::Reference;
-use crate::id::Id;
+use crate::record::FrozenReference;
+use crate::record::Reference;
+use crate::record::UnfrozenReference;
 
 #[derive(Debug, Serialize, Deserialize)]
-pub enum Ty {
+pub enum FrozenTy {
   Unit,
   Boolean,
   U8,
@@ -33,17 +34,17 @@ pub enum Ty {
   ArrayR32,
   ArrayR64,
   ArrayString,
-  Scalar(Reference),
-  Array(Reference),
+  Scalar(FrozenReference),
+  Array(FrozenReference),
 }
 
-impl Ty {
-  pub fn dependencies<'a>(&'a self, set: &mut HashSet<&'a Reference>) {
+impl FrozenTy {
+  pub fn dependencies<'a>(&'a self, set: &mut HashSet<&'a FrozenReference>) {
     match self {
-      Ty::Scalar(ty) => {
+      Self::Scalar(ty) => {
         set.insert(ty);
       },
-      Ty::Array(ty) => {
+      Self::Array(ty) => {
         set.insert(ty);
       },
       _ => {}
@@ -52,7 +53,7 @@ impl Ty {
 }
 
 #[derive(Debug, Serialize, Deserialize)]
-pub enum UnresolvedTy {
+pub enum UnfrozenTy {
   Unit,
   Boolean,
   U8,
@@ -78,6 +79,20 @@ pub enum UnresolvedTy {
   ArrayR32,
   ArrayR64,
   ArrayString,
-  Scalar(Id),
-  Array(Id),
+  Scalar(UnfrozenReference),
+  Array(UnfrozenReference),
+}
+
+impl UnfrozenTy {
+  pub fn dependencies<'a>(&'a self, set: &mut HashSet<&'a UnfrozenReference>) {
+    match self {
+      Self::Scalar(ty) => {
+        set.insert(ty);
+      },
+      Self::Array(ty) => {
+        set.insert(ty);
+      },
+      _ => {}
+    }
+  }
 }

@@ -1,20 +1,20 @@
-use std::collections::HashMap;
+// use std::collections::HashMap;
 
-use serde::{Serialize, Deserialize};
-use uuid::Uuid;
+// use serde::{Serialize, Deserialize};
+// use uuid::Uuid;
 
-use crate::ty::Ty;
+// use crate::ty::;
 
-pub mod action;
+// pub mod action;
 
-#[derive(Debug, Serialize, Deserialize)]
-pub struct StructureField {
-  pub name: String,
-  #[serde(rename = "type")]
-  pub ty: Ty,
-}
+// #[derive(Debug, Serialize, Deserialize)]
+// pub struct StructureField {
+//   pub name: String,
+//   #[serde(rename = "type")]
+//   pub ty: Ty,
+// }
 
-#[derive(Debug, Serialize, Deserialize)]
-pub struct Structure {
-  pub fields: HashMap<Uuid, StructureField>,
-}
+// #[derive(Debug, Serialize, Deserialize)]
+// pub struct Structure {
+//   pub fields: HashMap<Uuid, StructureField>,
+// }
