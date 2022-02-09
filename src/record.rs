@@ -31,9 +31,9 @@ pub type FrozenReference = Reference<semver::Version>;
 pub type UnfrozenReference = Reference<Option<semver::VersionReq>>;
 
 pub trait Apply<T> {
-  type Result;
+  type Error;
 
-  fn apply(&mut self, action: &T) -> Self::Result;
+  fn apply(&mut self, action: &T) -> Result<(), Self::Error>;
 }
 
 #[async_trait]
@@ -55,20 +55,87 @@ pub trait View {
   fn parent<'a>(&'a self) -> Option<&'a Uuid> { None }
 }
 
-pub trait Unfrozen<T, F: Freezer>: View + BlobDependencies + Apply<T> + Freeze<F> + Serialize + DeserializeOwned {
+pub trait Unfrozen<T>: View + BlobDependencies + Apply<T> + Serialize + DeserializeOwned {
   fn dependencies<'a>(&'a self, _set: &mut HashSet<&'a UnfrozenReference>) {}
 }
 pub trait Frozen: View + BlobDependencies + Serialize + DeserializeOwned {
   fn dependencies<'a>(&'a self, _set: &mut HashSet<&'a FrozenReference>) {}
 }
 
+impl Frozen for () {
+  fn dependencies<'a>(&'a self, _set: &mut HashSet<&'a FrozenReference>) {}
+}
 
+impl BlobDependencies for () {
+  fn blob_dependencies<'a>(&'a self, _set: &mut HashSet<&'a Uuid>) {}
+}
 
-pub trait Record<F: Freezer> {
+impl View for () {
+  fn name<'a>(&'a self) -> Option<&'a str> { None }
+  fn parent<'a>(&'a self) -> Option<&'a Uuid> { None }
+}
+
+pub trait Record {
   const TYPE: i16;
   const SCHEMA_VERSION: i16;
 
   type Action;
-  type Unfrozen: Unfrozen<Self::Action, F>;
+  type Unfrozen: Unfrozen<Self::Action>;
   type Frozen: Frozen;
 }
+
+pub enum RecordContent<R: Record> {
+  Action(R::Action),
+  Unfrozen(R::Unfrozen),
+  Frozen(R::Frozen),
+}
+
+macro_rules! impl_record {
+  ($($version:expr => $module: ident),+) => {
+    pub async fn freeze<F: 'static + crate::record::Freezer>(freezer: &mut F, schema_version: i16, data: &[u8]) -> Result<Vec<u8>, Box<dyn std::error::Error>> {
+      match schema_version {
+        $(
+          $version => $module::freeze(freezer, data).await,
+        )+
+        _ => Err(format!("Unsupported schema version: {}", schema_version).into()),
+      }
+    }
+    pub fn apply_raw(schema_version: i16, module: &[u8], action: &[u8]) -> Result<Vec<u8>, Box<dyn std::error::Error>> {
+      match schema_version {
+        $(
+          $version => $module::apply_raw(module, action),
+        )+
+        _ => Err(format!("Unsupported schema version: {}", schema_version).into()),
+      }
+    }
+    
+    pub fn apply_raw_iter<B: AsRef<[u8]>, I: Iterator<Item = B>>(schema_version: i16, module: &[u8], actions: I) -> Result<Vec<u8>, Box<dyn std::error::Error>> {
+      match schema_version {
+        $(
+          $version => $module::apply_raw_iter(module, actions),
+        )+
+        _ => Err(format!("Unsupported schema version: {}", schema_version).into()),
+      }
+    }
+    
+    pub fn name(schema_version: i16, module: &[u8]) -> Option<String> {
+      match schema_version {
+        $(
+          $version => $module::name(module),
+        )+
+        _ => None,
+      }
+    }
+    
+    pub fn parent(schema_version: i16, module: &[u8]) -> Option<uuid::Uuid> {
+      match schema_version {
+        $(
+          $version => $module::parent(module),
+        )+
+        _ => None,
+      }
+    }
+  };
+}
+
+pub(crate) use impl_record;

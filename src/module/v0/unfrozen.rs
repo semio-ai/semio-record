@@ -4,7 +4,7 @@ use async_trait::async_trait;
 use serde::{Serialize, Deserialize};
 use uuid::Uuid;
 
-use crate::{record::{UnfrozenReference, Freeze, Freezer, View, Unfrozen, Apply}, blob::BlobDependencies};
+use crate::{record::{UnfrozenReference, Freeze, Freezer, View, Unfrozen, Apply}, blob::BlobDependencies, unfrozen::impl_unfrozen};
 
 use super::{frozen, action::Action};
 
@@ -245,21 +245,9 @@ impl Module {
     self.exports.insert(id.clone(), export);
     id
   }
-
-  pub fn apply_raw(&mut self, bytes: &[u8]) -> Result<(), Box<dyn Error>> {
-    let action: Action = rmp_serde::from_slice(bytes)?;
-    self.apply(&action)?;
-    Ok(())
-  }
-
-  pub fn apply_raw_iter<B: AsRef<[u8]>, I: Iterator<Item = B>>(&mut self, actions: I) -> Result<(), Box<dyn Error>> {
-    for action in actions {
-      let action: Action = rmp_serde::from_slice(action.as_ref())?;
-      let _ = self.apply(&action);
-    }    
-    Ok(())
-  }
 }
+
+impl_unfrozen!(Module, Action);
 
 impl Default for Module {
   fn default() -> Self {
@@ -272,7 +260,7 @@ impl Default for Module {
   }
 }
 
-impl<F: Freezer> Unfrozen<Action, F> for Module {
+impl Unfrozen<Action> for Module {
   fn dependencies<'a>(&'a self, set: &mut HashSet<&'a UnfrozenReference>) {
     for (_, export) in &self.exports {
       export.dependencies(set);

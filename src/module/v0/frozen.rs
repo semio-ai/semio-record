@@ -53,15 +53,15 @@ impl Function {
   pub fn parameter_named(&self, name: &str) -> Option<&Parameter> {
     self.parameter(self.parameter_id(name)?)
   }
-  
-  fn append_parameter(&mut self, parameter: Parameter) -> Uuid {
+
+  pub fn append_parameter(&mut self, parameter: Parameter) -> Uuid {
     let id = Uuid::new_v4();
     self.parameters.insert(id.clone(), parameter);
     self.parameter_ordering.push(id.clone());
     id
   }
 
-  fn insert_parameter(&mut self, index: usize, parameter: Parameter) -> Uuid {
+  pub fn insert_parameter(&mut self, index: usize, parameter: Parameter) -> Uuid {
     let id = Uuid::new_v4();
     self.parameters.insert(id.clone(), parameter);
     self.parameter_ordering.insert(index, id.clone());

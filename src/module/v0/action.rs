@@ -2,7 +2,7 @@
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
-use derive_more::{Display, Error};
+use derive_more::{Display, Error, From};
 
 use crate::{
   record::{Apply, UnfrozenReference},
@@ -19,9 +19,9 @@ pub enum SetExecutableError {}
 
 impl Apply<SetExecutable> for Module
 {
-  type Result = Result<(), RenameExportError>;
+  type Error = RenameExportError;
 
-  fn apply(&mut self, action: &SetExecutable) -> Self::Result {
+  fn apply(&mut self, action: &SetExecutable) -> Result<(), Self::Error> {
     self.executable = Some(action.0);
     Ok(())
   }
@@ -39,9 +39,9 @@ pub enum AddExportError
 
 impl Apply<AddExport> for Module
 {
-  type Result = Result<(), AddExportError>;
+  type Error = AddExportError;
 
-  fn apply(&mut self, action: &AddExport) -> Self::Result {
+  fn apply(&mut self, action: &AddExport) -> Result<(), Self::Error> {
     if !self.has_export_named(&action.0.name) {
       return Err(AddExportError::NameAlreadyExists);
     }
@@ -63,9 +63,9 @@ pub enum RemoveExportError {
 
 impl Apply<RemoveExport> for Module
 {
-  type Result = Result<(), RemoveExportError>;
+  type Error = RemoveExportError;
 
-  fn apply(&mut self, action: &RemoveExport) -> Self::Result {
+  fn apply(&mut self, action: &RemoveExport) -> Result<(), Self::Error> {
     if !self.has_export(&action.0) {
       return Err(RemoveExportError::ExportNotFound)?;
     }
@@ -92,9 +92,9 @@ pub enum RenameExportError {
 
 impl Apply<RenameExport> for Module
 {
-  type Result = Result<(), RenameExportError>;
+  type Error = RenameExportError;
 
-  fn apply(&mut self, action: &RenameExport) -> Self::Result {
+  fn apply(&mut self, action: &RenameExport) -> Result<(), Self::Error> {
     // Check if the new name is already taken.
     if let Some(id) = self.export_id(&action.name)
     {
@@ -131,9 +131,9 @@ pub enum AppendFunctionParameterError
 
 impl Apply<AppendFunctionParameter> for Module
 {
-  type Result = Result<(), AppendFunctionParameterError>;
+  type Error = AppendFunctionParameterError;
 
-  fn apply(&mut self, action: &AppendFunctionParameter) -> Self::Result {
+  fn apply(&mut self, action: &AppendFunctionParameter) -> Result<(), Self::Error> {
 
     let export = self
       .export_mut(&action.export)
@@ -172,9 +172,9 @@ pub enum RemoveFunctionParameterError {
 
 impl Apply<RemoveFunctionParameter> for Module
 {
-  type Result = Result<Parameter, RemoveFunctionParameterError>;
+  type Error = RemoveFunctionParameterError;
 
-  fn apply(&mut self, action: &RemoveFunctionParameter) -> Self::Result {
+  fn apply(&mut self, action: &RemoveFunctionParameter) -> Result<(), Self::Error> {
     let export = self
       .export_mut(&action.export)
       .ok_or(RemoveFunctionParameterError::ExportNotFound)?;
@@ -184,11 +184,11 @@ impl Apply<RemoveFunctionParameter> for Module
       .as_function_mut()
       .ok_or(RemoveFunctionParameterError::WrongType)?;
 
-    let ret = func
+    let _ = func
       .remove_parameter(&action.parameter)
       .ok_or(RemoveFunctionParameterError::ParameterNotFound)?;
 
-    Ok(ret)
+    Ok(())
   }
 }
 
@@ -211,9 +211,9 @@ pub enum SetFunctionParameterNameError {
 
 impl Apply<SetFunctionParameterName> for Module
 {
-  type Result = Result<(), SetFunctionParameterNameError>;
+  type Error = SetFunctionParameterNameError;
 
-  fn apply(&mut self, action: &SetFunctionParameterName) -> Self::Result {
+  fn apply(&mut self, action: &SetFunctionParameterName) -> Result<(), Self::Error> {
     let export = self
       .export_mut(&action.export)
       .ok_or(SetFunctionParameterNameError::ExportNotFound)?;
@@ -253,9 +253,9 @@ pub enum SetFunctionParameterTypeError
 
 impl Apply<SetFunctionParameterType> for Module
 {
-  type Result = Result<(), SetFunctionParameterTypeError>;
+  type Error = SetFunctionParameterTypeError;
 
-  fn apply(&mut self, action: &SetFunctionParameterType) -> Self::Result {
+  fn apply(&mut self, action: &SetFunctionParameterType) -> Result<(), Self::Error> {
     let export = self
       .export_mut(&action.export)
       .ok_or(SetFunctionParameterTypeError::ExportNotFound)?;
@@ -294,9 +294,9 @@ pub enum SetFunctionParameterMutabilityError {
 
 impl Apply<SetFunctionParameterMutability> for Module
 {
-  type Result = Result<(), SetFunctionParameterMutabilityError>;
+  type Error = SetFunctionParameterMutabilityError;
 
-  fn apply(&mut self, action: &SetFunctionParameterMutability) -> Self::Result {
+  fn apply(&mut self, action: &SetFunctionParameterMutability) -> Result<(), Self::Error> {
     let export = self
       .export_mut(&action.export)
       .ok_or(SetFunctionParameterMutabilityError::ExportNotFound)?;
@@ -331,9 +331,9 @@ pub enum SetFunctionReturnTypeError
 
 impl Apply<SetFunctionReturnType> for Module
 {
-  type Result = Result<(), SetFunctionReturnTypeError>;
+  type Error = SetFunctionReturnTypeError;
 
-  fn apply(&mut self, action: &SetFunctionReturnType) -> Self::Result {
+  fn apply(&mut self, action: &SetFunctionReturnType) -> Result<(), Self::Error> {
     let export = self
       .export_mut(&action.export)
       .ok_or(SetFunctionReturnTypeError::ExportNotFound)?;
@@ -349,7 +349,8 @@ impl Apply<SetFunctionReturnType> for Module
   }
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, From)]
+#[serde(tag = "type", rename_all = "lowercase")]
 pub enum Action {
   AddExport(AddExport),
   RemoveExport(RemoveExport),
@@ -361,7 +362,7 @@ pub enum Action {
   SetFunctionReturnType(SetFunctionReturnType),
 }
 
-#[derive(Display, Debug, Error)]
+#[derive(Display, Debug, Error, From)]
 pub enum ActionError
 {
   AddExport(AddExportError),
@@ -376,35 +377,20 @@ pub enum ActionError
 
 impl Apply<Action> for Module
 {
-  type Result = Result<(), ActionError>;
+  type Error = ActionError;
 
-  fn apply(&mut self, action: &Action) -> Self::Result {
+  fn apply(&mut self, action: &Action) -> Result<(), Self::Error> {
     match action {
-      Action::AddExport(action) => self
-        .apply(action)
-        .map_err(ActionError::AddExport),
-      Action::RemoveExport(action) => self
-        .apply(action)
-        .map_err(ActionError::RemoveExport),
-      Action::AppendFunctionParameter(action) => self
-        .apply(action)
-        .map_err(ActionError::AppendFunctionParameter),
-      Action::RemoveFunctionParameter(action) => self
-        .apply(action)
-        .map_err(ActionError::RemoveFunctionParameter)
-        .map(|_| ()),
-      Action::SetFunctionParameterName(action) => self
-        .apply(action)
-        .map_err(ActionError::SetFunctionParameterName),
-      Action::SetFunctionParameterType(action) => self
-        .apply(action)
-        .map_err(ActionError::SetFunctionParameterType),
-      Action::SetFunctionParameterMutability(action) => self
-        .apply(action)
-        .map_err(ActionError::SetFunctionParameterMutability),
-      Action::SetFunctionReturnType(action) => self
-        .apply(action)
-        .map_err(ActionError::SetFunctionReturnType),
+      Action::AddExport(action) => self.apply(action)?,
+      Action::RemoveExport(action) => self.apply(action)?,
+      Action::AppendFunctionParameter(action) => self.apply(action)?,
+      Action::RemoveFunctionParameter(action) => self.apply(action)?,
+      Action::SetFunctionParameterName(action) => self.apply(action)?,
+      Action::SetFunctionParameterType(action) => self.apply(action)?,
+      Action::SetFunctionParameterMutability(action) => self.apply(action)?,
+      Action::SetFunctionReturnType(action) => self.apply(action)?,
     }
+
+    Ok(())
   }
 }
