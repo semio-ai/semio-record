@@ -117,6 +117,15 @@ macro_rules! impl_record {
         _ => Err(format!("Unsupported schema version: {}", schema_version).into()),
       }
     }
+
+    pub async fn apply_raw_stream<S: futures::Stream<Item = Vec<u8>> + Unpin>(schema_version: i16, module: &[u8], actions: S) -> Result<Vec<u8>, Box<dyn std::error::Error>> {
+      match schema_version {
+        $(
+          $version => $module::apply_raw_stream(module, actions).await,
+        )+
+        _ => Err(format!("Unsupported schema version: {}", schema_version).into()),
+      }
+    }
     
     pub fn name(schema_version: i16, module: &[u8]) -> Option<String> {
       match schema_version {

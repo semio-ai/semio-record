@@ -18,6 +18,12 @@ macro_rules! impl_schema_version {
       unfrozen.apply_raw_iter(actions)?;
       Ok(rmp_serde::to_vec(&unfrozen)?)
     }
+
+    pub async fn apply_raw_stream<S: futures::Stream<Item = Vec<u8>> + Unpin>(data: &[u8], actions: S) -> Result<Vec<u8>, Box<dyn std::error::Error>> {
+      let mut unfrozen: <$t as crate::record::Record>::Unfrozen = rmp_serde::from_slice(data)?;
+      unfrozen.apply_raw_stream(actions).await?;
+      Ok(rmp_serde::to_vec(&unfrozen)?)
+    }
     
     pub fn name(data: &[u8]) -> Option<String> {
       use crate::record::View;

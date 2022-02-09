@@ -16,6 +16,16 @@ macro_rules! impl_unfrozen {
         }    
         Ok(())
       }
+
+      pub async fn apply_raw_stream<S: futures::Stream<Item = Vec<u8>> + Unpin>(&mut self, mut actions: S) -> Result<(), Box<dyn std::error::Error>> {
+        use crate::record::Apply;
+        use futures::StreamExt;
+        while let Some(action) = actions.next().await {
+          let action: $action = rmp_serde::from_slice(action.as_ref())?;
+          let _ = self.apply(&action);
+        }    
+        Ok(())
+      }
     }
   };
 }

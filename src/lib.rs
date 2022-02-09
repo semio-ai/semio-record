@@ -1,6 +1,3 @@
-use std::error::Error;
-
-use record::Freezer;
 use uuid::Uuid;
 
 pub mod blob;
@@ -45,6 +42,15 @@ macro_rules! impl_lib {
       match ty {
         $(
           crate::record::$ty => $module::apply_raw_iter(schema_version, data, actions),
+        )+
+        _ => Err(format!("Unsupported record type: {}", ty).into()),
+      }
+    }
+
+    pub async fn apply_raw_stream<S: futures::Stream<Item = Vec<u8>> + Unpin>(ty: i16, schema_version: i16, data: &[u8], actions: S) -> Result<Vec<u8>, Box<dyn std::error::Error>> {
+      match ty {
+        $(
+          crate::record::$ty => $module::apply_raw_stream(schema_version, data, actions).await,
         )+
         _ => Err(format!("Unsupported record type: {}", ty).into()),
       }
