@@ -5,32 +5,38 @@ use uuid::Uuid;
 use derive_more::{Display, Error, From};
 
 use crate::{
-  record::{Apply, UnfrozenReference},
+  record::{Apply, UnfrozenReference}, action::{SetName, SetNameError, SetParentError, SetParent},
 };
 
 use super::unfrozen::{Export, Module, Parameter};
 
 
-#[derive(Debug, Serialize, Deserialize)]
-pub struct SetExecutable(pub Uuid);
+#[derive(Debug, Serialize, Deserialize, GraphQLObject)]
+pub struct SetExecutable {
+  pub blob_id: Uuid,
+}
 
-#[derive(Display, Debug, Error)]
-pub enum SetExecutableError {}
+#[derive(Display, Debug, Error, GraphQLEnum)]
+pub enum SetExecutableError {
+  _Dummy
+}
 
 impl Apply<SetExecutable> for Module
 {
   type Error = RenameExportError;
 
   fn apply(&mut self, action: &SetExecutable) -> Result<(), Self::Error> {
-    self.executable = Some(action.0);
+    self.executable = Some(action.blob_id);
     Ok(())
   }
 }
 
-#[derive(Debug, Serialize, Deserialize)]
-pub struct AddExport(pub Export);
+#[derive(Debug, Serialize, Deserialize, GraphQLObject)]
+pub struct AddExport {
+  pub export: Export
+}
 
-#[derive(Display, Debug, Error)]
+#[derive(Display, Debug, Error, GraphQLEnum)]
 pub enum AddExportError
 {
   #[display(fmt = "Export name already exists in module")]
@@ -42,20 +48,22 @@ impl Apply<AddExport> for Module
   type Error = AddExportError;
 
   fn apply(&mut self, action: &AddExport) -> Result<(), Self::Error> {
-    if !self.has_export_named(&action.0.name) {
+    if !self.has_export_named(&action.export.name) {
       return Err(AddExportError::NameAlreadyExists);
     }
 
-    self.exports.insert(Uuid::new_v4(), action.0.clone());
+    self.exports.insert(Uuid::new_v4(), action.export.clone());
 
     Ok(())
   }
 }
 
-#[derive(Debug, Serialize, Deserialize)]
-pub struct RemoveExport(pub Uuid);
+#[derive(Debug, Serialize, Deserialize, GraphQLObject)]
+pub struct RemoveExport {
+  pub id: Uuid,
+}
 
-#[derive(Display, Debug, Error)]
+#[derive(Display, Debug, Error, GraphQLEnum)]
 pub enum RemoveExportError {
   #[display(fmt = "Export not found in module")]
   ExportNotFound,
@@ -66,23 +74,23 @@ impl Apply<RemoveExport> for Module
   type Error = RemoveExportError;
 
   fn apply(&mut self, action: &RemoveExport) -> Result<(), Self::Error> {
-    if !self.has_export(&action.0) {
+    if !self.has_export(&action.id) {
       return Err(RemoveExportError::ExportNotFound)?;
     }
 
-    self.remove_export(&action.0);
+    self.remove_export(&action.id);
 
     Ok(())
   }
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, GraphQLObject)]
 pub struct RenameExport {
   pub id: Uuid,
   pub name: String,
 }
 
-#[derive(Display, Debug, Error)]
+#[derive(Display, Debug, Error, GraphQLEnum)]
 pub enum RenameExportError {
   #[display(fmt = "Export not found in module")]
   ExportNotFound,
@@ -112,13 +120,13 @@ impl Apply<RenameExport> for Module
   }
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, GraphQLObject)]
 pub struct AppendFunctionParameter {
   pub export: Uuid,
   pub parameter: Parameter,
 }
 
-#[derive(Display, Debug, Error)]
+#[derive(Display, Debug, Error, GraphQLEnum)]
 pub enum AppendFunctionParameterError
 {
   #[display(fmt = "Export not found in module")]
@@ -154,13 +162,13 @@ impl Apply<AppendFunctionParameter> for Module
   }
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, GraphQLObject)]
 pub struct RemoveFunctionParameter {
   pub export: Uuid,
   pub parameter: Uuid,
 }
 
-#[derive(Display, Debug, Error)]
+#[derive(Display, Debug, Error, GraphQLEnum)]
 pub enum RemoveFunctionParameterError {
   #[display(fmt = "Export not found in module")]
   ExportNotFound,
@@ -192,14 +200,14 @@ impl Apply<RemoveFunctionParameter> for Module
   }
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, GraphQLObject)]
 pub struct SetFunctionParameterName {
   pub export: Uuid,
   pub parameter: Uuid,
   pub name: String,
 }
 
-#[derive(Display, Debug, Error)]
+#[derive(Display, Debug, Error, GraphQLEnum)]
 pub enum SetFunctionParameterNameError {
   #[display(fmt = "Export not found in module")]
   ExportNotFound,
@@ -233,14 +241,14 @@ impl Apply<SetFunctionParameterName> for Module
   }
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, GraphQLObject)]
 pub struct SetFunctionParameterType {
   pub export: Uuid,
   pub parameter: Uuid,
   pub type_ref: UnfrozenReference,
 }
 
-#[derive(Display, Debug, Error)]
+#[derive(Display, Debug, Error, GraphQLEnum)]
 pub enum SetFunctionParameterTypeError
 {
   #[display(fmt = "Export not found in module")]
@@ -275,14 +283,14 @@ impl Apply<SetFunctionParameterType> for Module
   }
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, GraphQLObject)]
 pub struct SetFunctionParameterMutability {
   pub export: Uuid,
   pub parameter: Uuid,
   pub mutable: bool,
 }
 
-#[derive(Display, Debug, Error)]
+#[derive(Display, Debug, Error, GraphQLEnum)]
 pub enum SetFunctionParameterMutabilityError {
   #[display(fmt = "Export not found in module")]
   ExportNotFound,
@@ -316,13 +324,13 @@ impl Apply<SetFunctionParameterMutability> for Module
   }
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, GraphQLObject)]
 pub struct SetFunctionReturnType {
   pub export: Uuid,
   pub type_ref: UnfrozenReference,
 }
 
-#[derive(Display, Debug, Error)]
+#[derive(Display, Debug, Error, GraphQLEnum)]
 pub enum SetFunctionReturnTypeError
 {
   #[display(fmt = "Export not found in module")]
@@ -349,9 +357,11 @@ impl Apply<SetFunctionReturnType> for Module
   }
 }
 
-#[derive(Debug, Serialize, Deserialize, From)]
+#[derive(Debug, Serialize, Deserialize, From, GraphQLUnion)]
 #[serde(tag = "type", rename_all = "lowercase")]
 pub enum Action {
+  SetParent(SetParent),
+  SetName(SetName),
   AddExport(AddExport),
   RemoveExport(RemoveExport),
   AppendFunctionParameter(AppendFunctionParameter),
@@ -365,6 +375,8 @@ pub enum Action {
 #[derive(Display, Debug, Error, From)]
 pub enum ActionError
 {
+  SetParent(SetParentError),
+  SetName(SetNameError),
   AddExport(AddExportError),
   RemoveExport(RemoveExportError),
   AppendFunctionParameter(AppendFunctionParameterError),
@@ -381,6 +393,8 @@ impl Apply<Action> for Module
 
   fn apply(&mut self, action: &Action) -> Result<(), Self::Error> {
     match action {
+      Action::SetParent(action) => self.apply(action)?,
+      Action::SetName(action) => self.apply(action)?,
       Action::AddExport(action) => self.apply(action)?,
       Action::RemoveExport(action) => self.apply(action)?,
       Action::AppendFunctionParameter(action) => self.apply(action)?,

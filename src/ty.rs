@@ -4,7 +4,6 @@ use serde::Deserialize;
 use serde::Serialize;
 
 use crate::record::FrozenReference;
-use crate::record::Reference;
 use crate::record::UnfrozenReference;
 
 #[derive(Debug, Serialize, Deserialize)]

@@ -7,7 +7,7 @@ use crate::{record::{Unfrozen, UnfrozenReference, View, Freeze, Freezer}, blob::
 
 use super::action::Action;
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, GraphQLObject)]
 pub struct Organization {
   pub name: String,
 }

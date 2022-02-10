@@ -1,9 +1,16 @@
+
+
+
 use std::{collections::{HashSet, HashMap}, error::Error};
+
 
 use async_trait::async_trait;
 use chrono::Duration;
+use juniper::{GraphQLObject, GraphQLValue, ExecutionResult, marker::IsOutputType, ScalarValue, GraphQLType, DefaultScalarValue};
 use serde::{Deserialize, Serialize, de::DeserializeOwned};
 use uuid::Uuid;
+
+use derive_more::From;
 
 use crate::blob::BlobDependencies;
 
@@ -16,19 +23,78 @@ pub const TYPE_MODULE: i16 = 0x0020;
 pub const TYPE_STRUCTURE: i16 = 0x0021;
 pub const TYPE_ENUMERATION: i16 = 0x0022;
 
+#[derive(Debug, From, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize)]
+pub struct Version(pub semver::Version);
+
+#[juniper::graphql_scalar]
+impl<S> GraphQLScalar for Version
+where
+  S: juniper::ScalarValue
+{
+  fn resolve(&self) -> juniper::Value {
+    juniper::Value::scalar(self.0.to_string())
+  }
+
+  // NOTE: The error type should implement `IntoFieldError<S>`.
+  fn from_input_value(value: &juniper::InputValue) -> Option<Version> {
+    match value.as_string_value() {
+      Some(s) => Some(Version(s.parse().ok()?)),
+      None => None
+    }
+  }
+  
+  fn from_str<'a>(value: juniper::ScalarToken<'a>) -> juniper::ParseScalarResult<'a, S> {
+    <String as juniper::ParseScalarValue<S>>::from_str(value)
+  }
+}
+
+#[derive(Debug, From, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
+pub struct VersionReq(pub Option<semver::VersionReq>);
+
+#[juniper::graphql_scalar]
+impl<S> GraphQLScalar for VersionReq
+where
+  S: juniper::ScalarValue
+{
+  fn resolve(&self) -> juniper::Value {
+    match &self.0 {
+      None => juniper::Value::null(),
+      Some(s) => juniper::Value::scalar(s.to_string())
+    }
+  }
+
+  fn from_input_value(value: &juniper::InputValue) -> Option<VersionReq> {
+    if value.is_null() {
+      return Some(VersionReq(None));
+    }
+
+    match value.as_string_value() {
+      Some(s) => Some(VersionReq(Some(s.parse().ok()?))),
+      None => None
+    }
+  }
+  
+  fn from_str<'a>(value: juniper::ScalarToken<'a>) -> juniper::ParseScalarResult<'a, S> {
+    <String as juniper::ParseScalarValue<S>>::from_str(value)
+  }
+}
+
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Path {
   pub components: Vec<String>,
 }
 
-#[derive(Debug, Serialize, Deserialize, Hash, PartialEq, Eq, Clone, PartialOrd, Ord)]
-pub struct Reference<V> {
+#[derive(Debug, Serialize, Deserialize, Hash, PartialEq, Eq, Clone, PartialOrd, Ord, GraphQLObject)]
+pub struct FrozenReference {
   pub id: Uuid,
-  pub version: V,
+  pub version: Version,
 }
 
-pub type FrozenReference = Reference<semver::Version>;
-pub type UnfrozenReference = Reference<Option<semver::VersionReq>>;
+#[derive(Debug, Serialize, Deserialize, Hash, PartialEq, Eq, Clone, GraphQLObject)]
+pub struct UnfrozenReference {
+  pub id: Uuid,
+  pub version_req: VersionReq,
+}
 
 pub trait Apply<T> {
   type Error;
@@ -75,16 +141,18 @@ impl View for () {
   fn parent<'a>(&'a self) -> Option<&'a Uuid> { None }
 }
 
-pub trait Record {
+pub trait RecordDefn {
   const TYPE: i16;
   const SCHEMA_VERSION: i16;
 
   type Action;
   type Unfrozen: Unfrozen<Self::Action>;
   type Frozen: Frozen;
+  type Public: From<Self::Unfrozen> + GraphQLValue + IsOutputType<DefaultScalarValue>;
+  type Private: From<Self::Unfrozen> + GraphQLValue + IsOutputType<DefaultScalarValue>;
 }
 
-pub enum RecordContent<R: Record> {
+pub enum RecordContent<R: RecordDefn> {
   Action(R::Action),
   Unfrozen(R::Unfrozen),
   Frozen(R::Frozen),

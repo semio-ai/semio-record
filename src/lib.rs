@@ -1,3 +1,6 @@
+#[macro_use] extern crate juniper;
+
+use serde::{Serialize, Deserialize};
 use uuid::Uuid;
 
 pub mod blob;
@@ -14,6 +17,7 @@ pub mod user;
 pub mod schema_version;
 pub mod unfrozen;
 pub mod acl;
+pub mod action;
 
 macro_rules! impl_lib {
   ($($ty:tt => $module:tt),+) => {
@@ -81,3 +85,7 @@ impl_lib!(
   TYPE_ORGANIZATION => organization,
   TYPE_MODULE => module
 );
+
+
+pub use rmp_serde::to_vec as serialize;
+pub use rmp_serde::from_slice as deserialize;
