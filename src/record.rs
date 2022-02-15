@@ -1,7 +1,7 @@
 
 
 
-use std::{collections::{HashSet, HashMap}, error::Error};
+use std::{collections::{HashSet, HashMap}, error::Error, fmt::Display};
 
 
 use async_trait::async_trait;
@@ -97,7 +97,10 @@ pub struct UnfrozenReference {
 }
 
 pub trait Apply<T> {
-  type Error;
+  type Error: Display;
+
+  fn mutates_name(_action: &T) -> bool { false }
+  fn mutates_parent(_action: &T) -> bool { false }
 
   fn apply(&mut self, action: &T) -> Result<(), Self::Error>;
 }

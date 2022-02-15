@@ -5,7 +5,7 @@ pub mod private;
 
 use crate::{schema_version::impl_schema_version, record::{RecordDefn, TYPE_USER}};
 
-struct User;
+pub struct User;
 
 impl RecordDefn for User {
   const TYPE: i16 = TYPE_USER;

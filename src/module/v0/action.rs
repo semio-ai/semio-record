@@ -391,6 +391,13 @@ impl Apply<Action> for Module
 {
   type Error = ActionError;
 
+  fn mutates_name(action: &Action) -> bool {
+    match action {
+      Action::SetName(_) => true,
+      _ => false,
+    }
+  }
+
   fn apply(&mut self, action: &Action) -> Result<(), Self::Error> {
     match action {
       Action::SetParent(action) => self.apply(action)?,

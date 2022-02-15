@@ -3,7 +3,7 @@ use std::collections::HashSet;
 use async_trait::async_trait;
 use serde::{Deserialize, Serialize};
 
-use crate::{record::{Unfrozen, UnfrozenReference, View, Freeze, Freezer}, blob::BlobDependencies, unfrozen::impl_unfrozen};
+use crate::{record::{Unfrozen, UnfrozenReference, View, Freeze, Freezer}, blob::BlobDependencies, unfrozen::impl_unfrozen, action::Name};
 
 use super::action::Action;
 
@@ -15,7 +15,7 @@ pub struct User {
   pub email: String,
   pub password_hash: String,
   pub email_verified: bool,
-  pub token_secret: Vec<u8>,
+  pub token_secret: String,
 }
 
 impl_unfrozen!(User, Action);
@@ -35,6 +35,16 @@ impl View for User {
 
   fn parent<'a>(&'a self) -> Option<&'a uuid::Uuid> {
     None
+  }
+}
+
+impl Name for User {
+  fn name(&self) -> &str {
+    &self.user_name
+  }
+  
+  fn set_name(&mut self, name: String) {
+    self.user_name = name;
   }
 }
 

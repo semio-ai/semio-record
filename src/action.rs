@@ -10,7 +10,7 @@ pub trait Name {
   fn set_name(&mut self, name: String);
 }
 
-#[derive(Debug, Serialize, Deserialize, GraphQLObject)]
+#[derive(Debug, Serialize, Deserialize, GraphQLObject, Display)]
 pub struct SetName {
   pub name: String,
 }
@@ -34,12 +34,16 @@ pub enum SetNameError {
 impl<N: Name> Apply<SetName> for N {
   type Error = SetNameError;
 
+  fn mutates_name(_action: &SetName) -> bool {
+    true
+  }
+
   fn apply(&mut self, action: &SetName) -> Result<(), Self::Error> {
     if action.name.len() < 3 {
       return Err(SetNameError::NameTooShort);
     }
 
-    if action.name.len() > 20 {
+    if action.name.len() > 32 {
       return Err(SetNameError::NameTooLong);
     }
 
