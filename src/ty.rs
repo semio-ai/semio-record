@@ -6,8 +6,10 @@ use serde::Serialize;
 use crate::record::FrozenReference;
 use crate::record::UnfrozenReference;
 
-#[derive(Debug, Serialize, Deserialize)]
-pub enum FrozenTy {
+use juniper::{GraphQLObject, GraphQLEnum};
+
+#[derive(Debug, GraphQLEnum, Serialize, Deserialize)]
+pub enum Primitive {
   Unit,
   Boolean,
   U8,
@@ -33,7 +35,17 @@ pub enum FrozenTy {
   ArrayR32,
   ArrayR64,
   ArrayString,
-  Scalar(FrozenReference),
+}
+
+#[derive(Debug, GraphQLObject, Serialize, Deserialize)]
+pub struct FozenScalar {
+  pub reference: FrozenReference
+}
+
+#[derive(Debug, Serialize, Deserialize, GraphQLUnion)]
+pub enum FrozenTy {
+  Primitive(Primitive),
+  Scalar(FrozenScalar),
   Array(FrozenReference),
 }
 
@@ -51,33 +63,9 @@ impl FrozenTy {
   }
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, GraphQLUnion)]
 pub enum UnfrozenTy {
-  Unit,
-  Boolean,
-  U8,
-  U16,
-  U32,
-  U64,
-  S8,
-  S16,
-  S32,
-  S64,
-  R32,
-  R64,
-  String,
-  ArrayBoolean,
-  ArrayU8,
-  ArrayU16,
-  ArrayU32,
-  ArrayU64,
-  ArrayS8,
-  ArrayS16,
-  ArrayS32,
-  ArrayS64,
-  ArrayR32,
-  ArrayR64,
-  ArrayString,
+  
   Scalar(UnfrozenReference),
   Array(UnfrozenReference),
 }
