@@ -7,13 +7,16 @@ use derive_more::{Display, From, Error};
 
 use super::unfrozen::{StructureField, Structure};
 
-#[derive(Debug, Serialize, Deserialize, Display, GraphQLObject)]
+#[derive(Debug, Serialize, Deserialize, GraphQLObject)]
 pub struct AddField  {
   pub field: StructureField
 }
 
 #[derive(Debug, Serialize, Deserialize, Display, Error, GraphQLEnum)]
 pub enum AddFieldError {
+  #[display(fmt = "Name already exists")]
+  NameAlreadyExists,
+
   #[display(fmt = "Name is too short")]
   NameTooShort,
 }
@@ -22,11 +25,16 @@ impl Apply<AddField> for Structure {
   type Error = AddFieldError;
 
   fn apply(&mut self, action: &AddField) -> Result<(), Self::Error> {
-    if action.token_secret.len() < 64 {
-      return Err(SetTokenSecretError::TooShort);
+    if action.field.name.is_empty() {
+      return Err(AddFieldError::NameTooShort);
+    }
+    
+    for field in self.fields.values() {
+      if field.name == action.field.name {
+        return Err(AddFieldError::NameAlreadyExists);
+      }
     }
 
-    self.token_secret = action.token_secret.clone();
 
     Ok(())
   }

@@ -3,18 +3,18 @@ use std::collections::{HashMap, HashSet};
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
-use crate::{record::{FrozenReference, Frozen, View}, blob::BlobDependencies};
+use crate::{record::{FrozenReference, Frozen, View}, blob::BlobDependencies, ty::FrozenTy};
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Parameter {
   pub name: String,
-  pub type_ref: FrozenReference,
+  pub ty: FrozenTy,
   pub mutable: bool,
 }
 
 impl Parameter {
   fn dependencies<'a>(&'a self, set: &mut HashSet<&'a FrozenReference>) {
-    set.insert(&self.type_ref);
+    self.ty.dependencies(set);
   }
 }
 

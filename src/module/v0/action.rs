@@ -5,7 +5,7 @@ use uuid::Uuid;
 use derive_more::{Display, Error, From};
 
 use crate::{
-  record::{Apply, UnfrozenReference}, action::{SetName, SetNameError, SetParentError, SetParent},
+  record::{Apply, UnfrozenReference}, action::{SetName, SetNameError, SetParentError, SetParent}, ty::UnfrozenTy,
 };
 
 use super::unfrozen::{Export, Module, Parameter};
@@ -245,7 +245,7 @@ impl Apply<SetFunctionParameterName> for Module
 pub struct SetFunctionParameterType {
   pub export: Uuid,
   pub parameter: Uuid,
-  pub type_ref: UnfrozenReference,
+  pub ty: UnfrozenTy,
 }
 
 #[derive(Display, Debug, Error, GraphQLEnum)]
@@ -277,7 +277,7 @@ impl Apply<SetFunctionParameterType> for Module
       .parameter_mut(&action.parameter)
       .ok_or(SetFunctionParameterTypeError::ParameterNotFound)?;
 
-    parameter.type_ref = action.type_ref.clone();
+    parameter.ty = action.ty.clone();
 
     Ok(())
   }

@@ -6,7 +6,7 @@ use std::{collections::{HashSet, HashMap}, error::Error, fmt::Display};
 
 use async_trait::async_trait;
 use chrono::Duration;
-use juniper::{GraphQLObject, GraphQLValue, ExecutionResult, marker::IsOutputType, ScalarValue, GraphQLType, DefaultScalarValue};
+use juniper::{GraphQLObject, GraphQLValue, ExecutionResult, marker::IsOutputType, ScalarValue, GraphQLType, DefaultScalarValue, FromInputValue, InputValue};
 use serde::{Deserialize, Serialize, de::DeserializeOwned};
 use uuid::Uuid;
 
@@ -94,6 +94,35 @@ pub struct FrozenReference {
 pub struct UnfrozenReference {
   pub id: Uuid,
   pub version_req: VersionReq,
+}
+
+impl<S: ScalarValue> FromInputValue<S> for UnfrozenReference {
+  fn from_input_value(v: &InputValue<S>) -> Option<Self> {
+    match v {
+      InputValue::Object(object) => {
+        let mut id = None;
+        let mut version_req = None;
+
+        for (key, value) in object {
+          match key.item.as_str() {
+            "id" => id = Some(Uuid::parse_str(value.item.as_string_value()?).ok()?),
+            "versionReq" => version_req = VersionReq::from_input_value(&value.item),
+            _ => return None
+          }
+        }
+
+        if id.is_none() {
+          return None;
+        }
+
+        Some(UnfrozenReference {
+          id: id.unwrap(),
+          version_req: version_req.unwrap_or(VersionReq(None))
+        })
+      },
+      _ => None
+    }
+  }
 }
 
 pub trait Apply<T> {

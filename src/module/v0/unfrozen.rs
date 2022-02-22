@@ -1,11 +1,11 @@
 use std::{collections::{HashMap, HashSet}, error::Error};
 
 use async_trait::async_trait;
-use juniper::{GraphQLEnum, GraphQLUnion, GraphQLObject, FromInputValue, ScalarValue, InputValue, marker::IsInputType};
+use juniper::{GraphQLEnum, GraphQLUnion, GraphQLObject, FromInputValue, ScalarValue, InputValue, marker::IsInputType, DefaultScalarValue};
 use serde::{Serialize, Deserialize};
 use uuid::Uuid;
 
-use crate::{record::{UnfrozenReference, Freeze, Freezer, View, Unfrozen, Apply}, blob::BlobDependencies, unfrozen::impl_unfrozen, action::{Name, Parent}};
+use crate::{record::{UnfrozenReference, Freeze, Freezer, View, Unfrozen, Apply}, blob::BlobDependencies, unfrozen::impl_unfrozen, action::{Name, Parent}, ty::UnfrozenTy};
 
 use super::{frozen, action::Action};
 
@@ -14,13 +14,47 @@ use derive_more::From;
 #[derive(Debug, Serialize, Deserialize, Clone, GraphQLObject)]
 pub struct Parameter {
   pub name: String,
-  pub type_ref: UnfrozenReference,
+  #[serde(rename = "type")]
+  pub ty: UnfrozenTy,
   pub mutable: bool,
+}
+
+impl <S: ScalarValue> FromInputValue<S> for Parameter {
+  fn from_input_value(v: &InputValue<S>) -> Option<Self> {
+    match v {
+      InputValue::Object(object) => {
+        let mut name = None;
+        let mut ty = None;
+        let mut mutable = None;
+        for (key, value) in object {
+          match key.item.as_str() {
+            "name" => {
+              name = Some(value.item.as_string_value()?.to_string());
+            }
+            "type" => {
+              ty = UnfrozenTy::from_input_value(&value.item);
+            },
+            "mutable" => {
+              mutable = Some(value.item.as_scalar()?.as_boolean()?);
+            },
+            _ => None?
+          }
+        }
+
+        Some(Parameter {
+          name: name?,
+          ty: ty?,
+          mutable: mutable.unwrap_or(false),
+        })
+      },
+      _ => None,
+    }
+  }
 }
 
 impl Parameter {
   pub fn dependencies<'a>(&'a self, set: &mut HashSet<&'a UnfrozenReference>) {
-    set.insert(&self.type_ref);
+    self.ty.dependencies(set);
   }
 }
 
@@ -31,7 +65,7 @@ impl<F: Freezer> Freeze<F> for Parameter {
   async fn freeze(&self, freezer: &F) -> Result<Self::Frozen, F::Error> {
     Ok(Self::Frozen {
       name: self.name.clone(),
-      type_ref: freezer.freeze(&self.type_ref).await?,
+      ty: self.ty.freeze(freezer).await?,
       mutable: self.mutable,
     })
   }
@@ -110,8 +144,70 @@ impl Function {
   }
 }
 
+#[derive(GraphQLObject)]
+pub struct IdParameter {
+  pub id: Uuid,
+  pub parameter: Parameter,
+}
+
+impl From<(Uuid, Parameter)> for IdParameter {
+  fn from(pair: (Uuid, Parameter)) -> Self {
+    Self {
+      id: pair.0,
+      parameter: pair.1,
+    }
+  }
+}
+
+impl<S: ScalarValue> FromInputValue<S> for IdParameter {
+  fn from_input_value(v: &InputValue<S>) -> Option<Self> {
+    match v {
+      InputValue::Object(object) => {
+        let mut id = None;
+        let mut parameter = None;
+        for (key, value) in object {
+          match key.item.as_str() {
+            "id" => {
+              id = Some(Uuid::parse_str(value.item.as_string_value()?).ok()?);
+            },
+            "parameter" => {
+              parameter = Parameter::from_input_value(&value.item);
+            },
+            _ => {
+              return None;
+            }
+          }
+        }
+
+        let id = if let Some(id) = id {
+          id
+        } else {
+          return None;
+        };
+
+        let parameter = if let Some(parameter) = parameter {
+          parameter
+        } else {
+          return None;
+        };
+
+        Some(Self {
+          id,
+          parameter,
+        })
+      },
+      _ => None,
+    }
+  }
+}
+
 #[graphql_object]
 impl Function {
+  #[graphql(name = "parameters")]
+  pub fn gql_parameters(&self) -> Vec<IdParameter> {
+    self.parameters.iter().map(|(k, v)| (k.clone(), v.clone()).into()).collect()
+  }
+
   #[graphql(name = "parameterId")]
   pub fn gql_parameter_id(&self, id: String) -> Option<Uuid> {
     self.parameter_id(&id).map(Clone::clone)
@@ -153,6 +249,45 @@ impl<F: Freezer> Freeze<F> for Function {
       parameter_ordering: self.parameter_ordering.clone(),
       return_type_ref: freezer.freeze(&self.return_type_ref).await?,
     })
+  }
+}
+
+impl<S: ScalarValue> FromInputValue<S> for Function {
+  fn from_input_value(value: &InputValue<S>) -> Option<Self> {
+    match value {
+      InputValue::Object(object) => {
+        let mut parameters = HashMap::new();
+        let mut parameter_ordering = Vec::new();
+        let mut return_type_ref = None;
+
+        for (key, value) in object {
+          match key.item.as_str() {
+            "parameters" => {
+              if let InputValue::List(list) = &value.item {
+                for value in list {
+                  let id_parameter = IdParameter::from_input_value(&value.item)?;
+                  parameters.insert(id_parameter.id.clone(), id_parameter.parameter);
+                  parameter_ordering.push(id_parameter.id);
+                }
+              } else {
+                None?;
+              }
+            }
+            "returnTypeRef" => {
+              return_type_ref = Some(UnfrozenReference::from_input_value(&value.item)?);
+            }
+            _ => None?
+          }
+        }
+
+        Some(Self {
+          parameters,
+          parameter_ordering,
+          return_type_ref: return_type_ref?,
+        })
+      },
+      _ => None,
+    }
   }
 }
 
@@ -199,10 +334,52 @@ impl<F: Freezer> Freeze<F> for ExportKind {
   }
 }
 
+impl<S: ScalarValue> FromInputValue<S> for ExportKind {
+  fn from_input_value(value: &InputValue<S>) -> Option<Self> {
+    Function::from_input_value(value).map(Self::Function)
+  }
+}
+
 #[derive(Debug, Serialize, Deserialize, Clone, GraphQLObject)]
 pub struct Export {
   pub name: String,
   pub kind: ExportKind,
+}
+
+impl<S: ScalarValue> FromInputValue<S> for Export {
+  fn from_input_value(value: &InputValue<S>) -> Option<Self> {
+    match value {
+      InputValue::Object(object) => {
+        let mut name = None;
+        let mut kind = None;
+        for (key, value) in object {
+          match key.item.as_str() {
+            "name" => {
+              if let Some(gname) = value.item.as_string_value() {
+                name = Some(gname.to_string());
+              } else {
+                return None;
+              }
+            },
+            "kind" => {
+              kind = Some(ExportKind::from_input_value(&value.item)?);
+            },
+            _ => {}
+          }
+        }
+
+        if name.is_none() || kind.is_none() {
+          return None;
+        }
+
+        Some(Self {
+          name: name.unwrap(),
+          kind: kind.unwrap(),
+        })
+      }
+      _ => None,
+    }
+  }
 }
 
 impl Export {
