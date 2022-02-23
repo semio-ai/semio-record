@@ -19,6 +19,9 @@ pub struct Parameter {
   pub mutable: bool,
 }
 
+impl<S: ScalarValue> IsInputType<S> for Parameter {}
+
+
 impl <S: ScalarValue> FromInputValue<S> for Parameter {
   fn from_input_value(v: &InputValue<S>) -> Option<Self> {
     match v {
@@ -75,7 +78,7 @@ impl<F: Freezer> Freeze<F> for Parameter {
 pub struct Function {
   pub parameters: HashMap<Uuid, Parameter>,
   pub parameter_ordering: Vec<Uuid>,
-  pub return_type_ref: UnfrozenReference,
+  pub return_ty: UnfrozenTy,
 }
 
 
@@ -140,7 +143,7 @@ impl Function {
     for (_, parameter) in &self.parameters {
       parameter.dependencies(set);
     }
-    set.insert(&self.return_type_ref);
+    self.return_ty.dependencies(set);
   }
 }
 
@@ -158,6 +161,9 @@ impl From<(Uuid, Parameter)> for IdParameter {
     }
   }
 }
+
+impl<S: ScalarValue> IsInputType<S> for IdParameter {}
+
 
 impl<S: ScalarValue> FromInputValue<S> for IdParameter {
   fn from_input_value(v: &InputValue<S>) -> Option<Self> {
@@ -247,10 +253,12 @@ impl<F: Freezer> Freeze<F> for Function {
     Ok(Self::Frozen {
       parameters,
       parameter_ordering: self.parameter_ordering.clone(),
-      return_type_ref: freezer.freeze(&self.return_type_ref).await?,
+      return_ty: self.return_ty.freeze(freezer).await?,
     })
   }
 }
+
+impl<S: ScalarValue> IsInputType<S> for Function {}
 
 impl<S: ScalarValue> FromInputValue<S> for Function {
   fn from_input_value(value: &InputValue<S>) -> Option<Self> {
@@ -258,7 +266,7 @@ impl<S: ScalarValue> FromInputValue<S> for Function {
       InputValue::Object(object) => {
         let mut parameters = HashMap::new();
         let mut parameter_ordering = Vec::new();
-        let mut return_type_ref = None;
+        let mut return_ty = None;
 
         for (key, value) in object {
           match key.item.as_str() {
@@ -274,7 +282,7 @@ impl<S: ScalarValue> FromInputValue<S> for Function {
               }
             }
             "returnTypeRef" => {
-              return_type_ref = Some(UnfrozenReference::from_input_value(&value.item)?);
+              return_ty = Some(UnfrozenTy::from_input_value(&value.item)?);
             }
             _ => None?
           }
@@ -283,7 +291,7 @@ impl<S: ScalarValue> FromInputValue<S> for Function {
         Some(Self {
           parameters,
           parameter_ordering,
-          return_type_ref: return_type_ref?,
+          return_ty: return_ty?,
         })
       },
       _ => None,
@@ -345,6 +353,8 @@ pub struct Export {
   pub name: String,
   pub kind: ExportKind,
 }
+
+impl<S: ScalarValue> IsInputType<S> for Export {}
 
 impl<S: ScalarValue> FromInputValue<S> for Export {
   fn from_input_value(value: &InputValue<S>) -> Option<Self> {

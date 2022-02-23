@@ -8,7 +8,7 @@ use async_trait::async_trait;
 
 /// An Access Control List (ACL) is a list of rules that specify which agents
 /// can perform which actions, if any.
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct Acl {
   /// A map of agent IDs to their permissions.
   pub permissions: HashMap<Uuid, WithPermissions>,

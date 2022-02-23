@@ -327,7 +327,7 @@ impl Apply<SetFunctionParameterMutability> for Module
 #[derive(Debug, Serialize, Deserialize, GraphQLObject)]
 pub struct SetFunctionReturnType {
   pub export: Uuid,
-  pub type_ref: UnfrozenReference,
+  pub ty: UnfrozenTy,
 }
 
 #[derive(Display, Debug, Error, GraphQLEnum)]
@@ -351,7 +351,7 @@ impl Apply<SetFunctionReturnType> for Module
       .as_function_mut()
       .ok_or(SetFunctionReturnTypeError::ExportNotFound)?;
 
-    func.return_type_ref = action.type_ref.clone();
+    func.return_ty = action.ty.clone();
 
     Ok(())
   }

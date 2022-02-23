@@ -22,7 +22,7 @@ impl Parameter {
 pub struct Function {
   pub parameters: HashMap<Uuid, Parameter>,
   pub parameter_ordering: Vec<Uuid>,
-  pub return_type_ref: FrozenReference,
+  pub return_ty: FrozenTy,
 }
 
 impl Function {
@@ -72,7 +72,7 @@ impl Function {
     for (_, parameter) in &self.parameters {
       parameter.dependencies(set);
     }
-    set.insert(&self.return_type_ref);
+    self.return_ty.dependencies(set);
   }
 }
 
