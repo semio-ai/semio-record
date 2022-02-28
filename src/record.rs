@@ -12,7 +12,7 @@ use uuid::Uuid;
 
 use derive_more::From;
 
-use crate::blob::BlobDependencies;
+use crate::{blob::BlobDependencies, acl::Acl};
 
 pub const TYPE_USER: i16 = 0x0000;
 pub const TYPE_ORGANIZATION: i16 = 0x0001;
@@ -151,6 +151,7 @@ pub trait Freezer: Send + Sync {
 pub trait View {
   fn name<'a>(&'a self) -> Option<&'a str> { None }
   fn parent<'a>(&'a self) -> Option<&'a Uuid> { None }
+  fn acl<'a>(&'a self) -> Option<&'a Acl> { None }
 }
 
 pub trait Unfrozen<T>: View + BlobDependencies + Apply<T> + Serialize + DeserializeOwned {
@@ -169,8 +170,6 @@ impl BlobDependencies for () {
 }
 
 impl View for () {
-  fn name<'a>(&'a self) -> Option<&'a str> { None }
-  fn parent<'a>(&'a self) -> Option<&'a Uuid> { None }
 }
 
 pub trait RecordDefn {
@@ -240,6 +239,15 @@ macro_rules! impl_record {
       match schema_version {
         $(
           $version => $module::parent(module),
+        )+
+        _ => None,
+      }
+    }
+
+    pub fn acl(schema_version: i16, module: &[u8]) -> Option<crate::acl::Acl> {
+      match schema_version {
+        $(
+          $version => $module::acl(module),
         )+
         _ => None,
       }

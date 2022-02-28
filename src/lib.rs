@@ -77,6 +77,15 @@ macro_rules! impl_lib {
         _ => None,
       }
     }
+
+    pub fn acl(ty: i16, schema_version: i16, data: &[u8]) -> Option<acl::Acl> {
+      match ty {
+        $(
+          crate::record::$ty => $module::acl(schema_version, data),
+        )+
+        _ => None,
+      }
+    }
   }
 }
 

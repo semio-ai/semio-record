@@ -36,6 +36,12 @@ macro_rules! impl_schema_version {
       let unfrozen: <$t as crate::record::RecordDefn>::Unfrozen = rmp_serde::from_slice(data).ok()?;
       unfrozen.parent().map(|u| u.clone())
     }
+
+    pub fn acl(data: &[u8]) -> Option<crate::acl::Acl> {
+      use crate::record::View;
+      let unfrozen: <$t as crate::record::RecordDefn>::Unfrozen = rmp_serde::from_slice(data).ok()?;
+      unfrozen.acl().map(|v| v.clone())
+    }
   };
 }
 

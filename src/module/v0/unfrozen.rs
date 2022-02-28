@@ -5,7 +5,7 @@ use juniper::{GraphQLEnum, GraphQLUnion, GraphQLObject, FromInputValue, ScalarVa
 use serde::{Serialize, Deserialize};
 use uuid::Uuid;
 
-use crate::{record::{UnfrozenReference, Freeze, Freezer, View, Unfrozen, Apply}, blob::BlobDependencies, unfrozen::impl_unfrozen, action::{Name, Parent}, ty::UnfrozenTy};
+use crate::{record::{UnfrozenReference, Freeze, Freezer, View, Unfrozen, Apply}, blob::BlobDependencies, unfrozen::impl_unfrozen, action::{Name, Parent}, ty::UnfrozenTy, acl::Acl};
 
 use super::{frozen, action::Action};
 
@@ -411,8 +411,9 @@ impl<F: Freezer> Freeze<F> for Export {
   }
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct Module {
+  pub acl: Acl,
   pub parent: Uuid,
   pub name: String,
   pub exports: HashMap<Uuid, Export>,
@@ -535,6 +536,7 @@ impl_unfrozen!(Module, Action);
 impl Default for Module {
   fn default() -> Self {
     Self {
+      acl: Acl::default(),
       parent: Uuid::nil(),
       name: String::new(),
       exports: HashMap::new(),
