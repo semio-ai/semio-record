@@ -6,24 +6,24 @@ use uuid::Uuid;
 use crate::{ty::FrozenTy, record::{View, Frozen, FrozenReference}, blob::BlobDependencies};
 
 #[derive(Debug, Clone, Serialize, Deserialize, GraphQLObject)]
-pub struct StructureField {
+pub struct EnumerationVariant {
   pub name: String,
   #[serde(rename = "type")]
   pub ty: FrozenTy,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct Structure {
+pub struct Enumeration {
   pub parent: Uuid,
   pub name: String,
-  pub fields: HashMap<Uuid, StructureField>,
+  pub variants: HashMap<Uuid, EnumerationVariant>,
 }
 
-impl Structure {
-  pub fn field_named(&self, name: &str) -> Option<&StructureField> {
-    for (_, field) in &self.fields {
-      if field.name == name {
-        return Some(field);
+impl Enumeration {
+  pub fn variant_named(&self, name: &str) -> Option<&EnumerationVariant> {
+    for (_, variant) in &self.variants {
+      if variant.name == name {
+        return Some(variant);
       }
     }
     None
@@ -31,13 +31,13 @@ impl Structure {
 }
 
 #[derive(Debug, Serialize, Deserialize, GraphQLObject)]
-pub struct IdStructureField {
+pub struct IdEnumerationVariant {
   pub id: Uuid,
-  pub field: StructureField,
+  pub variant: EnumerationVariant,
 }
 
 #[graphql_object]
-impl Structure {
+impl Enumeration {
   pub fn name(&self) -> &str {
     &self.name
   }
@@ -46,20 +46,20 @@ impl Structure {
     &self.parent
   }
 
-  pub fn fields(&self) -> Vec<IdStructureField> {
-    self.fields.iter().map(|(id, field)| IdStructureField {
+  pub fn variants(&self) -> Vec<IdEnumerationVariant> {
+    self.variants.iter().map(|(id, variant)| IdEnumerationVariant {
       id: id.clone(),
-      field: field.clone(),
+      variant: variant.clone(),
     }).collect()
   }
 
-  #[graphql(name = "fieldNamed")]
-  pub fn gql_field_named(&self, name: String) -> Option<&StructureField> {
-    self.field_named(&name)
+  #[graphql(name = "variantNamed")]
+  pub fn gql_variant_named(&self, name: String) -> Option<&EnumerationVariant> {
+    self.variant_named(&name)
   }
 }
 
-impl View for Structure {
+impl View for Enumeration {
   fn name<'a>(&'a self) -> Option<&'a str> {
     Some(&self.name)
   }
@@ -69,16 +69,16 @@ impl View for Structure {
   }
 }
 
-impl Frozen for Structure {
+impl Frozen for Enumeration {
   fn dependencies<'a>(&'a self, set: &mut HashSet<&'a FrozenReference>) {
-    for (_, field) in &self.fields {
-      field.ty.dependencies(set);
+    for (_, variant) in &self.variants {
+      variant.ty.dependencies(set);
     }
   }
 }
 
-impl BlobDependencies for Structure {
-  fn blob_dependencies<'a>(&'a self, set: &mut HashSet<&'a Uuid>) {
+impl BlobDependencies for Enumeration {
+  fn blob_dependencies<'a>(&'a self, _: &mut HashSet<&'a Uuid>) {
     
   }
 }

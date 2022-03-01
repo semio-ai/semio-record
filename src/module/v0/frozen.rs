@@ -5,7 +5,7 @@ use uuid::Uuid;
 
 use crate::{record::{FrozenReference, Frozen, View}, blob::BlobDependencies, ty::FrozenTy};
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, GraphQLObject)]
 pub struct Parameter {
   pub name: String,
   pub ty: FrozenTy,
@@ -18,7 +18,7 @@ impl Parameter {
   }
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Function {
   pub parameters: HashMap<Uuid, Parameter>,
   pub parameter_ordering: Vec<Uuid>,
@@ -76,7 +76,59 @@ impl Function {
   }
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, GraphQLObject)]
+pub struct IdParameter {
+  pub id: Uuid,
+  pub parameter: Parameter,
+}
+
+#[graphql_object]
+impl Function {
+  #[graphql(name = "parameterId")]
+  pub fn gql_parameter_id(&self, name: String) -> Option<Uuid> {
+    self.parameter_id(&name).cloned()
+  }
+
+  #[graphql(name = "hasParameter")]
+  pub fn gql_has_parameter(&self, id: Uuid) -> bool {
+    self.has_parameter(&id)
+  }
+
+  #[graphql(name = "hasParameterNamed")]
+  pub fn gql_has_parameter_named(&self, name: String) -> bool {
+    self.has_parameter_named(&name)
+  }
+
+  #[graphql(name = "parameter")]
+  pub fn gql_parameter(&self, id: Uuid) -> Option<Parameter> {
+    self.parameter(&id).cloned()
+  }
+
+  #[graphql(name = "parameterNamed")]
+  pub fn gql_parameter_named(&self, name: String) -> Option<Parameter> {
+    self.parameter_named(&name).cloned()
+  }
+
+  #[graphql(name = "parameters")]
+  pub fn gql_parameters(&self) -> Vec<IdParameter> {
+    self
+      .parameter_ordering
+      .iter()
+      .filter_map(|id| {
+        if let Some(parameter) = self.parameters.get(id) {
+          Some(IdParameter {
+            id: id.clone(),
+            parameter: parameter.clone(),
+          })
+        } else {
+          None
+        }
+      })
+      .collect()
+  }
+}
+
+#[derive(Debug, GraphQLUnion, Clone, Serialize, Deserialize)]
 #[serde(tag = "type", rename_all = "lowercase")]
 pub enum ExportKind {
   Function(Function),
@@ -96,7 +148,7 @@ impl ExportKind {
   }
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, GraphQLObject, Serialize, Deserialize)]
 pub struct Export {
   pub name: String,
   pub kind: ExportKind,
@@ -139,6 +191,62 @@ impl Module {
 
   pub fn export_named(&self, name: &str) -> Option<&Export> {
     self.exports.get(self.export_id(name)?)
+  }
+}
+
+#[derive(Debug, GraphQLObject, Serialize, Deserialize)]
+pub struct IdExport {
+  pub id: Uuid,
+  pub export: Export,
+}
+
+#[graphql_object]
+impl Module {
+  #[graphql(name = "exportId")]
+  pub fn gql_export_id(&self, name: String) -> Option<Uuid> {
+    self.export_id(&name).cloned()
+  }
+
+  #[graphql(name = "hasExport")]
+  pub fn gql_has_export(&self, id: Uuid) -> bool {
+    self.has_export(&id)
+  }
+
+  #[graphql(name = "hasExportNamed")]
+  pub fn gql_has_export_named(&self, name: String) -> bool {
+    self.has_export_named(&name)
+  }
+
+  #[graphql(name = "export")]
+  pub fn gql_export(&self, id: Uuid) -> Option<Export> {
+    self.export(&id).cloned()
+  }
+
+  #[graphql(name = "exportNamed")]
+  pub fn gql_export_named(&self, name: String) -> Option<Export> {
+    self.export_named(&name).cloned()
+  }
+
+  #[graphql(name = "parent")]
+  pub fn gql_parent(&self) -> Option<Uuid> {
+    Some(self.parent)
+  }
+
+  #[graphql(name = "name")]
+  pub fn gql_name(&self) -> String {
+    self.name.clone()
+  }
+
+  #[graphql(name = "exports")]
+  pub fn gql_exports(&self) -> Vec<IdExport> {
+    self
+      .exports
+      .iter()
+      .map(|(id, export)| IdExport {
+        id: id.clone(),
+        export: export.clone(),
+      })
+      .collect()
   }
 }
 

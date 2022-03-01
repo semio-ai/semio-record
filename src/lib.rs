@@ -1,8 +1,5 @@
 #[macro_use] extern crate juniper;
 
-use serde::{Serialize, Deserialize};
-use uuid::Uuid;
-
 pub mod blob;
 pub mod record;
 pub mod module;
@@ -69,7 +66,7 @@ macro_rules! impl_lib {
       }
     }
 
-    pub fn parent(ty: i16, schema_version: i16, data: &[u8]) -> Option<Uuid> {
+    pub fn parent(ty: i16, schema_version: i16, data: &[u8]) -> Option<uuid::Uuid> {
       match ty {
         $(
           crate::record::$ty => $module::parent(schema_version, data),
@@ -92,9 +89,18 @@ macro_rules! impl_lib {
 impl_lib!(
   TYPE_USER => user,
   TYPE_ORGANIZATION => organization,
-  TYPE_MODULE => module
+  TYPE_MODULE => module,
+  TYPE_STRUCTURE => structure,
+  TYPE_ENUMERATION => enumeration
 );
+
+#[derive(Debug, Serialize, Deserialize, GraphQLUnion)]
+pub enum FrozenRecord {
+  Module(module::latest::frozen::Module),
+}
 
 
 pub use rmp_serde::to_vec as serialize;
 pub use rmp_serde::from_slice as deserialize;
+use serde::Deserialize;
+use serde::Serialize;

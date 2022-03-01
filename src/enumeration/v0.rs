@@ -1,42 +1,22 @@
-// use std::collections::{HashMap, HashSet};
+pub mod action;
+pub mod frozen;
+pub mod unfrozen;
+pub mod public;
 
-// use serde::{Serialize, Deserialize};
-// use uuid::Uuid;
+use crate::{schema_version::impl_schema_version, record::{RecordDefn, TYPE_STRUCTURE}};
 
-// use crate::{ty::Ty, record::{Reference, Record, TYPE_ENUMERATION}};
+pub struct Enumeration;
 
-// #[derive(Debug, Serialize, Deserialize)]
-// pub struct EnumerationVariant {
-//   pub name: String,
-//   #[serde(rename = "type")]
-//   pub ty: Ty,
-// }
+impl RecordDefn for Enumeration {
+  const TYPE: i16 = TYPE_STRUCTURE;
+  const SCHEMA_VERSION: i16 = 0;
 
-// impl EnumerationVariant {
-//   fn dependencies<'a>(&'a self, set: &mut HashSet<&'a Reference>) {
-//     self.ty.dependencies(set)
-//   }
-// }
+  type Action = action::Action;
+  type Unfrozen = unfrozen::Enumeration;
+  type Frozen = frozen::Enumeration;
 
-// #[derive(Debug, Serialize, Deserialize)]
-// pub struct Enumeration {
-//   pub variants: HashMap<Uuid, EnumerationVariant>,
-// }
+  type Public = public::Public;
+  type Private = unfrozen::Enumeration;
+}
 
-// impl Record for Enumeration {
-//   const NAME: &'static str = "enumeration";
-//   const TYPE: i16 = TYPE_ENUMERATION;
-//   const SCHEMA_VERSION: i16 = 0;
-
-//   type Action = ();
-
-//   fn parent<'a>(&'a self) -> Option<&'a Uuid> {
-//     None
-//   }
-
-//   fn dependencies<'a>(&'a self, set: &mut HashSet<&'a Reference>) {
-//     for (_, variant) in &self.variants {
-//       variant.dependencies(set);
-//     }
-//   }
-// }
+impl_schema_version!(Enumeration);

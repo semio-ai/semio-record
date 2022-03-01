@@ -6,7 +6,11 @@ use uuid::Uuid;
 use async_trait::async_trait;
 use derive_more::Display;
 
-
+#[derive(Debug, Serialize, Deserialize, GraphQLObject, Clone)]
+pub struct IdWithPermissions {
+  pub id: Uuid,
+  pub with_permissions: WithPermissions
+}
 
 /// An Access Control List (ACL) is a list of rules that specify which agents
 /// can perform which actions, if any.
@@ -17,6 +21,31 @@ pub struct Acl {
 
   /// If no custom permissions are specified, these permissions should be used instead.
   pub default: WithPermissions,
+}
+
+impl Acl {
+  pub fn new(owner: Uuid, with_permissions: WithPermissions) -> Self {
+    let mut permissions = HashMap::new();
+    permissions.insert(owner, with_permissions);
+    Self {
+      permissions,
+      default: Default::default(),
+    }
+  }
+}
+
+#[graphql_object]
+impl Acl {
+  pub fn default(&self) -> &WithPermissions {
+    &self.default
+  }
+
+  pub fn permissions(&self) -> Vec<IdWithPermissions> {
+    self.permissions.iter().map(|(id, with_permissions)| IdWithPermissions {
+      id: id.clone(),
+      with_permissions: with_permissions.clone(),
+    }).collect()
+  }
 }
 
 impl Default for Acl {
@@ -102,9 +131,39 @@ impl Permissions {
   }
 }
 
-const NO_PERMISSIONS: Permissions = Permissions {
+pub const NO_PERMISSIONS: Permissions = Permissions {
   read: PermissionLevel::None,
   write: PermissionLevel::None,
+};
+
+pub const PRIVATE_WRITE: Permissions = Permissions {
+  read: PermissionLevel::None,
+  write: PermissionLevel::Private,
+};
+
+pub const PRIVATE_READ: Permissions = Permissions {
+  read: PermissionLevel::Private,
+  write: PermissionLevel::None,
+};
+
+pub const PUBLIC_READ: Permissions = Permissions {
+  read: PermissionLevel::Public,
+  write: PermissionLevel::None,
+};
+
+pub const PUBLIC_WRITE: Permissions = Permissions {
+  read: PermissionLevel::None,
+  write: PermissionLevel::Public,
+};
+
+pub const PUBLIC_READ_WRITE: Permissions = Permissions {
+  read: PermissionLevel::Public,
+  write: PermissionLevel::Public,
+};
+
+pub const PRIVATE_READ_WRITE: Permissions = Permissions {
+  read: PermissionLevel::Private,
+  write: PermissionLevel::Private,
 };
 
 #[derive(Debug, Serialize, Deserialize, Clone, Eq, PartialEq, GraphQLUnion)]

@@ -1,15 +1,19 @@
 use std::collections::HashSet;
+use std::str::FromStr;
 
 use juniper::FromInputValue;
 use juniper::InputValue;
 use juniper::ScalarValue;
+use juniper::marker::IsInputType;
 use serde::Deserialize;
 use serde::Serialize;
+use uuid::Uuid;
 
 use crate::record::Freeze;
 use crate::record::Freezer;
 use crate::record::FrozenReference;
 use crate::record::UnfrozenReference;
+use crate::record::VersionReq;
 
 use juniper::{GraphQLObject, GraphQLEnum, GraphQLUnion};
 
@@ -88,6 +92,12 @@ pub struct Primitive {
   pub kind: PrimitiveKind,
 }
 
+impl From<PrimitiveKind> for Primitive {
+  fn from(kind: PrimitiveKind) -> Self {
+    Self { kind }
+  }
+}
+
 impl Primitive {
   pub const UNIT: Self = Self { kind: PrimitiveKind::Unit };
   pub const BOOLEAN: Self = Self { kind: PrimitiveKind::Boolean };
@@ -139,6 +149,12 @@ pub enum FrozenTy {
   Primitive(Primitive),
   Scalar(FrozenScalar),
   Array(FrozenArray),
+}
+
+impl From<PrimitiveKind> for FrozenTy {
+  fn from(kind: PrimitiveKind) -> Self {
+    Self::Primitive(Primitive::from(kind))
+  }
 }
 
 impl FrozenTy {
@@ -256,6 +272,12 @@ pub enum UnfrozenTy {
   Array(UnfrozenArray),
 }
 
+impl From<PrimitiveKind> for UnfrozenTy {
+  fn from(kind: PrimitiveKind) -> Self {
+    Self::Primitive(Primitive::from(kind))
+  }
+}
+
 impl UnfrozenTy {
   pub fn as_primitive(&self) -> Option<&Primitive> {
     match self {
@@ -348,6 +370,45 @@ impl<F: Freezer> Freeze<F> for UnfrozenTy {
 
 impl<S: ScalarValue> FromInputValue<S> for UnfrozenTy {
   fn from_input_value(value: &InputValue<S>) -> Option<Self> {
-    unimplemented!()
+    let str = value.as_string_value()?;
+    Self::from_str(&str).ok()
+  }
+}
+
+impl<S: ScalarValue> IsInputType<S> for UnfrozenTy {}
+
+impl FromStr for UnfrozenTy {
+  type Err = ();
+
+  fn from_str(s: &str) -> Result<Self, Self::Err> {
+    let array = s.ends_with("[]");
+    let s = if array { &s[..s.len() - 2] } else { s };
+    let mut iter = s.split('@');
+    let s = iter.next().ok_or(())?;
+    let version_req = VersionReq(iter.next().map(|v| semver::VersionReq::parse(v).ok()).flatten());
+    match s {
+      "unit" => Ok(PrimitiveKind::Unit.into()),
+      "bool" => Ok(if array { PrimitiveKind::Boolean } else { PrimitiveKind::ArrayBoolean }.into()),
+      "u8" => Ok(if array { PrimitiveKind::U8 } else { PrimitiveKind::ArrayU8 }.into()),
+      "u16" => Ok(if array { PrimitiveKind::U16 } else { PrimitiveKind::ArrayU16 }.into()),
+      "u32" => Ok(if array { PrimitiveKind::U32 } else { PrimitiveKind::ArrayU32 }.into()),
+      "u64" => Ok(if array { PrimitiveKind::U64 } else { PrimitiveKind::ArrayU64 }.into()),
+      "i8" => Ok(if array { PrimitiveKind::I8 } else { PrimitiveKind::ArrayI8 }.into()),
+      "i16" => Ok(if array { PrimitiveKind::I16 } else { PrimitiveKind::ArrayI16 }.into()),
+      "i32" => Ok(if array { PrimitiveKind::I32 } else { PrimitiveKind::ArrayI32 }.into()),
+      "i64" => Ok(if array { PrimitiveKind::I64 } else { PrimitiveKind::ArrayI64 }.into()),
+      "f32" => Ok(if array { PrimitiveKind::F32 } else { PrimitiveKind::ArrayF32 }.into()),
+      "f64" => Ok(if array { PrimitiveKind::F64 } else { PrimitiveKind::ArrayF64 }.into()),
+      "str" => Ok(if array { PrimitiveKind::String } else { PrimitiveKind::ArrayString }.into()),
+      _ => {
+        let id = Uuid::parse_str(s).map_err(|_| ())?;
+        let reference = UnfrozenReference { id, version_req };
+        Ok(if array {
+          UnfrozenTy::Array(UnfrozenArray { reference })
+        } else {
+          UnfrozenTy::Scalar(UnfrozenScalar { reference })
+        })
+      }
+    }
   }
 }

@@ -9,18 +9,18 @@ use crate::{ty::UnfrozenTy, record::{View, Freezer, Freeze, Unfrozen, UnfrozenRe
 use super::{frozen, action::Action};
 
 #[derive(Clone, Debug, Serialize, Deserialize, GraphQLObject)]
-pub struct StructureField {
+pub struct EnumerationVariant {
   pub name: String,
   #[serde(rename = "type")]
   pub ty: UnfrozenTy,
 }
 
 #[async_trait]
-impl<F: Freezer> Freeze<F> for StructureField {
-  type Frozen = frozen::StructureField;
+impl<F: Freezer> Freeze<F> for EnumerationVariant {
+  type Frozen = frozen::EnumerationVariant;
 
   async fn freeze(&self, freezer: &F) -> Result<Self::Frozen, F::Error> {
-    Ok(frozen::StructureField {
+    Ok(frozen::EnumerationVariant {
       name: self.name.clone(),
       ty: self.ty.freeze(freezer).await?,
     })
@@ -28,38 +28,37 @@ impl<F: Freezer> Freeze<F> for StructureField {
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
-pub struct Structure {
+pub struct Enumeration {
   pub parent: Uuid,
   pub name: String,
   pub acl: Acl,
-  pub fields: HashMap<Uuid, StructureField>,
+  pub variants: HashMap<Uuid, EnumerationVariant>,
 }
 
-impl Default for Structure {
+impl Default for Enumeration {
   fn default() -> Self {
     Self {
       parent: Uuid::default(),
       name: "".to_string(),
       acl: Acl::default(),
-      fields: HashMap::new(),
+      variants: HashMap::new(),
     }
   }
 }
 
-impl_unfrozen!(Structure, Action);
-
+impl_unfrozen!(Enumeration, Action);
 
 #[derive(Debug, Serialize, Deserialize, GraphQLObject)]
-pub struct IdStructureField {
+pub struct IdEnumerationVariant {
   pub id: Uuid,
-  pub field: StructureField
+  pub variant: EnumerationVariant
 }
 
-impl Structure {
-  pub fn field_named(&self, name: &str) -> Option<&StructureField> {
-    for (_, field) in &self.fields {
-      if field.name == name {
-        return Some(field);
+impl Enumeration {
+  pub fn variant_named(&self, name: &str) -> Option<&EnumerationVariant> {
+    for (_, variant) in &self.variants {
+      if variant.name == name {
+        return Some(variant);
       }
     }
     None
@@ -67,7 +66,7 @@ impl Structure {
 }
 
 #[graphql_object]
-impl Structure {
+impl Enumeration {
   pub fn name(&self) -> &str {
     &self.name
   }
@@ -80,20 +79,20 @@ impl Structure {
     &self.acl
   }
 
-  pub fn fields(&self) -> Vec<IdStructureField> {
-    self.fields.iter().map(|(id, field)| IdStructureField {
+  pub fn variants(&self) -> Vec<IdEnumerationVariant> {
+    self.variants.iter().map(|(id, variant)| IdEnumerationVariant {
       id: id.clone(),
-      field: field.clone(),
+      variant: variant.clone(),
     }).collect()
   }
-
-  #[graphql(name = "fieldNamed")]
-  pub fn gql_field_named(&self, name: String) -> Option<&StructureField> {
-    self.field_named(&name)
+  
+  #[graphql(name = "variantNamed")]
+  pub fn gql_variant_named(&self, name: String) -> Option<&EnumerationVariant> {
+    self.variant_named(&name)
   }
 }
 
-impl View for Structure {
+impl View for Enumeration {
   fn name<'a>(&'a self) -> Option<&'a str> {
     Some(&self.name)
   }
@@ -108,7 +107,7 @@ impl View for Structure {
 }
 
 
-impl Name for Structure {
+impl Name for Enumeration {
   fn name(&self) -> &str {
     &self.name
   }
@@ -118,31 +117,31 @@ impl Name for Structure {
   }
 }
 
-impl Unfrozen<Action> for Structure {
+impl Unfrozen<Action> for Enumeration {
   fn dependencies<'a>(&'a self, set: &mut HashSet<&'a UnfrozenReference>) {
-    for field in self.fields.values() {
+    for field in self.variants.values() {
       field.ty.dependencies(set);
     }
   }
 }
 
-impl BlobDependencies for Structure {
+impl BlobDependencies for Enumeration {
   fn blob_dependencies<'a>(&'a self, _set: &mut HashSet<&'a uuid::Uuid>) {}
 }
 
 #[async_trait]
-impl<F: Freezer> Freeze<F> for Structure {
-  type Frozen = frozen::Structure;
+impl<F: Freezer> Freeze<F> for Enumeration {
+  type Frozen = frozen::Enumeration;
 
   async fn freeze(&self, freezer: &F) -> Result<Self::Frozen, F::Error> {
-    let mut fields = HashMap::new();
-    for (id, field) in &self.fields {
-      fields.insert(id.clone(), field.freeze(freezer).await?);
+    let mut variants = HashMap::new();
+    for (id, variant) in &self.variants {
+      variants.insert(id.clone(), variant.freeze(freezer).await?);
     }
-    Ok(frozen::Structure {
+    Ok(frozen::Enumeration {
       parent: self.parent.clone(),
       name: self.name.clone(),
-      fields,
+      variants,
     })
   }
 }

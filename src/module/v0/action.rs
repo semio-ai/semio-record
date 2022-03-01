@@ -215,6 +215,8 @@ pub enum SetFunctionParameterNameError {
   WrongType,
   #[display(fmt = "Parameter not found in export")]
   ParameterNotFound,
+  #[display(fmt = "Name already taken")]
+  NameTaken,
 }
 
 impl Apply<SetFunctionParameterName> for Module
@@ -231,6 +233,10 @@ impl Apply<SetFunctionParameterName> for Module
       .as_function_mut()
       .ok_or(SetFunctionParameterNameError::WrongType)?;
 
+    if let Some(_) = func.parameter_named(&action.name) {
+      return Err(SetFunctionParameterNameError::NameTaken);
+    }
+      
     let parameter = func
       .parameter_mut(&action.parameter)
       .ok_or(SetFunctionParameterNameError::ParameterNotFound)?;
