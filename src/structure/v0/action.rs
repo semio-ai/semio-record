@@ -1,7 +1,7 @@
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
-use crate::{ty::UnfrozenTy, record::Apply, action::{SetName, SetNameError}};
+use crate::{ty::UnfrozenTy, record::Apply, action::{SetName, SetNameError, SetParent, SetParentError}, acl::action::{Action as AclAction, ActionError as AclActionError}};
 
 use derive_more::{Display, From, Error};
 
@@ -125,23 +125,27 @@ impl Apply<SetFieldType> for Structure {
   }
 }
 
-#[derive(Debug, Serialize, Deserialize, From, GraphQLUnion)]
+#[derive(Debug, Serialize, Deserialize, From)]
 #[serde(tag = "type", rename_all = "lowercase")]
 pub enum Action {
   SetName(SetName),
+  SetParent(SetParent),
   AddField(AddField),
   RemoveField(RemoveField),
   SetFieldName(SetFieldName),
   SetFieldType(SetFieldType),
+  Acl(AclAction),
 }
 
 #[derive(Display, Debug, Error, From)]
 pub enum ActionError {
   SetName(SetNameError),
+  SetParent(SetParentError),
   AddField(AddFieldError),
   RemoveField(RemoveFieldError),
   SetFieldName(SetFieldNameError),
   SetFieldType(SetFieldTypeError),
+  Acl(AclActionError)
 }
 
 impl Apply<Action> for Structure {
@@ -157,10 +161,12 @@ impl Apply<Action> for Structure {
   fn apply(&mut self, action: &Action) -> Result<(), Self::Error> {
     match action {
       Action::SetName(action) => self.apply(action)?,
+      Action::SetParent(action) => self.apply(action)?,
       Action::AddField(action) => self.apply(action)?,
       Action::RemoveField(action) => self.apply(action)?,
       Action::SetFieldName(action) => self.apply(action)?,
       Action::SetFieldType(action) => self.apply(action)?,
+      Action::Acl(action) => self.apply(action)?,
     }
 
     Ok(())

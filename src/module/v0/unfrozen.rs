@@ -1,11 +1,11 @@
-use std::{collections::{HashMap, HashSet}, error::Error};
+use std::{collections::{HashMap, HashSet}};
 
 use async_trait::async_trait;
-use juniper::{GraphQLEnum, GraphQLUnion, GraphQLObject, FromInputValue, ScalarValue, InputValue, marker::IsInputType, DefaultScalarValue};
+use juniper::{GraphQLUnion, GraphQLObject, FromInputValue, ScalarValue, InputValue, marker::IsInputType};
 use serde::{Serialize, Deserialize};
 use uuid::Uuid;
 
-use crate::{record::{UnfrozenReference, Freeze, Freezer, View, Unfrozen, Apply}, blob::BlobDependencies, unfrozen::impl_unfrozen, action::{Name, Parent}, ty::UnfrozenTy, acl::Acl};
+use crate::{record::{UnfrozenReference, Freeze, Freezer, View, Unfrozen}, blob::BlobDependencies, unfrozen::impl_unfrozen, action::{name, parent}, ty::UnfrozenTy, acl::{Acl, action::with_acl}};
 
 use super::{frozen, action::Action};
 
@@ -339,7 +339,7 @@ impl<F: Freezer> Freeze<F> for ExportKind {
     match self {
       Self::Function(function) => Ok(Self::Frozen::Function(function.freeze(freezer).await?)),
     }
-  }
+  } 
 }
 
 impl<S: ScalarValue> FromInputValue<S> for ExportKind {
@@ -536,7 +536,7 @@ impl_unfrozen!(Module, Action);
 impl Default for Module {
   fn default() -> Self {
     Self {
-      acl: Acl::default(),
+      acl: Default::default(),
       parent: Uuid::nil(),
       name: String::new(),
       exports: HashMap::new(),
@@ -553,6 +553,8 @@ impl Unfrozen<Action> for Module {
   }
 }
 
+with_acl!(Module);
+
 impl View for Module {
   fn name<'a>(&'a self) -> Option<&'a str> {
     Some(&self.name)
@@ -560,6 +562,10 @@ impl View for Module {
 
   fn parent<'a>(&'a self) -> Option<&'a Uuid> {
     Some(&self.parent)
+  }
+
+  fn acl<'a>(&'a self) -> Option<&'a Acl> {
+    Some(&self.acl)
   }
 }
 
@@ -590,22 +596,5 @@ impl<F: Freezer> Freeze<F> for Module {
   }
 }
 
-impl Name for Module {
-  fn name(&self) -> &str {
-    &self.name
-  }
-
-  fn set_name(&mut self, name: String) {
-    self.name = name;
-  }
-}
-
-impl Parent for Module {
-  fn parent(&self) -> &Uuid {
-    &self.parent
-  }
-
-  fn set_parent(&mut self, parent: Uuid) {
-    self.parent = parent;
-  }
-}
+name!(Module);
+parent!(Module);

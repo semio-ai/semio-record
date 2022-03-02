@@ -1,7 +1,7 @@
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
-use crate::{ty::UnfrozenTy, record::Apply, action::{SetName, SetNameError}};
+use crate::{ty::UnfrozenTy, record::Apply, action::{SetName, SetNameError, SetParent, SetParentError}, acl::action::{Action as AclAction, ActionError as AclActionError}};
 
 use derive_more::{Display, From, Error};
 
@@ -125,23 +125,27 @@ impl Apply<SetVariantType> for Enumeration {
   }
 }
 
-#[derive(Debug, Serialize, Deserialize, From, GraphQLUnion)]
+#[derive(Debug, Serialize, Deserialize, From)]
 #[serde(tag = "type", rename_all = "lowercase")]
 pub enum Action {
   SetName(SetName),
+  SetParent(SetParent),
   AddVariant(AddVariant),
   RemoveVariant(RemoveVariant),
   SetVariantName(SetVariantName),
   SetVariantType(SetVariantType),
+  Acl(AclAction),
 }
 
 #[derive(Display, Debug, Error, From)]
 pub enum ActionError {
   SetName(SetNameError),
+  SetParent(SetParentError),
   AddVariant(AddVariantError),
   RemoveVariant(RemoveVariantError),
   SetVariantName(SetVariantNameError),
   SetVariantType(SetVariantTypeError),
+  Acl(AclActionError),
 }
 
 impl Apply<Action> for Enumeration {
@@ -157,10 +161,12 @@ impl Apply<Action> for Enumeration {
   fn apply(&mut self, action: &Action) -> Result<(), Self::Error> {
     match action {
       Action::SetName(action) => self.apply(action)?,
+      Action::SetParent(action) => self.apply(action)?,
       Action::AddVariant(action) => self.apply(action)?,
       Action::RemoveVariant(action) => self.apply(action)?,
       Action::SetVariantName(action) => self.apply(action)?,
       Action::SetVariantType(action) => self.apply(action)?,
+      Action::Acl(action) => self.apply(action)?,
     }
 
     Ok(())

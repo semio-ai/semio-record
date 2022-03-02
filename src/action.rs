@@ -57,6 +57,22 @@ impl<N: Name> Apply<SetName> for N {
   }
 }
 
+macro_rules! name {
+  ($t:tt) => {
+    impl crate::action::Name for $t {
+      fn name(&self) -> &str {
+        &self.name
+      }
+
+      fn set_name(&mut self, name: String) {
+        self.name = name;
+      }
+    }
+  };
+}
+
+pub(crate) use name;
+
 pub trait Parent {
   fn parent(&self) -> &Uuid;
   fn set_parent(&mut self, parent: Uuid);
@@ -92,3 +108,19 @@ impl<P: Parent> Apply<SetParent> for P {
     Ok(())
   }
 }
+
+macro_rules! parent {
+  ($t:tt) => {
+    impl crate::action::Parent for $t {
+      fn parent(&self) -> &uuid::Uuid {
+        &self.parent
+      }
+
+      fn set_parent(&mut self, parent: uuid::Uuid) {
+        self.parent = parent;
+      }
+    }
+  };
+}
+
+pub(crate) use parent;

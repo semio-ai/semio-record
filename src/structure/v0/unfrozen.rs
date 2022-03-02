@@ -4,7 +4,7 @@ use serde::{Serialize, Deserialize};
 use uuid::Uuid;
 use async_trait::async_trait;
 
-use crate::{ty::UnfrozenTy, record::{View, Freezer, Freeze, Unfrozen, UnfrozenReference}, action::Name, acl::Acl, blob::BlobDependencies, unfrozen::impl_unfrozen};
+use crate::{ty::UnfrozenTy, record::{View, Freezer, Freeze, Unfrozen, UnfrozenReference}, action::{name, parent}, acl::{Acl, action::with_acl}, blob::BlobDependencies, unfrozen::impl_unfrozen};
 
 use super::{frozen, action::Action};
 
@@ -40,7 +40,7 @@ impl Default for Structure {
     Self {
       parent: Uuid::default(),
       name: "".to_string(),
-      acl: Acl::default(),
+      acl: Default::default(),
       fields: HashMap::new(),
     }
   }
@@ -108,15 +108,10 @@ impl View for Structure {
 }
 
 
-impl Name for Structure {
-  fn name(&self) -> &str {
-    &self.name
-  }
-  
-  fn set_name(&mut self, name: String) {
-    self.name = name;
-  }
-}
+name!(Structure);
+parent!(Structure);
+
+with_acl!(Structure);
 
 impl Unfrozen<Action> for Structure {
   fn dependencies<'a>(&'a self, set: &mut HashSet<&'a UnfrozenReference>) {

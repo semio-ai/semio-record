@@ -91,12 +91,14 @@ impl_lib!(
   TYPE_ORGANIZATION => organization,
   TYPE_MODULE => module,
   TYPE_STRUCTURE => structure,
-  TYPE_ENUMERATION => enumeration
+  TYPE_ENUMERATION => enumeration,
+  TYPE_FOLDER => folder
 );
 
 #[derive(Debug, Serialize, Deserialize, GraphQLUnion)]
 pub enum FrozenRecord {
   Module(module::latest::frozen::Module),
+
 }
 
 

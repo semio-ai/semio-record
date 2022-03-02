@@ -1,10 +1,12 @@
+pub mod action;
+
 use std::collections::HashMap;
 
-use juniper::FieldError;
+use juniper::{FieldError, FromInputValue, ScalarValue, InputValue, marker::IsInputType, meta::ScalarMeta};
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 use async_trait::async_trait;
-use derive_more::Display;
+use derive_more::{Display, Error};
 
 #[derive(Debug, Serialize, Deserialize, GraphQLObject, Clone)]
 pub struct IdWithPermissions {
@@ -31,6 +33,22 @@ impl Acl {
       permissions,
       default: Default::default(),
     }
+  }
+
+  pub fn default(&self) -> &WithPermissions {
+    &self.default
+  }
+
+  pub fn default_mut(&mut self) -> &mut WithPermissions {
+    &mut self.default
+  }
+
+  pub fn permissions(&self) -> &HashMap<Uuid, WithPermissions> {
+    &self.permissions
+  }
+
+  pub fn permissions_mut(&mut self) -> &mut HashMap<Uuid, WithPermissions> {
+    &mut self.permissions
   }
 }
 
@@ -179,6 +197,27 @@ pub enum WithPermissions {
 
   /// Custom permissions
   Custom(Permissions),
+}
+
+impl<S: ScalarValue> FromInputValue<S> for WithPermissions {
+  fn from_input_value(v: &InputValue<S>) -> Option<Self> {
+    let s = v.as_string_value()?;
+    let mut iter = s.split(':');
+    match iter.next()? {
+      "none" => Some(WithPermissions::None(None { _dummy: 0 })),
+      "inherit" => Some(WithPermissions::Inherit(Inherit {
+        from: iter.next().map(|s| Uuid::parse_str(s).unwrap()),
+      })),
+      "custom" => Some(WithPermissions::Custom(Permissions {
+        read: PermissionLevel::from_input_value(&InputValue::<S>::Enum(iter.next()?.to_string()))?,
+        write: PermissionLevel::from_input_value(&InputValue::<S>::Enum(iter.next()?.to_string()))?,
+      })),
+      _ => None,
+    }
+  }
+}
+
+impl<S: ScalarValue> IsInputType<S> for WithPermissions {
 }
 
 impl Default for WithPermissions {

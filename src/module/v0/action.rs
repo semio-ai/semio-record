@@ -5,7 +5,8 @@ use uuid::Uuid;
 use derive_more::{Display, Error, From};
 
 use crate::{
-  record::{Apply, UnfrozenReference}, action::{SetName, SetNameError, SetParentError, SetParent}, ty::UnfrozenTy,
+  record::{Apply}, action::{SetName, SetNameError, SetParentError, SetParent}, ty::UnfrozenTy,
+  acl::action::{Action as AclAction, ActionError as AclActionError},
 };
 
 use super::unfrozen::{Export, Module, Parameter};
@@ -363,7 +364,7 @@ impl Apply<SetFunctionReturnType> for Module
   }
 }
 
-#[derive(Debug, Serialize, Deserialize, From, GraphQLUnion)]
+#[derive(Debug, Serialize, Deserialize, From)]
 #[serde(tag = "type", rename_all = "lowercase")]
 pub enum Action {
   SetParent(SetParent),
@@ -376,6 +377,7 @@ pub enum Action {
   SetFunctionParameterType(SetFunctionParameterType),
   SetFunctionParameterMutability(SetFunctionParameterMutability),
   SetFunctionReturnType(SetFunctionReturnType),
+  Acl(AclAction),
 }
 
 #[derive(Display, Debug, Error, From)]
@@ -391,6 +393,7 @@ pub enum ActionError
   SetFunctionParameterType(SetFunctionParameterTypeError),
   SetFunctionParameterMutability(SetFunctionParameterMutabilityError),
   SetFunctionReturnType(SetFunctionReturnTypeError),
+  Acl(AclActionError),
 }
 
 impl Apply<Action> for Module
@@ -416,6 +419,7 @@ impl Apply<Action> for Module
       Action::SetFunctionParameterType(action) => self.apply(action)?,
       Action::SetFunctionParameterMutability(action) => self.apply(action)?,
       Action::SetFunctionReturnType(action) => self.apply(action)?,
+      Action::Acl(action) => self.apply(action)?,
     }
 
     Ok(())

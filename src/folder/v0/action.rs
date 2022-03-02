@@ -1,85 +1,38 @@
-// use async_trait::async_trait;
-// use serde::{Serialize, Deserialize};
-// use uuid::Uuid;
+use async_trait::async_trait;
+use serde::{Serialize, Deserialize};
+use uuid::Uuid;
 
-// use derive_more::{Display, Error};
+use derive_more::{Display, Error, From};
 
-// use crate::patch::Apply;
+use crate::{acl::action::{Action as AclAction, ActionError as AclActionError}, action::{SetName, SetParent, SetNameError, SetParentError}, record::Apply};
 
-// use super::Folder;
+use super::unfrozen::Folder;
 
-// #[derive(Debug, Serialize, Deserialize)]
-// pub struct AddEntry {
-//   pub name: String,
-//   pub id: Uuid,
-// }
+#[derive(Debug, Serialize, Deserialize, From)]
+#[serde(tag = "type", rename_all = "lowercase")]
+pub enum Action {
+  SetName(SetName),
+  SetParent(SetParent),
+  Acl(AclAction),
+}
 
-// #[derive(Debug, Display, Error)]
-// pub enum AddEntryError {
-//   #[display(fmt = "Entry or link with that name already exists")]
-//   NameAlreadyExists,
-//   #[display(fmt = "Entry with that id already exists")]
-//   IdAlreadyExists,
-// }
+#[derive(Display, Debug, Error, From)]
+pub enum ActionError {
+  SetName(SetNameError),
+  SetParent(SetParentError),
+  Acl(AclActionError),
+}
 
-// #[async_trait]
-// impl<C: Send> Apply<AddEntry, C> for Folder
-// {
-//   type Result = Result<(), AddEntryError>;
-  
-//   async fn apply(&mut self, _: &mut C, action: &AddEntry) -> Self::Result {
-//     if self.entries.contains_key(&action.name) {
-//       return Err(AddEntryError::NameAlreadyExists);
-//     }
+impl Apply<Action> for Folder {
+  type Error = ActionError;
 
-//     if self.links.contains_key(&action.name) {
-//       return Err(AddEntryError::NameAlreadyExists);
-//     }
+  fn apply(&mut self, action: &Action) -> Result<(), Self::Error> {
+    match action {
+      Action::SetName(action) => self.apply(action)?,
+      Action::SetParent(action) => self.apply(action)?,
+      Action::Acl(action) => self.apply(action)?,
+    }
 
-//     if self.entries.values().find(|id| *id == &action.id).is_some() {
-//       return Err(AddEntryError::IdAlreadyExists);
-//     }
-
-//     self.entries.insert(action.name.clone(), action.id);
-    
-//     Ok(())
-//   }
-// }
-
-// #[derive(Debug, Serialize, Deserialize)]
-// pub struct AddEntry {
-//   pub name: String,
-//   pub id: Uuid,
-// }
-
-// #[derive(Debug, Display, Error)]
-// pub enum AddEntryError {
-//   #[display(fmt = "Entry or link with that name already exists")]
-//   NameAlreadyExists,
-//   #[display(fmt = "Entry with that id already exists")]
-//   IdAlreadyExists,
-// }
-
-// #[async_trait]
-// impl<C: Send> Apply<AddEntry, C> for Folder
-// {
-//   type Result = Result<(), AddEntryError>;
-  
-//   async fn apply(&mut self, _: &mut C, action: &AddEntry) -> Self::Result {
-//     if self.entries.contains_key(&action.name) {
-//       return Err(AddEntryError::NameAlreadyExists);
-//     }
-
-//     if self.links.contains_key(&action.name) {
-//       return Err(AddEntryError::NameAlreadyExists);
-//     }
-
-//     if self.entries.values().find(|id| *id == &action.id).is_some() {
-//       return Err(AddEntryError::IdAlreadyExists);
-//     }
-
-//     self.entries.insert(action.name.clone(), action.id);
-    
-//     Ok(())
-//   }
-// }
+    Ok(())
+  }
+}

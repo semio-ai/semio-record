@@ -2,12 +2,10 @@ pub mod action;
 pub mod frozen;
 pub mod unfrozen;
 
-use std::error::Error;
 
-use uuid::Uuid;
 
 use crate::{
-  record::{RecordDefn, TYPE_MODULE, Freezer, Freeze, View},
+  record::{RecordDefn, TYPE_MODULE},
   version::{ValidatedSemanticVersion, ValidationResult}, schema_version::impl_schema_version,
 };
 

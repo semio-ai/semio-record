@@ -23,7 +23,7 @@ impl Public {
   }
 }
 
-#[graphql_object]
+#[graphql_object(name = "StructurePublic")]
 impl Public {
   fn name(&self) -> &str {
     &self.name
