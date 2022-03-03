@@ -4,6 +4,7 @@ use serde::{Serialize, Deserialize};
 use super::unfrozen::User;
 
 #[derive(Debug, GraphQLObject, Serialize, Deserialize)]
+#[graphql(name = "UserPrivate")]
 pub struct Private {
   pub user_name: String,
   pub first_name: String,

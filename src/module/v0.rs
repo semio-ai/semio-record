@@ -1,4 +1,5 @@
 pub mod action;
+pub mod public;
 pub mod frozen;
 pub mod unfrozen;
 
@@ -18,7 +19,7 @@ impl RecordDefn for Module {
   type Frozen = frozen::Module;
   type Unfrozen = unfrozen::Module;
   type Action = action::Action;
-  type Public = unfrozen::Module;
+  type Public = public::Public;
   type Private = unfrozen::Module;
 }
 

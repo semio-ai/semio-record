@@ -6,8 +6,10 @@ use uuid::Uuid;
 use crate::{record::{FrozenReference, Frozen, View}, blob::BlobDependencies, ty::FrozenTy};
 
 #[derive(Debug, Clone, Serialize, Deserialize, GraphQLObject)]
+#[graphql(name = "FrozenParameter")]
 pub struct Parameter {
   pub name: String,
+  #[graphql(name = "type")]
   pub ty: FrozenTy,
   pub mutable: bool,
 }
@@ -77,12 +79,13 @@ impl Function {
 }
 
 #[derive(Debug, Serialize, Deserialize, GraphQLObject)]
+#[graphql(name = "FrozenIdParameter")]
 pub struct IdParameter {
   pub id: Uuid,
   pub parameter: Parameter,
 }
 
-#[graphql_object]
+#[graphql_object(name = "FrozenFunction")]
 impl Function {
   #[graphql(name = "parameterId")]
   pub fn gql_parameter_id(&self, name: String) -> Option<Uuid> {
@@ -126,10 +129,17 @@ impl Function {
       })
       .collect()
   }
+
+  #[graphql(name = "returnType")]
+  pub fn gql_return_type(&self) -> FrozenTy {
+    self.return_ty.clone()
+  }
+
 }
 
 #[derive(Debug, GraphQLUnion, Clone, Serialize, Deserialize)]
 #[serde(tag = "type", rename_all = "lowercase")]
+#[graphql(name = "FrozenExportKind")]
 pub enum ExportKind {
   Function(Function),
 }
@@ -149,6 +159,7 @@ impl ExportKind {
 }
 
 #[derive(Debug, Clone, GraphQLObject, Serialize, Deserialize)]
+#[graphql(name = "FrozenExport")]
 pub struct Export {
   pub name: String,
   pub kind: ExportKind,
@@ -195,12 +206,13 @@ impl Module {
 }
 
 #[derive(Debug, GraphQLObject, Serialize, Deserialize)]
+#[graphql(name = "FrozenIdExport")]
 pub struct IdExport {
   pub id: Uuid,
   pub export: Export,
 }
 
-#[graphql_object]
+#[graphql_object(name = "FrozenModule")]
 impl Module {
   #[graphql(name = "exportId")]
   pub fn gql_export_id(&self, name: String) -> Option<Uuid> {
@@ -247,6 +259,11 @@ impl Module {
         export: export.clone(),
       })
       .collect()
+  }
+
+  #[graphql(name = "executable")]
+  pub fn gql_executable(&self) -> Option<Uuid> {
+    self.executable.clone()
   }
 }
 

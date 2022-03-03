@@ -87,9 +87,47 @@ impl PrimitiveKind {
   }
 }
 
+impl ToString for PrimitiveKind {
+  fn to_string(&self) -> String {
+    match self {
+      PrimitiveKind::Unit => "unit".to_string(),
+      PrimitiveKind::Boolean => "bool".to_string(),
+      PrimitiveKind::U8 => "u8".to_string(),
+      PrimitiveKind::U16 => "u16".to_string(),
+      PrimitiveKind::U32 => "u32".to_string(),
+      PrimitiveKind::U64 => "u64".to_string(),
+      PrimitiveKind::I8 => "i8".to_string(),
+      PrimitiveKind::I16 => "i16".to_string(),
+      PrimitiveKind::I32 => "i32".to_string(),
+      PrimitiveKind::I64 => "i64".to_string(),
+      PrimitiveKind::F32 => "f32".to_string(),
+      PrimitiveKind::F64 => "f64".to_string(),
+      PrimitiveKind::String => "str".to_string(),
+      PrimitiveKind::ArrayBoolean => "bool[]".to_string(),
+      PrimitiveKind::ArrayU8 => "u8[]".to_string(),
+      PrimitiveKind::ArrayU16 => "u16[]".to_string(),
+      PrimitiveKind::ArrayU32 => "u32[]".to_string(),
+      PrimitiveKind::ArrayU64 => "u64[]".to_string(),
+      PrimitiveKind::ArrayI8 => "i8[]".to_string(),
+      PrimitiveKind::ArrayI16 => "i16[]".to_string(),
+      PrimitiveKind::ArrayI32 => "i32[]".to_string(),
+      PrimitiveKind::ArrayI64 => "i64[]".to_string(),
+      PrimitiveKind::ArrayF32 => "f32[]".to_string(),
+      PrimitiveKind::ArrayF64 => "f64[]".to_string(),
+      PrimitiveKind::ArrayString => "str[]".to_string(),
+    }
+  }
+}
+
 #[derive(Debug, GraphQLObject, Serialize, Deserialize, Clone, PartialEq, Eq)]
 pub struct Primitive {
   pub kind: PrimitiveKind,
+}
+
+impl ToString for Primitive {
+  fn to_string(&self) -> String {
+    self.kind.to_string()
+  }
 }
 
 impl From<PrimitiveKind> for Primitive {
@@ -241,6 +279,12 @@ pub struct UnfrozenScalar {
   pub reference: UnfrozenReference,
 }
 
+impl ToString for UnfrozenScalar {
+  fn to_string(&self) -> String {
+    self.reference.to_string()
+  }
+}
+
 #[async_trait]
 impl<F: Freezer> Freeze<F> for UnfrozenScalar {
   type Frozen = FrozenScalar;
@@ -253,6 +297,12 @@ impl<F: Freezer> Freeze<F> for UnfrozenScalar {
 #[derive(Debug, GraphQLObject, Serialize, Deserialize, Clone, PartialEq, Eq)]
 pub struct UnfrozenArray {
   pub reference: UnfrozenReference,
+}
+
+impl ToString for UnfrozenArray {
+  fn to_string(&self) -> String {
+    format!("{}[]", self.reference.to_string())
+  }
 }
 
 #[async_trait]
@@ -380,7 +430,7 @@ impl<S: ScalarValue> IsInputType<S> for UnfrozenTy {}
 impl FromStr for UnfrozenTy {
   type Err = ();
 
-  fn from_str(s: &str) -> Result<Self, Self::Err> {
+  fn from_str(s: &str) -> Result<Self, Self::Err> { 
     let array = s.ends_with("[]");
     let s = if array { &s[..s.len() - 2] } else { s };
     let mut iter = s.split('@');
@@ -410,6 +460,16 @@ impl FromStr for UnfrozenTy {
           UnfrozenTy::Scalar(UnfrozenScalar { reference })
         })
       }
+    }
+  }
+}
+
+impl ToString for UnfrozenTy {
+  fn to_string(&self) -> String {
+    match self {
+      Self::Primitive(primitive) => primitive.to_string(),
+      Self::Scalar(scalar) => scalar.to_string(),
+      Self::Array(array) => array.to_string(),
     }
   }
 }

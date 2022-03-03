@@ -96,6 +96,16 @@ pub struct UnfrozenReference {
   pub version_req: VersionReq,
 }
 
+impl ToString for UnfrozenReference {
+  fn to_string(&self) -> String {
+    if let Some(version_req) = &self.version_req.0 {
+      format!("{}@{}", self.id, version_req)
+    } else {
+      self.id.to_string()
+    }
+  }
+}
+
 impl<S: ScalarValue> FromInputValue<S> for UnfrozenReference {
   fn from_input_value(v: &InputValue<S>) -> Option<Self> {
     match v {
@@ -191,7 +201,7 @@ pub enum RecordContent<R: RecordDefn> {
 
 macro_rules! impl_record {
   ($($version:expr => $module: ident),+) => {
-    pub async fn freeze<F: 'static + crate::record::Freezer>(freezer: &mut F, schema_version: i16, data: &[u8]) -> Result<Vec<u8>, Box<dyn std::error::Error>> {
+    pub async fn freeze<F: 'static + crate::record::Freezer>(freezer: &F, schema_version: i16, data: &[u8]) -> Result<Vec<u8>, Box<dyn std::error::Error>> {
       match schema_version {
         $(
           $version => $module::freeze(freezer, data).await,

@@ -18,7 +18,7 @@ pub mod action;
 
 macro_rules! impl_lib {
   ($($ty:tt => $module:tt),+) => {
-    pub async fn freeze<F>(freezer: &mut F, ty: i16, schema_version: i16, data: &[u8]) -> Result<Vec<u8>, Box<dyn std::error::Error>>
+    pub async fn freeze<F>(freezer: &F, ty: i16, schema_version: i16, data: &[u8]) -> Result<Vec<u8>, Box<dyn std::error::Error>>
     where
       F: 'static + crate::record::Freezer,
     {
@@ -102,7 +102,7 @@ pub enum FrozenRecord {
 }
 
 
-pub use rmp_serde::to_vec as serialize;
-pub use rmp_serde::from_slice as deserialize;
+pub use serde_json::to_vec as serialize;
+pub use serde_json::from_slice as deserialize;
 use serde::Deserialize;
 use serde::Serialize;

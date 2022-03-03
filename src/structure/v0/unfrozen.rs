@@ -12,6 +12,7 @@ use super::{frozen, action::Action};
 pub struct StructureField {
   pub name: String,
   #[serde(rename = "type")]
+  #[graphql(name = "type")]
   pub ty: UnfrozenTy,
 }
 

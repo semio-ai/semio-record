@@ -24,7 +24,7 @@ pub enum SetExecutableError {
 
 impl Apply<SetExecutable> for Module
 {
-  type Error = RenameExportError;
+  type Error = SetExecutableError;
 
   fn apply(&mut self, action: &SetExecutable) -> Result<(), Self::Error> {
     self.executable = Some(action.blob_id);
@@ -49,7 +49,7 @@ impl Apply<AddExport> for Module
   type Error = AddExportError;
 
   fn apply(&mut self, action: &AddExport) -> Result<(), Self::Error> {
-    if !self.has_export_named(&action.export.name) {
+    if self.has_export_named(&action.export.name) {
       return Err(AddExportError::NameAlreadyExists);
     }
 
@@ -369,6 +369,7 @@ impl Apply<SetFunctionReturnType> for Module
 pub enum Action {
   SetParent(SetParent),
   SetName(SetName),
+  SetExecutable(SetExecutable),
   AddExport(AddExport),
   RemoveExport(RemoveExport),
   AppendFunctionParameter(AppendFunctionParameter),
@@ -385,6 +386,7 @@ pub enum ActionError
 {
   SetParent(SetParentError),
   SetName(SetNameError),
+  SetExecutable(SetExecutableError),
   AddExport(AddExportError),
   RemoveExport(RemoveExportError),
   AppendFunctionParameter(AppendFunctionParameterError),
@@ -411,6 +413,7 @@ impl Apply<Action> for Module
     match action {
       Action::SetParent(action) => self.apply(action)?,
       Action::SetName(action) => self.apply(action)?,
+      Action::SetExecutable(action) => self.apply(action)?,
       Action::AddExport(action) => self.apply(action)?,
       Action::RemoveExport(action) => self.apply(action)?,
       Action::AppendFunctionParameter(action) => self.apply(action)?,

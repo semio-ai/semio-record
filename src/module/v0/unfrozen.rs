@@ -15,6 +15,7 @@ use derive_more::From;
 pub struct Parameter {
   pub name: String,
   #[serde(rename = "type")]
+  #[graphql(name = "type")]
   pub ty: UnfrozenTy,
   pub mutable: bool,
 }
@@ -78,6 +79,7 @@ impl<F: Freezer> Freeze<F> for Parameter {
 pub struct Function {
   pub parameters: HashMap<Uuid, Parameter>,
   pub parameter_ordering: Vec<Uuid>,
+  #[serde(rename = "returnType")]
   pub return_ty: UnfrozenTy,
 }
 
@@ -237,6 +239,11 @@ impl Function {
   #[graphql(name = "parameterNamed")]
   pub fn gql_parameter_named(&self, name: String) -> Option<&Parameter> {
     self.parameter_named(&name)
+  }
+
+  #[graphql(name = "returnType")]
+  pub fn gql_return_ty(&self) -> UnfrozenTy {
+    self.return_ty.clone()
   }
 }
 

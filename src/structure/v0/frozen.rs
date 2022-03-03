@@ -6,9 +6,11 @@ use uuid::Uuid;
 use crate::{ty::FrozenTy, record::{View, Frozen, FrozenReference}, blob::BlobDependencies};
 
 #[derive(Debug, Clone, Serialize, Deserialize, GraphQLObject)]
+#[graphql(name = "FrozenStructureField")]
 pub struct StructureField {
   pub name: String,
   #[serde(rename = "type")]
+  #[graphql(name = "type")]
   pub ty: FrozenTy,
 }
 
@@ -31,12 +33,13 @@ impl Structure {
 }
 
 #[derive(Debug, Serialize, Deserialize, GraphQLObject)]
+#[graphql(name = "FrozenIdStructureField")]
 pub struct IdStructureField {
   pub id: Uuid,
   pub field: StructureField,
 }
 
-#[graphql_object]
+#[graphql_object(name = "FrozenStructure")]
 impl Structure {
   pub fn name(&self) -> &str {
     &self.name
