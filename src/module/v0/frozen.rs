@@ -48,26 +48,8 @@ impl Function {
     self.parameters.get(id)
   }
 
-  pub fn parameter_mut(&mut self, id: &Uuid) -> Option<&mut Parameter> {
-    self.parameters.get_mut(id)
-  }
-
   pub fn parameter_named(&self, name: &str) -> Option<&Parameter> {
     self.parameter(self.parameter_id(name)?)
-  }
-
-  pub fn append_parameter(&mut self, parameter: Parameter) -> Uuid {
-    let id = Uuid::new_v4();
-    self.parameters.insert(id.clone(), parameter);
-    self.parameter_ordering.push(id.clone());
-    id
-  }
-
-  pub fn insert_parameter(&mut self, index: usize, parameter: Parameter) -> Uuid {
-    let id = Uuid::new_v4();
-    self.parameters.insert(id.clone(), parameter);
-    self.parameter_ordering.insert(index, id.clone());
-    id
   }
 
   fn dependencies<'a>(&'a self, set: &mut HashSet<&'a FrozenReference>) {

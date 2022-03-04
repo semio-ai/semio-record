@@ -34,6 +34,7 @@ impl Apply<SetExecutable> for Module
 
 #[derive(Debug, Serialize, Deserialize, GraphQLObject)]
 pub struct AddExport {
+  pub id: Uuid,
   pub export: Export
 }
 
@@ -53,7 +54,7 @@ impl Apply<AddExport> for Module
       return Err(AddExportError::NameAlreadyExists);
     }
 
-    self.exports.insert(Uuid::new_v4(), action.export.clone());
+    self.exports.insert(action.id, action.export.clone());
 
     Ok(())
   }
@@ -124,6 +125,7 @@ impl Apply<RenameExport> for Module
 #[derive(Debug, Serialize, Deserialize, GraphQLObject)]
 pub struct AppendFunctionParameter {
   pub export: Uuid,
+  pub parameter_id: Uuid,
   pub parameter: Parameter,
 }
 
@@ -157,7 +159,7 @@ impl Apply<AppendFunctionParameter> for Module
       return Err(AppendFunctionParameterError::NameAlreadyExists);
     }
 
-    func.append_parameter(action.parameter.clone());
+    func.append_parameter(action.parameter_id, action.parameter.clone());
 
     Ok(())
   }

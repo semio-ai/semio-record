@@ -1,7 +1,7 @@
 
 
 
-use std::{collections::{HashSet, HashMap}, error::Error, fmt::Display};
+use std::{collections::{HashSet, HashMap}, error::Error, fmt::Display, str::FromStr};
 
 
 use async_trait::async_trait;
@@ -25,6 +25,18 @@ pub const TYPE_ENUMERATION: i16 = 0x0022;
 
 #[derive(Debug, From, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize)]
 pub struct Version(pub semver::Version);
+
+impl std::fmt::Display for Version {
+  fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+    write!(f, "{}", self.0)
+  }
+}
+
+impl Version {
+  pub fn parse(s: &str) -> Result<Self, semver::Error> {
+    Ok(Version(s.parse()?))
+  }
+}
 
 #[juniper::graphql_scalar]
 impl<S> GraphQLScalar for Version
@@ -51,6 +63,21 @@ where
 #[derive(Debug, From, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 pub struct VersionReq(pub Option<semver::VersionReq>);
 
+impl VersionReq {
+  pub fn parse(s: &str) -> Result<Self, semver::Error> {
+    Ok(Self(Some(s.parse()?)))
+  }
+}
+
+impl std::fmt::Display for VersionReq {
+  fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+    match &self.0 {
+      Some(req) => write!(f, "{}", req),
+      None => write!(f, "*")
+    }
+  }
+}
+
 #[juniper::graphql_scalar]
 impl<S> GraphQLScalar for VersionReq
 where
@@ -58,7 +85,7 @@ where
 {
   fn resolve(&self) -> juniper::Value {
     match &self.0 {
-      None => juniper::Value::null(),
+      None => juniper::Value::scalar("*".to_string()),
       Some(s) => juniper::Value::scalar(s.to_string())
     }
   }

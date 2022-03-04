@@ -8,12 +8,16 @@ use derive_more::{Display, From, Error};
 use super::unfrozen::{StructureField, Structure};
 
 #[derive(Debug, Serialize, Deserialize, GraphQLObject)]
-pub struct AddField  {
+pub struct AddField {
+  pub id: Uuid,
   pub field: StructureField
 }
 
 #[derive(Debug, Serialize, Deserialize, Display, Error, GraphQLEnum)]
 pub enum AddFieldError {
+  #[display(fmt = "ID already exists")]
+  IdAlreadyExists,
+
   #[display(fmt = "Name already exists")]
   NameAlreadyExists,
 
@@ -28,6 +32,10 @@ impl Apply<AddField> for Structure {
     if action.field.name.is_empty() {
       return Err(AddFieldError::NameTooShort);
     }
+
+    if self.fields.contains_key(&action.id) {
+      return Err(AddFieldError::IdAlreadyExists);
+    }
     
     for field in self.fields.values() {
       if field.name == action.field.name {
@@ -35,6 +43,7 @@ impl Apply<AddField> for Structure {
       }
     }
 
+    self.fields.insert(action.id, action.field.clone());
 
     Ok(())
   }

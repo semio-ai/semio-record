@@ -9,11 +9,15 @@ use super::unfrozen::{EnumerationVariant, Enumeration};
 
 #[derive(Debug, Serialize, Deserialize, GraphQLObject)]
 pub struct AddVariant  {
+  pub id: Uuid,
   pub variant: EnumerationVariant
 }
 
 #[derive(Debug, Serialize, Deserialize, Display, Error, GraphQLEnum)]
 pub enum AddVariantError {
+  #[display(fmt = "ID already exists")]
+  IdAlreadyExists,
+
   #[display(fmt = "Name already exists")]
   NameAlreadyExists,
 
@@ -28,6 +32,10 @@ impl Apply<AddVariant> for Enumeration {
     if action.variant.name.is_empty() {
       return Err(AddVariantError::NameTooShort);
     }
+
+    if self.variants.contains_key(&action.id) {
+      return Err(AddVariantError::IdAlreadyExists);
+    }
     
     for variant in self.variants.values() {
       if variant.name == action.variant.name {
@@ -35,6 +43,7 @@ impl Apply<AddVariant> for Enumeration {
       }
     }
 
+    self.variants.insert(action.id, action.variant.clone());
 
     Ok(())
   }

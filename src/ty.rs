@@ -185,8 +185,8 @@ pub struct FrozenScalar {
 #[derive(Debug, Serialize, Deserialize, GraphQLUnion, From, Clone, PartialEq, Eq)]
 pub enum FrozenTy {
   Primitive(Primitive),
-  Scalar(FrozenScalar),
-  Array(FrozenArray),
+  FrozenScalar(FrozenScalar),
+  FrozenArray(FrozenArray),
 }
 
 impl From<PrimitiveKind> for FrozenTy {
@@ -205,14 +205,14 @@ impl FrozenTy {
 
   pub fn as_scalar(&self) -> Option<&FrozenScalar> {
     match self {
-      Self::Scalar(scalar) => Some(scalar),
+      Self::FrozenScalar(scalar) => Some(scalar),
       _ => None,
     }
   }
 
   pub fn as_array(&self) -> Option<&FrozenArray> {
     match self {
-      Self::Array(array) => Some(array),
+      Self::FrozenArray(array) => Some(array),
       _ => None,
     }
   }
@@ -226,14 +226,14 @@ impl FrozenTy {
 
   pub fn is_scalar(&self) -> bool {
     match self {
-      Self::Scalar(_) => true,
+      Self::FrozenScalar(_) => true,
       _ => false,
     }
   }
 
   pub fn is_array(&self) -> bool {
     match self {
-      Self::Array(_) => true,
+      Self::FrozenArray(_) => true,
       _ => false,
     }
   }
@@ -247,24 +247,24 @@ impl FrozenTy {
 
   pub fn to_scalar(self) -> Option<FrozenScalar> {
     match self {
-      Self::Scalar(scalar) => Some(scalar),
+      Self::FrozenScalar(scalar) => Some(scalar),
       _ => None,
     }
   }
 
   pub fn to_array(self) -> Option<FrozenArray> {
     match self {
-      Self::Array(array) => Some(array),
+      Self::FrozenArray(array) => Some(array),
       _ => None,
     }
   }
 
   pub fn dependencies<'a>(&'a self, set: &mut HashSet<&'a FrozenReference>) {
     match self {
-      Self::Scalar(ty) => {
+      Self::FrozenScalar(ty) => {
         set.insert(&ty.reference);
       },
-      Self::Array(ty) => {
+      Self::FrozenArray(ty) => {
         set.insert(&ty.reference);
       },
       _ => {}
@@ -274,7 +274,7 @@ impl FrozenTy {
 
 
 
-#[derive(Debug, GraphQLObject, Serialize, Deserialize, Clone, PartialEq, Eq)]
+#[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq, GraphQLObject)]
 pub struct UnfrozenScalar {
   pub reference: UnfrozenReference,
 }
@@ -294,7 +294,7 @@ impl<F: Freezer> Freeze<F> for UnfrozenScalar {
   }
 }
 
-#[derive(Debug, GraphQLObject, Serialize, Deserialize, Clone, PartialEq, Eq)]
+#[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq, GraphQLObject)]
 pub struct UnfrozenArray {
   pub reference: UnfrozenReference,
 }
@@ -318,8 +318,8 @@ impl<F: Freezer> Freeze<F> for UnfrozenArray {
 #[derive(Debug, Serialize, Deserialize, GraphQLUnion, From, Clone, PartialEq, Eq)]
 pub enum UnfrozenTy {
   Primitive(Primitive),
-  Scalar(UnfrozenScalar),
-  Array(UnfrozenArray),
+  UnfrozenScalar(UnfrozenScalar),
+  UnfrozenArray(UnfrozenArray),
 }
 
 impl From<PrimitiveKind> for UnfrozenTy {
@@ -338,14 +338,14 @@ impl UnfrozenTy {
 
   pub fn as_scalar(&self) -> Option<&UnfrozenScalar> {
     match self {
-      Self::Scalar(scalar) => Some(scalar),
+      Self::UnfrozenScalar(scalar) => Some(scalar),
       _ => None,
     }
   }
 
   pub fn as_array(&self) -> Option<&UnfrozenArray> {
     match self {
-      Self::Array(array) => Some(array),
+      Self::UnfrozenArray(array) => Some(array),
       _ => None,
     }
   }
@@ -359,14 +359,14 @@ impl UnfrozenTy {
 
   pub fn is_scalar(&self) -> bool {
     match self {
-      Self::Scalar(_) => true,
+      Self::UnfrozenScalar(_) => true,
       _ => false,
     }
   }
 
   pub fn is_array(&self) -> bool {
     match self {
-      Self::Array(_) => true,
+      Self::UnfrozenArray(_) => true,
       _ => false,
     }
   }
@@ -380,24 +380,24 @@ impl UnfrozenTy {
 
   pub fn to_scalar(self) -> Option<UnfrozenScalar> {
     match self {
-      Self::Scalar(scalar) => Some(scalar),
+      Self::UnfrozenScalar(scalar) => Some(scalar),
       _ => None,
     }
   }
 
   pub fn to_array(self) -> Option<UnfrozenArray> {
     match self {
-      Self::Array(array) => Some(array),
+      Self::UnfrozenArray(array) => Some(array),
       _ => None,
     }
   }
 
   pub fn dependencies<'a>(&'a self, set: &mut HashSet<&'a UnfrozenReference>) {
     match self {
-      Self::Scalar(ty) => {
+      Self::UnfrozenScalar(ty) => {
         set.insert(&ty.reference);
       },
-      Self::Array(ty) => {
+      Self::UnfrozenArray(ty) => {
         set.insert(&ty.reference);
       },
       _ => {}
@@ -412,8 +412,8 @@ impl<F: Freezer> Freeze<F> for UnfrozenTy {
   async fn freeze(&self, freezer: &F) -> Result<Self::Frozen, F::Error> {
     match self {
       Self::Primitive(primitive) => Ok(FrozenTy::Primitive(primitive.clone())),
-      Self::Scalar(scalar) => Ok(FrozenTy::Scalar(scalar.freeze(freezer).await?)),
-      Self::Array(array) => Ok(FrozenTy::Array(array.freeze(freezer).await?)),
+      Self::UnfrozenScalar(scalar) => Ok(FrozenTy::FrozenScalar(scalar.freeze(freezer).await?)),
+      Self::UnfrozenArray(array) => Ok(FrozenTy::FrozenArray(array.freeze(freezer).await?)),
     }
   }
 }
@@ -455,9 +455,9 @@ impl FromStr for UnfrozenTy {
         let version_req = VersionReq(iter.next().map(|v| semver::VersionReq::parse(v).ok()).flatten());
         let reference = UnfrozenReference { id, version_req };
         Ok(if array {
-          UnfrozenTy::Array(UnfrozenArray { reference })
+          UnfrozenTy::UnfrozenArray(UnfrozenArray { reference })
         } else {
-          UnfrozenTy::Scalar(UnfrozenScalar { reference })
+          UnfrozenTy::UnfrozenScalar(UnfrozenScalar { reference })
         })
       }
     }
@@ -468,8 +468,8 @@ impl ToString for UnfrozenTy {
   fn to_string(&self) -> String {
     match self {
       Self::Primitive(primitive) => primitive.to_string(),
-      Self::Scalar(scalar) => scalar.to_string(),
-      Self::Array(array) => array.to_string(),
+      Self::UnfrozenScalar(scalar) => scalar.to_string(),
+      Self::UnfrozenArray(array) => array.to_string(),
     }
   }
 }
@@ -492,7 +492,7 @@ use crate::ty::UnfrozenArray;
   fn parse_ty_version_array() {
     assert_eq!(
       super::UnfrozenTy::from_str("006867d6-7898-4d11-8a8a-471135f66aed@>1.0.0[]").unwrap(),
-      super::UnfrozenTy::Array(UnfrozenArray {
+      super::UnfrozenTy::UnfrozenArray(UnfrozenArray {
         reference: super::UnfrozenReference {
           id: super::Uuid::from_str("006867d6-7898-4d11-8a8a-471135f66aed").unwrap(),
           version_req: super::VersionReq(Some(semver::VersionReq::parse(">1.0.0").unwrap())),

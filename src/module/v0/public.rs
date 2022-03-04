@@ -44,28 +44,6 @@ impl Public {
   pub fn export_named(&self, name: &str) -> Option<&Export> {
     self.exports.get(&self.export_id(name)?.clone())
   }
-
-  pub fn export_mut(&mut self, id: &Uuid) -> Option<&mut Export> {
-    self.exports.get_mut(id)
-  }
-
-  pub fn export_named_mut(&mut self, name: &str) -> Option<&mut Export> {
-    self.exports.get_mut(&self.export_id(name)?.clone())
-  }
-
-  pub fn remove_export(&mut self, id: &Uuid) -> Option<Export> {
-    self.exports.remove(id)
-  }
-
-  pub fn remove_export_named(&mut self, name: &str) -> Option<Export> {
-    self.remove_export(&self.export_id(name)?.clone())
-  }
-
-  pub fn add_export(&mut self, export: Export) -> Uuid {
-    let id = Uuid::new_v4();
-    self.exports.insert(id.clone(), export);
-    id
-  }
 }
 
 #[derive(GraphQLObject)]

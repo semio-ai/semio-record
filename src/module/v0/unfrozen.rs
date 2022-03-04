@@ -127,18 +127,14 @@ impl Function {
     self.remove_parameter(&self.parameter_id(name)?.clone())
   }
 
-  pub fn append_parameter(&mut self, parameter: Parameter) -> Uuid {
-    let id = Uuid::new_v4();
+  pub fn append_parameter(&mut self, id: Uuid, parameter: Parameter) {
     self.parameters.insert(id.clone(), parameter);
-    self.parameter_ordering.push(id.clone());
-    id
+    self.parameter_ordering.push(id);
   }
 
-  pub fn insert_parameter(&mut self, index: usize, parameter: Parameter) -> Uuid {
-    let id = Uuid::new_v4();
+  pub fn insert_parameter(&mut self, index: usize, id: Uuid, parameter: Parameter) {
     self.parameters.insert(id.clone(), parameter);
-    self.parameter_ordering.insert(index, id.clone());
-    id
+    self.parameter_ordering.insert(index, id);
   }
 
   pub fn dependencies<'a>(&'a self, set: &mut HashSet<&'a UnfrozenReference>) {
@@ -468,10 +464,8 @@ impl Module {
     self.remove_export(&self.export_id(name)?.clone())
   }
 
-  pub fn add_export(&mut self, export: Export) -> Uuid {
-    let id = Uuid::new_v4();
-    self.exports.insert(id.clone(), export);
-    id
+  pub fn add_export(&mut self, id: Uuid, export: Export) {
+    self.exports.insert(id, export);
   }
 }
 
