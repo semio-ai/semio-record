@@ -18,6 +18,7 @@ pub struct Public {
   pub name: String,
   pub exports: HashMap<Uuid, Export>,
   pub executable: Option<Uuid>,
+  pub dependencies: Vec<UnfrozenReference>,
 }
 
 impl Public {
@@ -107,6 +108,11 @@ impl Public {
   pub fn gql_export_named(&self, name: String) -> Option<&Export> {
     self.export_named(&name)
   }
+
+  #[graphql(name = "dependencies")]
+  pub fn gql_dependencies(&self) -> &Vec<UnfrozenReference> {
+    &self.dependencies
+  }
 }
 
 impl From<Module> for Public {
@@ -116,6 +122,7 @@ impl From<Module> for Public {
       name: module.name,
       exports: module.exports.into_iter().map(|(k, v)| (k, v.into())).collect(),
       executable: module.executable,
+      dependencies: module.dependencies,
     }
   }
 }

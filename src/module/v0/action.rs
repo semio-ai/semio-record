@@ -5,7 +5,7 @@ use uuid::Uuid;
 use derive_more::{Display, Error, From};
 
 use crate::{
-  record::{Apply}, action::{SetName, SetNameError, SetParentError, SetParent}, ty::UnfrozenTy,
+  record::{Apply, UnfrozenReference}, action::{SetName, SetNameError, SetParentError, SetParent}, ty::UnfrozenTy,
   acl::action::{Action as AclAction, ActionError as AclActionError},
 };
 
@@ -366,6 +366,68 @@ impl Apply<SetFunctionReturnType> for Module
   }
 }
 
+#[derive(Debug, Serialize, Deserialize, GraphQLObject)]
+pub struct AddDependency {
+  pub dependency: UnfrozenReference,
+}
+
+#[derive(Display, Debug, Error, GraphQLEnum)]
+pub enum AddDependencyError
+{
+  #[display(fmt = "Dependency already exists")]
+  AlreadyExists,
+  #[display(fmt = "Too many dependencies")]
+  TooMany,
+}
+
+impl Apply<AddDependency> for Module
+{
+  type Error = AddDependencyError;
+
+  fn apply(&mut self, action: &AddDependency) -> Result<(), Self::Error> {
+    if self.dependencies.len() >= 32 {
+      return Err(AddDependencyError::TooMany);
+    }
+
+    if self.dependencies.iter().any(|d| d.id == action.dependency.id) {
+      return Err(AddDependencyError::AlreadyExists);
+    }
+
+    self.dependencies.push(action.dependency.clone());
+
+    Ok(())
+  }
+}
+
+#[derive(Debug, Serialize, Deserialize, GraphQLObject)]
+pub struct RemoveDependency {
+  pub id: Uuid,
+}
+
+#[derive(Display, Debug, Error, GraphQLEnum)]
+pub enum RemoveDependencyError {
+  #[display(fmt = "Dependency not found")]
+  NotFound,
+}
+
+impl Apply<RemoveDependency> for Module
+{
+  type Error = RemoveDependencyError;
+
+  fn apply(&mut self, action: &RemoveDependency) -> Result<(), Self::Error> {
+    let index = self
+      .dependencies
+      .iter()
+      .position(|d| d.id == action.id)
+      .ok_or(RemoveDependencyError::NotFound)?;
+
+    self.dependencies.remove(index);
+
+    Ok(())
+  }
+}
+
+
 #[derive(Debug, Serialize, Deserialize, From)]
 #[serde(tag = "type", rename_all = "lowercase")]
 pub enum Action {
@@ -380,6 +442,8 @@ pub enum Action {
   SetFunctionParameterType(SetFunctionParameterType),
   SetFunctionParameterMutability(SetFunctionParameterMutability),
   SetFunctionReturnType(SetFunctionReturnType),
+  AddDependency(AddDependency),
+  RemoveDependency(RemoveDependency),
   Acl(AclAction),
 }
 
@@ -397,6 +461,8 @@ pub enum ActionError
   SetFunctionParameterType(SetFunctionParameterTypeError),
   SetFunctionParameterMutability(SetFunctionParameterMutabilityError),
   SetFunctionReturnType(SetFunctionReturnTypeError),
+  AddDependency(AddDependencyError),
+  RemoveDependency(RemoveDependencyError),
   Acl(AclActionError),
 }
 
@@ -424,6 +490,8 @@ impl Apply<Action> for Module
       Action::SetFunctionParameterType(action) => self.apply(action)?,
       Action::SetFunctionParameterMutability(action) => self.apply(action)?,
       Action::SetFunctionReturnType(action) => self.apply(action)?,
+      Action::AddDependency(action) => self.apply(action)?,
+      Action::RemoveDependency(action) => self.apply(action)?,
       Action::Acl(action) => self.apply(action)?,
     }
 

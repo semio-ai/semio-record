@@ -3,7 +3,7 @@ use std::collections::{HashMap, HashSet};
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
-use crate::{record::{FrozenReference, Frozen, View}, blob::BlobDependencies, ty::FrozenTy};
+use crate::{record::{FrozenReference, Frozen, View}, blob::BlobDependencies, ty::FrozenTy, acl::Acl};
 
 #[derive(Debug, Clone, Serialize, Deserialize, GraphQLObject)]
 #[graphql(name = "FrozenParameter")]
@@ -159,6 +159,7 @@ pub struct Module {
   pub name: String,
   pub exports: HashMap<Uuid, Export>,
   pub executable: Option<Uuid>,
+  pub dependencies: Vec<FrozenReference>,
 }
 
 impl Module {
@@ -185,6 +186,7 @@ impl Module {
   pub fn export_named(&self, name: &str) -> Option<&Export> {
     self.exports.get(self.export_id(name)?)
   }
+
 }
 
 #[derive(Debug, GraphQLObject, Serialize, Deserialize)]
@@ -247,6 +249,11 @@ impl Module {
   pub fn gql_executable(&self) -> Option<Uuid> {
     self.executable.clone()
   }
+
+  #[graphql(name = "dependencies")]
+  pub fn gql_dependencies(&self) -> &Vec<FrozenReference> {
+    &self.dependencies
+  }
 }
 
 impl View for Module {
@@ -271,6 +278,10 @@ impl Frozen for Module {
   fn dependencies<'a>(&'a self, set: &mut HashSet<&'a FrozenReference>) {
     for (_, export) in &self.exports {
       export.dependencies(set);
+    }
+
+    for dependency in &self.dependencies {
+      set.insert(dependency);
     }
   }
 }

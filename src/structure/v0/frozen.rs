@@ -3,7 +3,7 @@ use std::collections::{HashMap, HashSet};
 use serde::{Serialize, Deserialize};
 use uuid::Uuid;
 
-use crate::{ty::FrozenTy, record::{View, Frozen, FrozenReference}, blob::BlobDependencies};
+use crate::{ty::FrozenTy, record::{View, Frozen, FrozenReference}, blob::BlobDependencies, acl::Acl};
 
 #[derive(Debug, Clone, Serialize, Deserialize, GraphQLObject)]
 #[graphql(name = "FrozenStructureField")]

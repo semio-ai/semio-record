@@ -421,6 +421,7 @@ pub struct Module {
   pub name: String,
   pub exports: HashMap<Uuid, Export>,
   pub executable: Option<Uuid>,
+  pub dependencies: Vec<UnfrozenReference>,
 }
 
 impl Module {
@@ -484,8 +485,13 @@ impl From<(Uuid, Export)> for IdExport {
   }
 }
 
+
 #[graphql_object]
 impl Module {
+  pub fn acl(&self) -> &Acl {
+    &self.acl
+  }
+
   #[graphql(name = "parent")]
   pub fn gql_parent(&self) -> Uuid {
     self.parent.clone()
@@ -530,6 +536,11 @@ impl Module {
   pub fn gql_export_named(&self, name: String) -> Option<&Export> {
     self.export_named(&name)
   }
+
+  #[graphql(name = "dependencies")]
+  pub fn gql_dependencies(&self) -> &Vec<UnfrozenReference> {
+    &self.dependencies
+  }
 }
 
 impl_unfrozen!(Module, Action);
@@ -542,6 +553,7 @@ impl Default for Module {
       name: String::new(),
       exports: HashMap::new(),
       executable: None,
+      dependencies: Vec::new(),
     }
   }
 }
@@ -550,6 +562,10 @@ impl Unfrozen<Action> for Module {
   fn dependencies<'a>(&'a self, set: &mut HashSet<&'a UnfrozenReference>) {
     for (_, export) in &self.exports {
       export.dependencies(set);
+    }
+
+    for dependency in &self.dependencies {
+      set.insert(dependency);
     }
   }
 }
@@ -588,11 +604,17 @@ impl<F: Freezer> Freeze<F> for Module {
       exports.insert(id.clone(), export.freeze(freezer).await?);
     }
 
+    let mut dependencies = Vec::with_capacity(self.dependencies.len());
+    for dependency in &self.dependencies {
+      dependencies.push(freezer.freeze(dependency).await?);
+    }
+
     Ok(Self::Frozen {
       parent: self.parent,
       name: self.name.clone(),
       exports,
       executable: self.executable.clone(),
+      dependencies,
     })
   }
 }
