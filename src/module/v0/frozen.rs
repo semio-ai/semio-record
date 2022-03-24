@@ -3,7 +3,11 @@ use std::collections::{HashMap, HashSet};
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
-use crate::{record::{FrozenReference, Frozen, View}, blob::BlobDependencies, ty::FrozenTy, acl::Acl};
+use crate::{
+  blob::BlobDependencies,
+  record::{Frozen, FrozenReference, View},
+  ty::FrozenTy,
+};
 
 #[derive(Debug, Clone, Serialize, Deserialize, GraphQLObject)]
 #[graphql(name = "FrozenParameter")]
@@ -116,7 +120,6 @@ impl Function {
   pub fn gql_return_type(&self) -> FrozenTy {
     self.return_ty.clone()
   }
-
 }
 
 #[derive(Debug, GraphQLUnion, Clone, Serialize, Deserialize)]
@@ -170,7 +173,7 @@ impl Module {
       .find(|(_, export)| export.name == *name)
       .map(|(id, _)| id)
   }
-  
+
   pub fn has_export(&self, id: &Uuid) -> bool {
     self.exports.contains_key(id)
   }
@@ -186,7 +189,6 @@ impl Module {
   pub fn export_named(&self, name: &str) -> Option<&Export> {
     self.exports.get(self.export_id(name)?)
   }
-
 }
 
 #[derive(Debug, GraphQLObject, Serialize, Deserialize)]

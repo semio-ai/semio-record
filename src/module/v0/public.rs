@@ -1,16 +1,12 @@
-use std::{collections::{HashMap, HashSet}};
+use std::collections::HashMap;
 
-use async_trait::async_trait;
-use juniper::{GraphQLUnion, GraphQLObject, FromInputValue, ScalarValue, InputValue, marker::IsInputType};
-use serde::{Serialize, Deserialize};
+use juniper::GraphQLObject;
+use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
-use crate::{record::{UnfrozenReference, Freeze, Freezer, View, Unfrozen}, blob::BlobDependencies, unfrozen::impl_unfrozen, action::{name, parent}, ty::UnfrozenTy, acl::{Acl, action::with_acl}};
+use crate::record::UnfrozenReference;
 
-use super::{frozen, action::Action, unfrozen::{Module, Export}};
-
-use derive_more::From;
-
+use super::unfrozen::{Export, Module};
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct Public {
@@ -29,7 +25,7 @@ impl Public {
       .find(|(_, export)| export.name == *name)
       .map(|(id, _)| id)
   }
-  
+
   pub fn has_export(&self, id: &Uuid) -> bool {
     self.exports.contains_key(id)
   }
@@ -76,7 +72,11 @@ impl Public {
 
   #[graphql(name = "exports")]
   pub fn gql_exports(&self) -> Vec<IdExport> {
-    self.exports.iter().map(|(k, v)| (k.clone(), v.clone()).into()).collect()
+    self
+      .exports
+      .iter()
+      .map(|(k, v)| (k.clone(), v.clone()).into())
+      .collect()
   }
 
   #[graphql(name = "executable")]
@@ -120,7 +120,11 @@ impl From<Module> for Public {
     Self {
       parent: module.parent,
       name: module.name,
-      exports: module.exports.into_iter().map(|(k, v)| (k, v.into())).collect(),
+      exports: module
+        .exports
+        .into_iter()
+        .map(|(k, v)| (k, v.into()))
+        .collect(),
       executable: module.executable,
       dependencies: module.dependencies,
     }
