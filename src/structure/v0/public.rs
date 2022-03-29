@@ -1,11 +1,11 @@
 use std::collections::HashMap;
 
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
-use super::unfrozen::{StructureField, Structure, IdStructureField};
+use super::unfrozen::{IdStructureField, Structure, StructureField};
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct Public {
   pub name: String,
   pub parent: Uuid,
@@ -34,10 +34,14 @@ impl Public {
   }
 
   fn fields(&self) -> Vec<IdStructureField> {
-    self.fields.iter().map(|(id, field)| IdStructureField {
-      id: id.clone(),
-      field: field.clone(),
-    }).collect()
+    self
+      .fields
+      .iter()
+      .map(|(id, field)| IdStructureField {
+        id: id.clone(),
+        field: field.clone(),
+      })
+      .collect()
   }
 
   #[graphql(name = "fieldNamed")]

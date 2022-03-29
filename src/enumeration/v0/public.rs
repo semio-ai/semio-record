@@ -1,11 +1,11 @@
 use std::collections::HashMap;
 
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
-use super::unfrozen::{EnumerationVariant, Enumeration, IdEnumerationVariant};
+use super::unfrozen::{Enumeration, EnumerationVariant, IdEnumerationVariant};
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct Public {
   pub name: String,
   pub parent: Uuid,
@@ -34,10 +34,14 @@ impl Public {
   }
 
   fn variants(&self) -> Vec<IdEnumerationVariant> {
-    self.variants.iter().map(|(id, variant)| IdEnumerationVariant {
-      id: id.clone(),
-      variant: variant.clone(),
-    }).collect()
+    self
+      .variants
+      .iter()
+      .map(|(id, variant)| IdEnumerationVariant {
+        id: id.clone(),
+        variant: variant.clone(),
+      })
+      .collect()
   }
 
   #[graphql(name = "variantNamed")]
