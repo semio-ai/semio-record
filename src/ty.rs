@@ -1,10 +1,12 @@
 use std::collections::HashSet;
 use std::str::FromStr;
 
+use derive_more::From;
+use juniper::marker::IsInputType;
 use juniper::FromInputValue;
 use juniper::InputValue;
 use juniper::ScalarValue;
-use juniper::marker::IsInputType;
+use juniper::{GraphQLEnum, GraphQLObject, GraphQLUnion};
 use serde::Deserialize;
 use serde::Serialize;
 use uuid::Uuid;
@@ -14,10 +16,6 @@ use crate::record::Freezer;
 use crate::record::FrozenReference;
 use crate::record::UnfrozenReference;
 use crate::record::VersionReq;
-
-use juniper::{GraphQLObject, GraphQLEnum, GraphQLUnion};
-
-use derive_more::From;
 
 #[derive(Debug, GraphQLEnum, Serialize, Deserialize, Clone, PartialEq, Eq)]
 pub enum PrimitiveKind {
@@ -51,37 +49,37 @@ pub enum PrimitiveKind {
 impl PrimitiveKind {
   pub fn is_array(&self) -> bool {
     match self {
-      PrimitiveKind::ArrayBoolean |
-      PrimitiveKind::ArrayU8 |
-      PrimitiveKind::ArrayU16 |
-      PrimitiveKind::ArrayU32 |
-      PrimitiveKind::ArrayU64 |
-      PrimitiveKind::ArrayI8 |
-      PrimitiveKind::ArrayI16 |
-      PrimitiveKind::ArrayI32 |
-      PrimitiveKind::ArrayI64 |
-      PrimitiveKind::ArrayF32 |
-      PrimitiveKind::ArrayF64 |
-      PrimitiveKind::ArrayString => true,
+      PrimitiveKind::ArrayBoolean
+      | PrimitiveKind::ArrayU8
+      | PrimitiveKind::ArrayU16
+      | PrimitiveKind::ArrayU32
+      | PrimitiveKind::ArrayU64
+      | PrimitiveKind::ArrayI8
+      | PrimitiveKind::ArrayI16
+      | PrimitiveKind::ArrayI32
+      | PrimitiveKind::ArrayI64
+      | PrimitiveKind::ArrayF32
+      | PrimitiveKind::ArrayF64
+      | PrimitiveKind::ArrayString => true,
       _ => false,
     }
   }
 
   pub fn is_scalar(&self) -> bool {
     match self {
-      PrimitiveKind::Unit |
-      PrimitiveKind::Boolean |
-      PrimitiveKind::U8 |
-      PrimitiveKind::U16 |
-      PrimitiveKind::U32 |
-      PrimitiveKind::U64 |
-      PrimitiveKind::I8 |
-      PrimitiveKind::I16 |
-      PrimitiveKind::I32 |
-      PrimitiveKind::I64 |
-      PrimitiveKind::F32 |
-      PrimitiveKind::F64 |
-      PrimitiveKind::String => true,
+      PrimitiveKind::Unit
+      | PrimitiveKind::Boolean
+      | PrimitiveKind::U8
+      | PrimitiveKind::U16
+      | PrimitiveKind::U32
+      | PrimitiveKind::U64
+      | PrimitiveKind::I8
+      | PrimitiveKind::I16
+      | PrimitiveKind::I32
+      | PrimitiveKind::I64
+      | PrimitiveKind::F32
+      | PrimitiveKind::F64
+      | PrimitiveKind::String => true,
       _ => false,
     }
   }
@@ -119,6 +117,41 @@ impl ToString for PrimitiveKind {
   }
 }
 
+impl FromStr for PrimitiveKind {
+  type Err = String;
+
+  fn from_str(s: &str) -> Result<Self, Self::Err> {
+    match s {
+      "unit" => Ok(PrimitiveKind::Unit),
+      "bool" => Ok(PrimitiveKind::Boolean),
+      "u8" => Ok(PrimitiveKind::U8),
+      "u16" => Ok(PrimitiveKind::U16),
+      "u32" => Ok(PrimitiveKind::U32),
+      "u64" => Ok(PrimitiveKind::U64),
+      "i8" => Ok(PrimitiveKind::I8),
+      "i16" => Ok(PrimitiveKind::I16),
+      "i32" => Ok(PrimitiveKind::I32),
+      "i64" => Ok(PrimitiveKind::I64),
+      "f32" => Ok(PrimitiveKind::F32),
+      "f64" => Ok(PrimitiveKind::F64),
+      "str" => Ok(PrimitiveKind::String),
+      "bool[]" => Ok(PrimitiveKind::ArrayBoolean),
+      "u8[]" => Ok(PrimitiveKind::ArrayU8),
+      "u16[]" => Ok(PrimitiveKind::ArrayU16),
+      "u32[]" => Ok(PrimitiveKind::ArrayU32),
+      "u64[]" => Ok(PrimitiveKind::ArrayU64),
+      "i8[]" => Ok(PrimitiveKind::ArrayI8),
+      "i16[]" => Ok(PrimitiveKind::ArrayI16),
+      "i32[]" => Ok(PrimitiveKind::ArrayI32),
+      "i64[]" => Ok(PrimitiveKind::ArrayI64),
+      "f32[]" => Ok(PrimitiveKind::ArrayF32),
+      "f64[]" => Ok(PrimitiveKind::ArrayF64),
+      "str[]" => Ok(PrimitiveKind::ArrayString),
+      _ => Err(format!("unknown primitive kind: {}", s)),
+    }
+  }
+}
+
 #[derive(Debug, GraphQLObject, Serialize, Deserialize, Clone, PartialEq, Eq)]
 pub struct Primitive {
   pub kind: PrimitiveKind,
@@ -137,31 +170,81 @@ impl From<PrimitiveKind> for Primitive {
 }
 
 impl Primitive {
-  pub const UNIT: Self = Self { kind: PrimitiveKind::Unit };
-  pub const BOOLEAN: Self = Self { kind: PrimitiveKind::Boolean };
-  pub const U8: Self = Self { kind: PrimitiveKind::U8 };
-  pub const U16: Self = Self { kind: PrimitiveKind::U16 };
-  pub const U32: Self = Self { kind: PrimitiveKind::U32 };
-  pub const U64: Self = Self { kind: PrimitiveKind::U64 };
-  pub const I8: Self = Self { kind: PrimitiveKind::I8 };
-  pub const I16: Self = Self { kind: PrimitiveKind::I16 };
-  pub const I32: Self = Self { kind: PrimitiveKind::I32 };
-  pub const I64: Self = Self { kind: PrimitiveKind::I64 };
-  pub const F32: Self = Self { kind: PrimitiveKind::F32 };
-  pub const F64: Self = Self { kind: PrimitiveKind::F64 };
-  pub const STRING: Self = Self { kind: PrimitiveKind::String };
-  pub const ARRAY_BOOLEAN: Self = Self { kind: PrimitiveKind::ArrayBoolean };
-  pub const ARRAY_U8: Self = Self { kind: PrimitiveKind::ArrayU8 };
-  pub const ARRAY_U16: Self = Self { kind: PrimitiveKind::ArrayU16 };
-  pub const ARRAY_U32: Self = Self { kind: PrimitiveKind::ArrayU32 };
-  pub const ARRAY_U64: Self = Self { kind: PrimitiveKind::ArrayU64 };
-  pub const ARRAY_I8: Self = Self { kind: PrimitiveKind::ArrayI8 };
-  pub const ARRAY_I16: Self = Self { kind: PrimitiveKind::ArrayI16 };
-  pub const ARRAY_I32: Self = Self { kind: PrimitiveKind::ArrayI32 };
-  pub const ARRAY_I64: Self = Self { kind: PrimitiveKind::ArrayI64 };
-  pub const ARRAY_F32: Self = Self { kind: PrimitiveKind::ArrayF32 };
-  pub const ARRAY_F64: Self = Self { kind: PrimitiveKind::ArrayF64 };
-  pub const ARRAY_STRING: Self = Self { kind: PrimitiveKind::ArrayString };
+  pub const UNIT: Self = Self {
+    kind: PrimitiveKind::Unit,
+  };
+  pub const BOOLEAN: Self = Self {
+    kind: PrimitiveKind::Boolean,
+  };
+  pub const U8: Self = Self {
+    kind: PrimitiveKind::U8,
+  };
+  pub const U16: Self = Self {
+    kind: PrimitiveKind::U16,
+  };
+  pub const U32: Self = Self {
+    kind: PrimitiveKind::U32,
+  };
+  pub const U64: Self = Self {
+    kind: PrimitiveKind::U64,
+  };
+  pub const I8: Self = Self {
+    kind: PrimitiveKind::I8,
+  };
+  pub const I16: Self = Self {
+    kind: PrimitiveKind::I16,
+  };
+  pub const I32: Self = Self {
+    kind: PrimitiveKind::I32,
+  };
+  pub const I64: Self = Self {
+    kind: PrimitiveKind::I64,
+  };
+  pub const F32: Self = Self {
+    kind: PrimitiveKind::F32,
+  };
+  pub const F64: Self = Self {
+    kind: PrimitiveKind::F64,
+  };
+  pub const STRING: Self = Self {
+    kind: PrimitiveKind::String,
+  };
+  pub const ARRAY_BOOLEAN: Self = Self {
+    kind: PrimitiveKind::ArrayBoolean,
+  };
+  pub const ARRAY_U8: Self = Self {
+    kind: PrimitiveKind::ArrayU8,
+  };
+  pub const ARRAY_U16: Self = Self {
+    kind: PrimitiveKind::ArrayU16,
+  };
+  pub const ARRAY_U32: Self = Self {
+    kind: PrimitiveKind::ArrayU32,
+  };
+  pub const ARRAY_U64: Self = Self {
+    kind: PrimitiveKind::ArrayU64,
+  };
+  pub const ARRAY_I8: Self = Self {
+    kind: PrimitiveKind::ArrayI8,
+  };
+  pub const ARRAY_I16: Self = Self {
+    kind: PrimitiveKind::ArrayI16,
+  };
+  pub const ARRAY_I32: Self = Self {
+    kind: PrimitiveKind::ArrayI32,
+  };
+  pub const ARRAY_I64: Self = Self {
+    kind: PrimitiveKind::ArrayI64,
+  };
+  pub const ARRAY_F32: Self = Self {
+    kind: PrimitiveKind::ArrayF32,
+  };
+  pub const ARRAY_F64: Self = Self {
+    kind: PrimitiveKind::ArrayF64,
+  };
+  pub const ARRAY_STRING: Self = Self {
+    kind: PrimitiveKind::ArrayString,
+  };
 
   pub fn is_array(&self) -> bool {
     self.kind.is_array()
@@ -174,12 +257,12 @@ impl Primitive {
 
 #[derive(Debug, GraphQLObject, Serialize, Deserialize, Clone, PartialEq, Eq)]
 pub struct FrozenArray {
-  pub reference: FrozenReference
+  pub reference: FrozenReference,
 }
 
 #[derive(Debug, GraphQLObject, Serialize, Deserialize, Clone, PartialEq, Eq)]
 pub struct FrozenScalar {
-  pub reference: FrozenReference
+  pub reference: FrozenReference,
 }
 
 #[derive(Debug, Serialize, Deserialize, GraphQLUnion, From, Clone, PartialEq, Eq)]
@@ -263,16 +346,14 @@ impl FrozenTy {
     match self {
       Self::FrozenScalar(ty) => {
         set.insert(&ty.reference);
-      },
+      }
       Self::FrozenArray(ty) => {
         set.insert(&ty.reference);
-      },
+      }
       _ => {}
     }
   }
 }
-
-
 
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq, GraphQLObject)]
 pub struct UnfrozenScalar {
@@ -290,7 +371,9 @@ impl<F: Freezer> Freeze<F> for UnfrozenScalar {
   type Frozen = FrozenScalar;
 
   async fn freeze(&self, freezer: &F) -> Result<Self::Frozen, F::Error> {
-    Ok(FrozenScalar { reference: freezer.freeze(&self.reference).await? })
+    Ok(FrozenScalar {
+      reference: freezer.freeze(&self.reference).await?,
+    })
   }
 }
 
@@ -310,10 +393,11 @@ impl<F: Freezer> Freeze<F> for UnfrozenArray {
   type Frozen = FrozenArray;
 
   async fn freeze(&self, freezer: &F) -> Result<Self::Frozen, F::Error> {
-    Ok(FrozenArray { reference: freezer.freeze(&self.reference).await? })
+    Ok(FrozenArray {
+      reference: freezer.freeze(&self.reference).await?,
+    })
   }
 }
-
 
 #[derive(Debug, Serialize, Deserialize, GraphQLUnion, From, Clone, PartialEq, Eq)]
 pub enum UnfrozenTy {
@@ -396,10 +480,10 @@ impl UnfrozenTy {
     match self {
       Self::UnfrozenScalar(ty) => {
         set.insert(&ty.reference);
-      },
+      }
       Self::UnfrozenArray(ty) => {
         set.insert(&ty.reference);
-      },
+      }
       _ => {}
     }
   }
@@ -430,29 +514,118 @@ impl<S: ScalarValue> IsInputType<S> for UnfrozenTy {}
 impl FromStr for UnfrozenTy {
   type Err = ();
 
-  fn from_str(s: &str) -> Result<Self, Self::Err> { 
+  fn from_str(s: &str) -> Result<Self, Self::Err> {
     let array = s.ends_with("[]");
     let s = if array { &s[..s.len() - 2] } else { s };
     let mut iter = s.split('@');
     let s = iter.next().ok_or(())?;
-    
+
     match s {
       "unit" => Ok(PrimitiveKind::Unit.into()),
-      "bool" => Ok(if !array { PrimitiveKind::Boolean } else { PrimitiveKind::ArrayBoolean }.into()),
-      "u8" => Ok(if !array { PrimitiveKind::U8 } else { PrimitiveKind::ArrayU8 }.into()),
-      "u16" => Ok(if !array { PrimitiveKind::U16 } else { PrimitiveKind::ArrayU16 }.into()),
-      "u32" => Ok(if !array { PrimitiveKind::U32 } else { PrimitiveKind::ArrayU32 }.into()),
-      "u64" => Ok(if !array { PrimitiveKind::U64 } else { PrimitiveKind::ArrayU64 }.into()),
-      "i8" => Ok(if !array { PrimitiveKind::I8 } else { PrimitiveKind::ArrayI8 }.into()),
-      "i16" => Ok(if !array { PrimitiveKind::I16 } else { PrimitiveKind::ArrayI16 }.into()),
-      "i32" => Ok(if !array { PrimitiveKind::I32 } else { PrimitiveKind::ArrayI32 }.into()),
-      "i64" => Ok(if !array { PrimitiveKind::I64 } else { PrimitiveKind::ArrayI64 }.into()),
-      "f32" => Ok(if !array { PrimitiveKind::F32 } else { PrimitiveKind::ArrayF32 }.into()),
-      "f64" => Ok(if !array { PrimitiveKind::F64 } else { PrimitiveKind::ArrayF64 }.into()),
-      "str" => Ok(if !array { PrimitiveKind::String } else { PrimitiveKind::ArrayString }.into()),
+      "bool" => Ok(
+        if !array {
+          PrimitiveKind::Boolean
+        } else {
+          PrimitiveKind::ArrayBoolean
+        }
+        .into(),
+      ),
+      "u8" => Ok(
+        if !array {
+          PrimitiveKind::U8
+        } else {
+          PrimitiveKind::ArrayU8
+        }
+        .into(),
+      ),
+      "u16" => Ok(
+        if !array {
+          PrimitiveKind::U16
+        } else {
+          PrimitiveKind::ArrayU16
+        }
+        .into(),
+      ),
+      "u32" => Ok(
+        if !array {
+          PrimitiveKind::U32
+        } else {
+          PrimitiveKind::ArrayU32
+        }
+        .into(),
+      ),
+      "u64" => Ok(
+        if !array {
+          PrimitiveKind::U64
+        } else {
+          PrimitiveKind::ArrayU64
+        }
+        .into(),
+      ),
+      "i8" => Ok(
+        if !array {
+          PrimitiveKind::I8
+        } else {
+          PrimitiveKind::ArrayI8
+        }
+        .into(),
+      ),
+      "i16" => Ok(
+        if !array {
+          PrimitiveKind::I16
+        } else {
+          PrimitiveKind::ArrayI16
+        }
+        .into(),
+      ),
+      "i32" => Ok(
+        if !array {
+          PrimitiveKind::I32
+        } else {
+          PrimitiveKind::ArrayI32
+        }
+        .into(),
+      ),
+      "i64" => Ok(
+        if !array {
+          PrimitiveKind::I64
+        } else {
+          PrimitiveKind::ArrayI64
+        }
+        .into(),
+      ),
+      "f32" => Ok(
+        if !array {
+          PrimitiveKind::F32
+        } else {
+          PrimitiveKind::ArrayF32
+        }
+        .into(),
+      ),
+      "f64" => Ok(
+        if !array {
+          PrimitiveKind::F64
+        } else {
+          PrimitiveKind::ArrayF64
+        }
+        .into(),
+      ),
+      "str" => Ok(
+        if !array {
+          PrimitiveKind::String
+        } else {
+          PrimitiveKind::ArrayString
+        }
+        .into(),
+      ),
       _ => {
         let id = Uuid::parse_str(s).map_err(|_| ())?;
-        let version_req = VersionReq(iter.next().map(|v| semver::VersionReq::parse(v).ok()).flatten());
+        let version_req = VersionReq(
+          iter
+            .next()
+            .map(|v| semver::VersionReq::parse(v).ok())
+            .flatten(),
+        );
         let reference = UnfrozenReference { id, version_req };
         Ok(if array {
           UnfrozenTy::UnfrozenArray(UnfrozenArray { reference })
@@ -478,7 +651,7 @@ impl ToString for UnfrozenTy {
 mod test {
   use std::str::FromStr;
 
-use crate::ty::UnfrozenArray;
+  use crate::ty::UnfrozenArray;
 
   #[test]
   fn parse_u8_array() {

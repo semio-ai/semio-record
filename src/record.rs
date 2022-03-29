@@ -1,18 +1,15 @@
-
-
-
-use std::{collections::{HashSet, HashMap}, error::Error, fmt::Display, str::FromStr};
-
+use std::{collections::HashSet, fmt::Display};
 
 use async_trait::async_trait;
-use chrono::Duration;
-use juniper::{GraphQLObject, GraphQLValue, ExecutionResult, marker::IsOutputType, ScalarValue, GraphQLType, DefaultScalarValue, FromInputValue, InputValue};
-use serde::{Deserialize, Serialize, de::DeserializeOwned};
+use derive_more::From;
+use juniper::{
+  marker::IsOutputType, DefaultScalarValue, FromInputValue, GraphQLObject, GraphQLValue,
+  InputValue, ScalarValue,
+};
+use serde::{de::DeserializeOwned, Deserialize, Serialize};
 use uuid::Uuid;
 
-use derive_more::From;
-
-use crate::{blob::BlobDependencies, acl::Acl};
+use crate::{acl::Acl, blob::BlobDependencies};
 
 pub const TYPE_USER: i16 = 0x0000;
 pub const TYPE_ORGANIZATION: i16 = 0x0001;
@@ -41,7 +38,7 @@ impl Version {
 #[juniper::graphql_scalar]
 impl<S> GraphQLScalar for Version
 where
-  S: juniper::ScalarValue
+  S: juniper::ScalarValue,
 {
   fn resolve(&self) -> juniper::Value {
     juniper::Value::scalar(self.0.to_string())
@@ -51,10 +48,10 @@ where
   fn from_input_value(value: &juniper::InputValue) -> Option<Version> {
     match value.as_string_value() {
       Some(s) => Some(Version(s.parse().ok()?)),
-      None => None
+      None => None,
     }
   }
-  
+
   fn from_str<'a>(value: juniper::ScalarToken<'a>) -> juniper::ParseScalarResult<'a, S> {
     <String as juniper::ParseScalarValue<S>>::from_str(value)
   }
@@ -73,7 +70,7 @@ impl std::fmt::Display for VersionReq {
   fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
     match &self.0 {
       Some(req) => write!(f, "{}", req),
-      None => write!(f, "*")
+      None => write!(f, "*"),
     }
   }
 }
@@ -81,12 +78,12 @@ impl std::fmt::Display for VersionReq {
 #[juniper::graphql_scalar]
 impl<S> GraphQLScalar for VersionReq
 where
-  S: juniper::ScalarValue
+  S: juniper::ScalarValue,
 {
   fn resolve(&self) -> juniper::Value {
     match &self.0 {
       None => juniper::Value::scalar("*".to_string()),
-      Some(s) => juniper::Value::scalar(s.to_string())
+      Some(s) => juniper::Value::scalar(s.to_string()),
     }
   }
 
@@ -97,10 +94,10 @@ where
 
     match value.as_string_value() {
       Some(s) => Some(VersionReq(Some(s.parse().ok()?))),
-      None => None
+      None => None,
     }
   }
-  
+
   fn from_str<'a>(value: juniper::ScalarToken<'a>) -> juniper::ParseScalarResult<'a, S> {
     <String as juniper::ParseScalarValue<S>>::from_str(value)
   }
@@ -111,7 +108,9 @@ pub struct Path {
   pub components: Vec<String>,
 }
 
-#[derive(Debug, Serialize, Deserialize, Hash, PartialEq, Eq, Clone, PartialOrd, Ord, GraphQLObject)]
+#[derive(
+  Debug, Serialize, Deserialize, Hash, PartialEq, Eq, Clone, PartialOrd, Ord, GraphQLObject,
+)]
 pub struct FrozenReference {
   pub id: Uuid,
   pub version: Version,
@@ -144,7 +143,7 @@ impl<S: ScalarValue> FromInputValue<S> for UnfrozenReference {
           match key.item.as_str() {
             "id" => id = Some(Uuid::parse_str(value.item.as_string_value()?).ok()?),
             "versionReq" => version_req = VersionReq::from_input_value(&value.item),
-            _ => return None
+            _ => return None,
           }
         }
 
@@ -154,10 +153,10 @@ impl<S: ScalarValue> FromInputValue<S> for UnfrozenReference {
 
         Some(UnfrozenReference {
           id: id.unwrap(),
-          version_req: version_req.unwrap_or(VersionReq(None))
+          version_req: version_req.unwrap_or(VersionReq(None)),
         })
-      },
-      _ => None
+      }
+      _ => None,
     }
   }
 }
@@ -165,8 +164,12 @@ impl<S: ScalarValue> FromInputValue<S> for UnfrozenReference {
 pub trait Apply<T> {
   type Error: Display;
 
-  fn mutates_name(_action: &T) -> bool { false }
-  fn mutates_parent(_action: &T) -> bool { false }
+  fn mutates_name(_action: &T) -> bool {
+    false
+  }
+  fn mutates_parent(_action: &T) -> bool {
+    false
+  }
 
   fn apply(&mut self, action: &T) -> Result<(), Self::Error>;
 }
@@ -186,9 +189,15 @@ pub trait Freezer: Send + Sync {
 }
 
 pub trait View {
-  fn name<'a>(&'a self) -> Option<&'a str> { None }
-  fn parent<'a>(&'a self) -> Option<&'a Uuid> { None }
-  fn acl<'a>(&'a self) -> Option<&'a Acl> { None }
+  fn name<'a>(&'a self) -> Option<&'a str> {
+    None
+  }
+  fn parent<'a>(&'a self) -> Option<&'a Uuid> {
+    None
+  }
+  fn acl<'a>(&'a self) -> Option<&'a Acl> {
+    None
+  }
 }
 
 pub trait Unfrozen<T>: View + BlobDependencies + Apply<T> + Serialize + DeserializeOwned {
@@ -206,8 +215,7 @@ impl BlobDependencies for () {
   fn blob_dependencies<'a>(&'a self, _set: &mut HashSet<&'a Uuid>) {}
 }
 
-impl View for () {
-}
+impl View for () {}
 
 pub trait RecordDefn {
   const TYPE: i16;
@@ -244,7 +252,7 @@ macro_rules! impl_record {
         _ => Err(format!("Unsupported schema version: {}", schema_version).into()),
       }
     }
-    
+
     pub fn apply_raw_iter<B: AsRef<[u8]>, I: Iterator<Item = B>>(schema_version: i16, module: &[u8], actions: I) -> Result<Vec<u8>, Box<dyn std::error::Error>> {
       match schema_version {
         $(
@@ -262,7 +270,7 @@ macro_rules! impl_record {
         _ => Err(format!("Unsupported schema version: {}", schema_version).into()),
       }
     }
-    
+
     pub fn name(schema_version: i16, module: &[u8]) -> Option<String> {
       match schema_version {
         $(
@@ -271,7 +279,7 @@ macro_rules! impl_record {
         _ => None,
       }
     }
-    
+
     pub fn parent(schema_version: i16, module: &[u8]) -> Option<uuid::Uuid> {
       match schema_version {
         $(
