@@ -19,7 +19,7 @@ pub struct Parameter {
 }
 
 impl Parameter {
-  fn dependencies<'a>(&'a self, set: &mut HashSet<&'a FrozenReference>) {
+  pub fn dependencies<'a>(&'a self, set: &mut HashSet<&'a FrozenReference>) {
     self.ty.dependencies(set);
   }
 }
@@ -56,7 +56,7 @@ impl Function {
     self.parameter(self.parameter_id(name)?)
   }
 
-  fn dependencies<'a>(&'a self, set: &mut HashSet<&'a FrozenReference>) {
+  pub fn dependencies<'a>(&'a self, set: &mut HashSet<&'a FrozenReference>) {
     for (_, parameter) in &self.parameters {
       parameter.dependencies(set);
     }
@@ -136,7 +136,7 @@ impl ExportKind {
     }
   }
 
-  fn dependencies<'a>(&'a self, set: &mut HashSet<&'a FrozenReference>) {
+  pub fn dependencies<'a>(&'a self, set: &mut HashSet<&'a FrozenReference>) {
     match self {
       Self::Function(function) => function.dependencies(set),
     }
@@ -151,7 +151,7 @@ pub struct Export {
 }
 
 impl Export {
-  fn dependencies<'a>(&'a self, set: &mut HashSet<&'a FrozenReference>) {
+  pub fn dependencies<'a>(&'a self, set: &mut HashSet<&'a FrozenReference>) {
     self.kind.dependencies(set)
   }
 }

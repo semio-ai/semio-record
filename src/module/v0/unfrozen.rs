@@ -327,7 +327,7 @@ impl ExportKind {
     }
   }
 
-  fn dependencies<'a>(&'a self, set: &mut HashSet<&'a UnfrozenReference>) {
+  pub fn dependencies<'a>(&'a self, set: &mut HashSet<&'a UnfrozenReference>) {
     match self {
       Self::Function(function) => function.dependencies(set),
     }
@@ -396,7 +396,7 @@ impl<S: ScalarValue> FromInputValue<S> for Export {
 }
 
 impl Export {
-  fn dependencies<'a>(&'a self, set: &mut HashSet<&'a UnfrozenReference>) {
+  pub fn dependencies<'a>(&'a self, set: &mut HashSet<&'a UnfrozenReference>) {
     self.kind.dependencies(set)
   }
 }
