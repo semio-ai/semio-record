@@ -1,10 +1,11 @@
-use async_trait::async_trait;
-use serde::{Serialize, Deserialize};
-use uuid::Uuid;
-
 use derive_more::{Display, Error, From};
+use serde::{Deserialize, Serialize};
 
-use crate::{acl::action::{Action as AclAction, ActionError as AclActionError}, action::{SetName, SetParent, SetNameError, SetParentError}, record::Apply};
+use crate::{
+  acl::action::{Action as AclAction, ActionError as AclActionError},
+  action::{SetName, SetNameError, SetParent, SetParentError},
+  record::Apply,
+};
 
 use super::unfrozen::Folder;
 
