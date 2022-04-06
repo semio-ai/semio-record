@@ -1,9 +1,13 @@
 use std::collections::{HashMap, HashSet};
 
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
-use crate::{ty::FrozenTy, record::{View, Frozen, FrozenReference}, blob::BlobDependencies, acl::Acl};
+use crate::{
+  blob::BlobDependencies,
+  record::{Frozen, FrozenReference, View},
+  ty::FrozenTy,
+};
 
 #[derive(Debug, Clone, Serialize, Deserialize, GraphQLObject)]
 #[graphql(name = "FrozenStructureField")]
@@ -50,10 +54,14 @@ impl Structure {
   }
 
   pub fn fields(&self) -> Vec<IdStructureField> {
-    self.fields.iter().map(|(id, field)| IdStructureField {
-      id: id.clone(),
-      field: field.clone(),
-    }).collect()
+    self
+      .fields
+      .iter()
+      .map(|(id, field)| IdStructureField {
+        id: id.clone(),
+        field: field.clone(),
+      })
+      .collect()
   }
 
   #[graphql(name = "fieldNamed")]
@@ -81,7 +89,5 @@ impl Frozen for Structure {
 }
 
 impl BlobDependencies for Structure {
-  fn blob_dependencies<'a>(&'a self, set: &mut HashSet<&'a Uuid>) {
-    
-  }
+  fn blob_dependencies<'a>(&'a self, _: &mut HashSet<&'a Uuid>) {}
 }

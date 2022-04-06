@@ -2,16 +2,16 @@ pub mod action;
 
 use std::collections::HashMap;
 
-use juniper::{FieldError, FromInputValue, ScalarValue, InputValue, marker::IsInputType, meta::ScalarMeta};
+use async_trait::async_trait;
+use derive_more::Display;
+use juniper::{marker::IsInputType, FieldError, FromInputValue, InputValue, ScalarValue};
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
-use async_trait::async_trait;
-use derive_more::{Display, Error};
 
 #[derive(Debug, Serialize, Deserialize, GraphQLObject, Clone)]
 pub struct IdWithPermissions {
   pub id: Uuid,
-  pub with_permissions: WithPermissions
+  pub with_permissions: WithPermissions,
 }
 
 /// An Access Control List (ACL) is a list of rules that specify which agents
@@ -59,10 +59,14 @@ impl Acl {
   }
 
   pub fn permissions(&self) -> Vec<IdWithPermissions> {
-    self.permissions.iter().map(|(id, with_permissions)| IdWithPermissions {
-      id: id.clone(),
-      with_permissions: with_permissions.clone(),
-    }).collect()
+    self
+      .permissions
+      .iter()
+      .map(|(id, with_permissions)| IdWithPermissions {
+        id: id.clone(),
+        with_permissions: with_permissions.clone(),
+      })
+      .collect()
   }
 }
 
@@ -80,16 +84,24 @@ impl Acl {
     self.permissions.get(agent).unwrap_or(&self.default)
   }
 
-  pub async fn resolve<P: PermissionResolver>(&self, resolver: &P, parent: Option<&Uuid>, agent: &Uuid) -> Result<Permissions, FieldError> {
-    Ok(self
-      .with_permissions(agent)
-      .resolve(resolver, parent, agent)
-      .await?
+  pub async fn resolve<P: PermissionResolver>(
+    &self,
+    resolver: &P,
+    parent: Option<&Uuid>,
+    agent: &Uuid,
+  ) -> Result<Permissions, FieldError> {
+    Ok(
+      self
+        .with_permissions(agent)
+        .resolve(resolver, parent, agent)
+        .await?,
     )
   }
 }
 
-#[derive(Debug, Display, Serialize, Deserialize, Clone, Eq, PartialEq, PartialOrd, Ord, GraphQLEnum)]
+#[derive(
+  Debug, Display, Serialize, Deserialize, Clone, Eq, PartialEq, PartialOrd, Ord, GraphQLEnum,
+)]
 #[serde(rename_all = "lowercase")]
 pub enum PermissionLevel {
   None,
@@ -117,7 +129,7 @@ pub struct Inherit {
   /// If the specified record does not have an ACL, that
   /// record's logical parent will be used recursively.
   /// If the recursive search doesn't find any ACL, this is equivalent to `acl::None`.
-  pub from: Option<Uuid>
+  pub from: Option<Uuid>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone, Eq, PartialEq, GraphQLObject)]
@@ -138,11 +150,17 @@ impl Default for Permissions {
 impl Permissions {
   pub fn validate(&self, required: &Permissions) -> Result<(), FieldError> {
     if self.read < required.read {
-      return Err(FieldError::new("Read permission for agent is too low", graphql_value!({ "error": "UNAUTHORIZED" })));
+      return Err(FieldError::new(
+        "Read permission for agent is too low",
+        graphql_value!({ "error": "UNAUTHORIZED" }),
+      ));
     }
 
     if self.write < required.write {
-      return Err(FieldError::new("Write permission for agent is too low", graphql_value!({ "error": "UNAUTHORIZED" })));
+      return Err(FieldError::new(
+        "Write permission for agent is too low",
+        graphql_value!({ "error": "UNAUTHORIZED" }),
+      ));
     }
 
     Ok(())
@@ -217,8 +235,7 @@ impl<S: ScalarValue> FromInputValue<S> for WithPermissions {
   }
 }
 
-impl<S: ScalarValue> IsInputType<S> for WithPermissions {
-}
+impl<S: ScalarValue> IsInputType<S> for WithPermissions {}
 
 impl Default for WithPermissions {
   fn default() -> Self {
@@ -227,10 +244,19 @@ impl Default for WithPermissions {
 }
 
 impl WithPermissions {
-  pub async fn resolve<P: PermissionResolver>(&self, resolver: &P, parent: Option<&Uuid>, agent: &Uuid) -> Result<Permissions, FieldError> {
+  pub async fn resolve<P: PermissionResolver>(
+    &self,
+    resolver: &P,
+    parent: Option<&Uuid>,
+    agent: &Uuid,
+  ) -> Result<Permissions, FieldError> {
     match self {
       WithPermissions::None(_) => Ok(NO_PERMISSIONS),
-      WithPermissions::Inherit(inherit) => Ok(resolver.inherited_permissions(parent, &inherit, agent).await?),
+      WithPermissions::Inherit(inherit) => Ok(
+        resolver
+          .inherited_permissions(parent, &inherit, agent)
+          .await?,
+      ),
       WithPermissions::Custom(permissions) => Ok(permissions.clone()),
     }
   }
@@ -238,15 +264,27 @@ impl WithPermissions {
 
 #[async_trait]
 pub trait PermissionResolver {
-  async fn inherited_permissions(&self, parent: Option<&Uuid>, inherit: &Inherit, agent: &Uuid) -> Result<Permissions, FieldError>;
+  async fn inherited_permissions(
+    &self,
+    parent: Option<&Uuid>,
+    inherit: &Inherit,
+    agent: &Uuid,
+  ) -> Result<Permissions, FieldError>;
 }
 
 pub struct DummyPermissionResolver;
 
 #[async_trait]
 impl PermissionResolver for DummyPermissionResolver {
-  async fn inherited_permissions(&self, _parent: Option<&Uuid>, _inherit: &Inherit, _agent: &Uuid) -> Result<Permissions, FieldError> {
-    Err(FieldError::new("Inheriting permissions is not possible", graphql_value!({ "error": "UNAUTHORIZED" })))
+  async fn inherited_permissions(
+    &self,
+    _parent: Option<&Uuid>,
+    _inherit: &Inherit,
+    _agent: &Uuid,
+  ) -> Result<Permissions, FieldError> {
+    Err(FieldError::new(
+      "Inheriting permissions is not possible",
+      graphql_value!({ "error": "UNAUTHORIZED" }),
+    ))
   }
 }
-
