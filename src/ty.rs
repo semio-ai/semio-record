@@ -17,7 +17,7 @@ use crate::record::FrozenReference;
 use crate::record::UnfrozenReference;
 use crate::record::VersionReq;
 
-#[derive(Debug, GraphQLEnum, Serialize, Deserialize, Clone, PartialEq, Eq)]
+#[derive(Debug, GraphQLEnum, Serialize, Deserialize, Clone, PartialEq, Eq, Hash)]
 pub enum PrimitiveKind {
   Unit,
   Boolean,
