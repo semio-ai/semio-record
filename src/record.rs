@@ -75,6 +75,12 @@ impl std::fmt::Display for VersionReq {
   }
 }
 
+impl Into<semver::VersionReq> for VersionReq {
+  fn into(self) -> semver::VersionReq {
+    self.0.unwrap_or_default()
+  }
+}
+
 #[juniper::graphql_scalar]
 impl<S> GraphQLScalar for VersionReq
 where
