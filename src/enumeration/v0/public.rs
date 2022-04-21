@@ -5,7 +5,7 @@ use uuid::Uuid;
 
 use super::unfrozen::{Enumeration, EnumerationVariant, IdEnumerationVariant};
 
-#[derive(Clone, Debug, Serialize, Deserialize)]
+#[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq)]
 pub struct Public {
   pub name: String,
   pub parent: Uuid,

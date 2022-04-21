@@ -8,7 +8,7 @@ use crate::{ty::UnfrozenTy, record::{View, Freezer, Freeze, Unfrozen, UnfrozenRe
 
 use super::{frozen, action::Action};
 
-#[derive(Clone, Debug, Serialize, Deserialize, GraphQLObject)]
+#[derive(Clone, Debug, Serialize, Deserialize, GraphQLObject, PartialEq, Eq)]
 pub struct EnumerationVariant {
   pub name: String,
   #[serde(rename = "type")]

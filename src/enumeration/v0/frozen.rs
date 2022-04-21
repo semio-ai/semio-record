@@ -5,7 +5,7 @@ use uuid::Uuid;
 
 use crate::{ty::FrozenTy, record::{View, Frozen, FrozenReference}, blob::BlobDependencies};
 
-#[derive(Debug, Clone, Serialize, Deserialize, GraphQLObject)]
+#[derive(Debug, Clone, Serialize, Deserialize, GraphQLObject, PartialEq, Eq)]
 #[graphql(name = "FrozenEnumerationVariant")]
 pub struct EnumerationVariant {
   pub name: String,
@@ -14,7 +14,7 @@ pub struct EnumerationVariant {
   pub ty: FrozenTy,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
 pub struct Enumeration {
   pub parent: Uuid,
   pub name: String,
