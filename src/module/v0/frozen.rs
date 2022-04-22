@@ -156,7 +156,7 @@ impl Export {
   }
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Module {
   pub parent: Uuid,
   pub name: String,
