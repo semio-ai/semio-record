@@ -81,6 +81,12 @@ impl Into<semver::VersionReq> for VersionReq {
   }
 }
 
+impl From<Version> for VersionReq {
+  fn from(version: Version) -> Self {
+    Self(Some(semver::VersionReq::parse(version.0.to_string().as_str()).unwrap()))
+  }
+}
+
 #[juniper::graphql_scalar]
 impl<S> GraphQLScalar for VersionReq
 where
@@ -214,7 +220,9 @@ pub trait Frozen: View + BlobDependencies + Serialize + DeserializeOwned {
 }
 
 impl Frozen for () {
-  fn dependencies<'a>(&'a self, _set: &mut HashSet<&'a FrozenReference>) {}
+  fn dependencies<'a>(&'a self, _set: &mut HashSet<&'a FrozenReference>) {
+    unreachable!("no frozen record of this type can exist, dependencies do not exist")
+  }
 }
 
 impl BlobDependencies for () {
