@@ -4,7 +4,7 @@ use uuid::Uuid;
 
 use super::unfrozen::Folder;
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct Public {
   pub name: String,
   pub parent: Uuid,
