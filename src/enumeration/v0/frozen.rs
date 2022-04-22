@@ -3,7 +3,7 @@ use std::collections::{HashMap, HashSet};
 use serde::{Serialize, Deserialize};
 use uuid::Uuid;
 
-use crate::{ty::FrozenTy, record::{View, Frozen, FrozenReference}, blob::BlobDependencies};
+use crate::{ty::FrozenTy, record::{View, Frozen, FrozenReference, Version}, blob::BlobDependencies};
 
 #[derive(Debug, Clone, Serialize, Deserialize, GraphQLObject, PartialEq, Eq)]
 #[graphql(name = "FrozenEnumerationVariant")]
@@ -59,6 +59,23 @@ impl Enumeration {
   #[graphql(name = "variantNamed")]
   pub fn gql_variant_named(&self, name: String) -> Option<&EnumerationVariant> {
     self.variant_named(&name)
+  }
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+pub struct EnumerationAndVersion {
+  pub enumeration: Enumeration,
+  pub version: Version,
+}
+
+#[graphql_object(name = "FrozenEnumerationAndVersion")]
+impl EnumerationAndVersion {
+  pub fn enumeration(&self) -> &Enumeration {
+    &self.enumeration
+  }
+
+  pub fn version(&self) -> &Version {
+    &self.version
   }
 }
 
