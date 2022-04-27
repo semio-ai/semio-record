@@ -74,7 +74,7 @@ Each variant has an associated UUID.
 with `StructureField`s capable of associating values of any other type
 to named and UUID-identified attributes.
 
-## Other Notions
+## Common Components
 
 ### Primitive
 
