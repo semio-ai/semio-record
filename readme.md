@@ -5,9 +5,9 @@ This project defines the entity types used in the
 and in its clients that use the [client library](https://github.com/semio-ai/semio-client)
 such as the [Semio CLI](https://github.com/semio-ai/semio-cli).
 
-Entities have properties in common.
+These entities have properties in common.
 - They represent a versioned record in the database.
-  Hence they are always referred to as "records".
+  Hence they are always referred to as **"records"**.
 - They have [the same facets (see `RecordDefn`)](src/record.rs):
   - `Private`: the original description of the record,
     as defined by its author.
@@ -22,7 +22,8 @@ Entities have properties in common.
   - `Frozen`: a record frozen in a specific version.
     Its dependencies are described as `FrozenReference`s,
     which version information is a specific `Version`.
-  - `Action`: 
+  - `Action`: the set of operations that can be applied to a record.
+    A record is the result of a sequence of actions applied to an empty shell.
 - They have a type information and a type version information.
 - They are meant to be serializable and deserializable using that information,
   so that their inner details do not have to be involved in the database structure.
@@ -39,7 +40,9 @@ Each record type corresponds to a `mod` in this crate and a directory with the s
 For each version of the record type, a sub-directory is created,
 with a `mod` for each facet inside.
 
-## User
+## Record Types
+
+### User
 
 [`User`](src/user.rs) represents users with access rights to the database.
 This is a root record type (no parent),
@@ -47,19 +50,33 @@ and may be the parent of any other non-root record type.
 It is meant to correspond to users known to the database server,
 and with [controlled access rights](#access-control-lists).
 
-## Organization
+### Organization
 
 [`Organization`](src/organization.rs) represents an organization,
 under which other records should be organized.
 This is useful to regroup records under the same authority.
 
-## Folder
+### Folder
 
 [`Folder`](src/folder.rs) represents a folder,
 that serves as an intermediary parent to other records,
 in order to organize them conveniently.
 
-## Primitive
+### Enumeration
+
+[`Enumeration`](src/enumeration.rs) represents an enumeration type,
+with `EnumerationVariant`s capable of holding values of any other type.
+Each variant has an associated UUID.
+
+### Structure
+
+[`Structure`](src/structure.rs) represents a structure type,
+with `StructureField`s capable of associating values of any other type
+to named and UUID-identified attributes.
+
+## Other Notions
+
+### Primitive
 
 [`Primitive`](src/ty.rs) represents a primitive type,
 *but it is not a record type*.
@@ -68,26 +85,14 @@ such as [`Enumeration`](#enumeration) or [`Structure`](#structure).
 All records representing types can be referred to using
 [`FrozenTy` or `UnfrozenTy`](src/ty.rs).
 
-## Enumeration
-
-[`Enumeration`](src/enumeration.rs) represents an enumeration type,
-with `EnumerationVariant`s capable of holding values of any other type.
-Each variant has an associated UUID.
-
-## Structure
-
-[`Structure`](src/structure.rs) represents a structure type,
-with `StructureField`s capable of associating values of any other type
-to named and UUID-identified attributes.
-
-## Access Control Lists
+### Access Control Lists
 
 `Private` and `Unfrozen` records hold an access control list,
 defining which permissions are required to access them.
 These are meant to be handled by the database,
 so that to reject requests from users who were not granted the permissions.
 
-## Freezing
+### Freezing
 
 Implement the [`Freezer`](src/record.rs) trait to interface with the
 `freeze` methods available for `Unfrozen` records.
