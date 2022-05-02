@@ -95,7 +95,8 @@ impl_lib!(
   TYPE_MODULE => module,
   TYPE_STRUCTURE => structure,
   TYPE_ENUMERATION => enumeration,
-  TYPE_FOLDER => folder
+  TYPE_FOLDER => folder,
+  TYPE_ANIMATION => animation
 );
 
 #[derive(Debug, Serialize, Deserialize, GraphQLUnion)]
