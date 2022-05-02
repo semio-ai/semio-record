@@ -15,6 +15,9 @@ pub mod schema_version;
 pub mod unfrozen;
 pub mod acl;
 pub mod action;
+pub mod animation;
+pub mod color;
+pub mod math;
 
 macro_rules! impl_lib {
   ($($ty:tt => $module:tt),+) => {
