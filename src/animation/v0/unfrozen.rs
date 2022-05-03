@@ -53,6 +53,7 @@ pub struct Group {
   pub locked: bool,
   pub collapsed: bool,
   pub color: Color,
+  // Children nodes (of any type)
   pub children_ids: HashSet<Uuid>,
 }
 

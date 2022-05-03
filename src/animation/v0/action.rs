@@ -12,14 +12,14 @@ use crate::{
 
 use super::unfrozen::{Animation, Node, Key, Value, Transition};
 
-#[derive(Debug, Serialize, Deserialize, From)]
+#[derive(Debug, Serialize, Deserialize, From, Clone)]
 pub struct AddNode {
   pub parent_id: Uuid,
   pub id: Uuid,
   pub node: Node,
 }
 
-#[derive(Display, Debug, Serialize, Deserialize, Error)]
+#[derive(Display, Debug, Serialize, Deserialize, Error, Clone)]
 pub enum AddNodeError {
   #[display(fmt = "Node already exists")]
   NodeExists,
@@ -55,12 +55,12 @@ impl Apply<AddNode> for Animation {
   }
 }
 
-#[derive(Debug, Serialize, Deserialize, From)]
+#[derive(Debug, Serialize, Deserialize, From, Clone)]
 pub struct RemoveNode {
   pub id: Uuid,
 }
 
-#[derive(Display, Debug, Serialize, Deserialize, Error)]
+#[derive(Display, Debug, Serialize, Deserialize, Error, Clone)]
 pub enum RemoveNodeError {
   #[display(fmt = "Node does not exist")]
   NodeDoesNotExist,
@@ -84,14 +84,14 @@ impl Apply<RemoveNode> for Animation {
   }
 }
 
-#[derive(Debug, Serialize, Deserialize, From)]
+#[derive(Debug, Serialize, Deserialize, From, Clone)]
 pub struct AddKey {
   pub node_id: Uuid,
   pub key_id: Uuid,
   pub key: Key,
 }
 
-#[derive(Display, Debug, Serialize, Deserialize, Error)]
+#[derive(Display, Debug, Serialize, Deserialize, Error, Clone)]
 pub enum AddKeyError {
   #[display(fmt = "Node does not exist")]
   NodeDoesNotExist,
@@ -132,13 +132,13 @@ impl Apply<AddKey> for Animation {
   }
 }
 
-#[derive(Debug, Serialize, Deserialize, From)]
+#[derive(Debug, Serialize, Deserialize, From, Clone)]
 pub struct RemoveKey {
   pub node_id: Uuid,
   pub key_id: Uuid,
 }
 
-#[derive(Display, Debug, Serialize, Deserialize, Error)]
+#[derive(Display, Debug, Serialize, Deserialize, Error, Clone)]
 pub enum RemoveKeyError {
   #[display(fmt = "Node does not exist")]
   NodeDoesNotExist,
@@ -171,13 +171,13 @@ impl Apply<RemoveKey> for Animation {
   }
 }
 
-#[derive(Debug, Serialize, Deserialize, From)]
+#[derive(Debug, Serialize, Deserialize, From, Clone)]
 pub struct SetNodeName {
   pub id: Uuid,
   pub name: String,
 }
 
-#[derive(Display, Debug, Serialize, Deserialize, Error)]
+#[derive(Display, Debug, Serialize, Deserialize, Error, Clone)]
 pub enum SetNodeNameError {
   #[display(fmt = "Node does not exist")]
   NodeDoesNotExist,
@@ -200,13 +200,13 @@ impl Apply<SetNodeName> for Animation {
   }
 }
 
-#[derive(Debug, Serialize, Deserialize, From)]
+#[derive(Debug, Serialize, Deserialize, From, Clone)]
 pub struct SetNodeParent {
   pub id: Uuid,
   pub parent_id: Uuid,
 }
 
-#[derive(Display, Debug, Serialize, Deserialize, Error)]
+#[derive(Display, Debug, Serialize, Deserialize, Error, Clone)]
 pub enum SetNodeParentError {
   #[display(fmt = "Node does not exist")]
   NodeDoesNotExist,
@@ -249,13 +249,13 @@ impl Apply<SetNodeParent> for Animation {
   }
 }
 
-#[derive(Debug, Serialize, Deserialize, From)]
+#[derive(Debug, Serialize, Deserialize, From, Clone)]
 pub struct SetNodeColor {
   pub id: Uuid,
   pub color: Color,
 }
 
-#[derive(Display, Debug, Serialize, Deserialize, Error)]
+#[derive(Display, Debug, Serialize, Deserialize, Error, Clone)]
 pub enum SetNodeColorError {
   #[display(fmt = "Node does not exist")]
   NodeDoesNotExist,
@@ -278,13 +278,13 @@ impl Apply<SetNodeColor> for Animation {
   }
 }
 
-#[derive(Debug, Serialize, Deserialize, From)]
+#[derive(Debug, Serialize, Deserialize, From, Clone)]
 pub struct SetNodeLocked {
   pub id: Uuid,
   pub locked: bool,
 }
 
-#[derive(Display, Debug, Serialize, Deserialize, Error)]
+#[derive(Display, Debug, Serialize, Deserialize, Error, Clone)]
 pub enum SetNodeLockedError {
   #[display(fmt = "Node does not exist")]
   NodeDoesNotExist,
@@ -307,13 +307,13 @@ impl Apply<SetNodeLocked> for Animation {
   }
 }
 
-#[derive(Debug, Serialize, Deserialize, From)]
+#[derive(Debug, Serialize, Deserialize, From, Clone)]
 pub struct SetNodeCollapsed {
   pub id: Uuid,
   pub collapsed: bool,
 }
 
-#[derive(Display, Debug, Serialize, Deserialize, Error)]
+#[derive(Display, Debug, Serialize, Deserialize, Error, Clone)]
 pub enum SetNodeCollapsedError {
   #[display(fmt = "Node does not exist")]
   NodeDoesNotExist,
@@ -336,14 +336,14 @@ impl Apply<SetNodeCollapsed> for Animation {
   }
 }
 
-#[derive(Debug, Serialize, Deserialize, From)]
+#[derive(Debug, Serialize, Deserialize, From, Clone)]
 pub struct SetKeyAt {
   pub id: Uuid,
   pub key_id: Uuid,
   pub at: f64,
 }
 
-#[derive(Display, Debug, Serialize, Deserialize, Error)]
+#[derive(Display, Debug, Serialize, Deserialize, Error, Clone)]
 pub enum SetKeyAtError {
   #[display(fmt = "Node does not exist")]
   NodeDoesNotExist,
@@ -385,14 +385,14 @@ impl Apply<SetKeyAt> for Animation {
   }
 }
 
-#[derive(Debug, Serialize, Deserialize, From)]
+#[derive(Debug, Serialize, Deserialize, From, Clone)]
 pub struct SetKeyValue {
   pub id: Uuid,
   pub key_id: Uuid,
   pub value: Value,
 }
 
-#[derive(Display, Debug, Serialize, Deserialize, Error)]
+#[derive(Display, Debug, Serialize, Deserialize, Error, Clone)]
 pub enum SetKeyValueError {
   #[display(fmt = "Node does not exist")]
   NodeDoesNotExist,
@@ -427,14 +427,14 @@ impl Apply<SetKeyValue> for Animation {
   }
 }
 
-#[derive(Debug, Serialize, Deserialize, From)]
+#[derive(Debug, Serialize, Deserialize, From, Clone)]
 pub struct SetKeyTransition {
   pub id: Uuid,
   pub key_id: Uuid,
   pub transition: Transition,
 }
 
-#[derive(Display, Debug, Serialize, Deserialize, Error)]
+#[derive(Display, Debug, Serialize, Deserialize, Error, Clone)]
 pub enum SetKeyTransitionError {
   #[display(fmt = "Node does not exist")]
   NodeDoesNotExist,

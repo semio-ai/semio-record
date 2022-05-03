@@ -3,7 +3,7 @@ use serde::{Serialize, Deserialize};
 
 use super::unfrozen::User;
 
-#[derive(Debug, GraphQLObject, Serialize, Deserialize)]
+#[derive(Debug, Clone, GraphQLObject, Serialize, Deserialize)]
 #[graphql(name = "UserPublic")]
 pub struct Public {
   pub user_name: String,

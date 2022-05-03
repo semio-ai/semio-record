@@ -7,13 +7,13 @@ use derive_more::{Display, From, Error};
 
 use super::unfrozen::{StructureField, Structure};
 
-#[derive(Debug, Serialize, Deserialize, GraphQLObject)]
+#[derive(Debug, Serialize, Deserialize, GraphQLObject, Clone)]
 pub struct AddField {
   pub id: Uuid,
   pub field: StructureField
 }
 
-#[derive(Debug, Serialize, Deserialize, Display, Error, GraphQLEnum)]
+#[derive(Debug, Serialize, Deserialize, Display, Error, GraphQLEnum, Clone)]
 pub enum AddFieldError {
   #[display(fmt = "ID already exists")]
   IdAlreadyExists,
@@ -49,12 +49,12 @@ impl Apply<AddField> for Structure {
   }
 }
 
-#[derive(Debug, Serialize, Deserialize, GraphQLObject)]
+#[derive(Debug, Serialize, Deserialize, GraphQLObject, Clone)]
 pub struct RemoveField  {
   pub id: Uuid,
 }
 
-#[derive(Debug, Serialize, Deserialize, Display, Error, GraphQLEnum)]
+#[derive(Debug, Serialize, Deserialize, Display, Error, GraphQLEnum, Clone)]
 pub enum RemoveFieldError {
   #[display(fmt = "Field does not exist")]
   FieldDoesNotExist,
@@ -72,13 +72,13 @@ impl Apply<RemoveField> for Structure {
   }
 }
 
-#[derive(Debug, Serialize, Deserialize, GraphQLObject)]
+#[derive(Debug, Serialize, Deserialize, GraphQLObject, Clone)]
 pub struct SetFieldName  {
   pub id: Uuid,
   pub name: String,
 }
 
-#[derive(Debug, Serialize, Deserialize, Display, Error, GraphQLEnum)]
+#[derive(Debug, Serialize, Deserialize, Display, Error, GraphQLEnum, Clone)]
 pub enum SetFieldNameError {
   #[display(fmt = "Field does not exist")]
   FieldDoesNotExist,
@@ -109,13 +109,13 @@ impl Apply<SetFieldName> for Structure {
   }
 }
 
-#[derive(Debug, Serialize, Deserialize, GraphQLObject)]
+#[derive(Debug, Serialize, Deserialize, GraphQLObject, Clone)]
 pub struct SetFieldType  {
   pub id: Uuid,
   pub ty: UnfrozenTy,
 }
 
-#[derive(Debug, Serialize, Deserialize, Display, Error, GraphQLEnum)]
+#[derive(Debug, Serialize, Deserialize, Display, Error, GraphQLEnum, Clone)]
 pub enum SetFieldTypeError {
   #[display(fmt = "Field does not exist")]
   FieldDoesNotExist,
@@ -134,7 +134,7 @@ impl Apply<SetFieldType> for Structure {
   }
 }
 
-#[derive(Debug, Serialize, Deserialize, From)]
+#[derive(Debug, Serialize, Deserialize, From, Clone)]
 #[serde(tag = "type", rename_all = "lowercase")]
 pub enum Action {
   SetName(SetName),
@@ -146,7 +146,7 @@ pub enum Action {
   Acl(AclAction),
 }
 
-#[derive(Display, Debug, Error, From)]
+#[derive(Display, Debug, Error, From, Serialize, Deserialize, Clone)]
 pub enum ActionError {
   SetName(SetNameError),
   SetParent(SetParentError),
