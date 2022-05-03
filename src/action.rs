@@ -10,7 +10,7 @@ pub trait Name {
   fn set_name(&mut self, name: String);
 }
 
-#[derive(Debug, Serialize, Deserialize, GraphQLObject, Display)]
+#[derive(Debug, Serialize, Deserialize, GraphQLObject, Display, Clone)]
 pub struct SetName {
   pub name: String,
 }
@@ -21,7 +21,7 @@ impl SetName {
   }
 }
 
-#[derive(Debug, Display, Error, GraphQLEnum)]
+#[derive(Debug, Display, Error, GraphQLEnum, Serialize, Deserialize, Clone)]
 pub enum SetNameError {
   #[display(fmt = "Name too short")]
   NameTooShort,
@@ -78,7 +78,7 @@ pub trait Parent {
   fn set_parent(&mut self, parent: Uuid);
 }
 
-#[derive(Debug, Serialize, Deserialize, GraphQLObject)]
+#[derive(Debug, Serialize, Deserialize, GraphQLObject, Clone)]
 pub struct SetParent {
   pub id: Uuid,
 }
@@ -89,7 +89,7 @@ impl SetParent {
   }
 }
 
-#[derive(Debug, Display, Error, GraphQLEnum)]
+#[derive(Debug, Display, Error, GraphQLEnum, Serialize, Deserialize, Clone)]
 pub enum SetParentError {
   #[display(fmt = "Parent is not a valid UUID")]
   Invalid,

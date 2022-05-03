@@ -3,7 +3,7 @@ use serde::{Serialize, Deserialize};
 
 use super::unfrozen::Organization;
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Public {
   pub name: String,
 }

@@ -28,12 +28,12 @@ use crate::record::Apply;
 
 use super::{WithPermissions, Acl};
 
-#[derive(Debug, Serialize, Deserialize, GraphQLObject)]
+#[derive(Debug, Serialize, Deserialize, GraphQLObject, Clone)]
 pub struct SetDefault {
   pub with_permissions: WithPermissions,
 }
 
-#[derive(Debug, Serialize, Deserialize, Display, Error, GraphQLEnum)]
+#[derive(Debug, Serialize, Deserialize, Display, Error, GraphQLEnum, Clone)]
 pub enum SetDefaultError {
   #[display(fmt = "Invalid permissions")]
   InvalidPermissions,
@@ -50,13 +50,13 @@ impl<T: WithAcl> Apply<SetDefault> for T {
   }
 }
 
-#[derive(Debug, Serialize, Deserialize, GraphQLObject)]
+#[derive(Debug, Serialize, Deserialize, GraphQLObject, Clone)]
 pub struct AddPermissions {
   pub agent: Uuid,
   pub with_permissions: WithPermissions,
 }
 
-#[derive(Debug, Serialize, Deserialize, Display, Error, GraphQLEnum)]
+#[derive(Debug, Serialize, Deserialize, Display, Error, GraphQLEnum, Clone)]
 pub enum AddPermissionsError {
   #[display(fmt = "Invalid permissions")]
   InvalidPermissions,
@@ -80,12 +80,12 @@ impl<T: WithAcl> Apply<AddPermissions> for T {
   }
 }
 
-#[derive(Debug, Serialize, Deserialize, GraphQLObject)]
+#[derive(Debug, Serialize, Deserialize, GraphQLObject, Clone)]
 pub struct RemovePermissions {
   pub agent: Uuid,
 }
 
-#[derive(Debug, Serialize, Deserialize, Display, Error, GraphQLEnum)]
+#[derive(Debug, Serialize, Deserialize, Display, Error, GraphQLEnum, Clone)]
 pub enum RemovePermissionsError {
   #[display(fmt = "Agent does not exists")]
   AgentDoesNotExists,
@@ -106,13 +106,13 @@ impl<T: WithAcl> Apply<RemovePermissions> for T {
   }
 }
 
-#[derive(Debug, Serialize, Deserialize, GraphQLObject)]
+#[derive(Debug, Serialize, Deserialize, GraphQLObject, Clone)]
 pub struct SetPermissions {
   pub agent: Uuid,
   pub with_permissions: WithPermissions,
 }
 
-#[derive(Debug, Serialize, Deserialize, Display, Error, GraphQLEnum)]
+#[derive(Debug, Serialize, Deserialize, Display, Error, GraphQLEnum, Clone)]
 pub enum SetPermissionsError {
   #[display(fmt = "Invalid permissions")]
   InvalidPermissions,
@@ -137,7 +137,7 @@ impl<T: WithAcl> Apply<SetPermissions> for T {
   }
 }
 
-#[derive(Debug, Serialize, Deserialize, GraphQLUnion)]
+#[derive(Debug, Serialize, Deserialize, GraphQLUnion, Clone)]
 pub enum Action {
   SetDefault(SetDefault),
   AddPermissions(AddPermissions),
@@ -146,7 +146,7 @@ pub enum Action {
 }
 
 
-#[derive(Debug, Serialize, Deserialize, Display, Error, From)]
+#[derive(Debug, Serialize, Deserialize, Display, Error, From, Clone)]
 pub enum ActionError {
   SetDefault(SetDefaultError),
   AddPermissions(AddPermissionsError),

@@ -7,13 +7,13 @@ use derive_more::{Display, From, Error};
 
 use super::unfrozen::{EnumerationVariant, Enumeration};
 
-#[derive(Debug, Serialize, Deserialize, GraphQLObject)]
+#[derive(Debug, Serialize, Deserialize, GraphQLObject, Clone)]
 pub struct AddVariant  {
   pub id: Uuid,
   pub variant: EnumerationVariant
 }
 
-#[derive(Debug, Serialize, Deserialize, Display, Error, GraphQLEnum)]
+#[derive(Debug, Serialize, Deserialize, Display, Error, GraphQLEnum, Clone)]
 pub enum AddVariantError {
   #[display(fmt = "ID already exists")]
   IdAlreadyExists,
@@ -49,12 +49,12 @@ impl Apply<AddVariant> for Enumeration {
   }
 }
 
-#[derive(Debug, Serialize, Deserialize, GraphQLObject)]
+#[derive(Debug, Serialize, Deserialize, GraphQLObject, Clone)]
 pub struct RemoveVariant  {
   pub id: Uuid,
 }
 
-#[derive(Debug, Serialize, Deserialize, Display, Error, GraphQLEnum)]
+#[derive(Debug, Serialize, Deserialize, Display, Error, GraphQLEnum, Clone)]
 pub enum RemoveVariantError {
   #[display(fmt = "Variant does not exist")]
   VariantDoesNotExist,
@@ -72,13 +72,13 @@ impl Apply<RemoveVariant> for Enumeration {
   }
 }
 
-#[derive(Debug, Serialize, Deserialize, GraphQLObject)]
+#[derive(Debug, Serialize, Deserialize, GraphQLObject, Clone)]
 pub struct SetVariantName  {
   pub id: Uuid,
   pub name: String,
 }
 
-#[derive(Debug, Serialize, Deserialize, Display, Error, GraphQLEnum)]
+#[derive(Debug, Serialize, Deserialize, Display, Error, GraphQLEnum, Clone)]
 pub enum SetVariantNameError {
   #[display(fmt = "Variant does not exist")]
   VariantDoesNotExist,
@@ -109,13 +109,13 @@ impl Apply<SetVariantName> for Enumeration {
   }
 }
 
-#[derive(Debug, Serialize, Deserialize, GraphQLObject)]
+#[derive(Debug, Serialize, Deserialize, GraphQLObject, Clone)]
 pub struct SetVariantType  {
   pub id: Uuid,
   pub ty: UnfrozenTy,
 }
 
-#[derive(Debug, Serialize, Deserialize, Display, Error, GraphQLEnum)]
+#[derive(Debug, Serialize, Deserialize, Display, Error, GraphQLEnum, Clone)]
 pub enum SetVariantTypeError {
   #[display(fmt = "Variant does not exist")]
   VariantDoesNotExist,
@@ -134,7 +134,7 @@ impl Apply<SetVariantType> for Enumeration {
   }
 }
 
-#[derive(Debug, Serialize, Deserialize, From)]
+#[derive(Debug, Serialize, Deserialize, From, Clone)]
 #[serde(tag = "type", rename_all = "lowercase")]
 pub enum Action {
   SetName(SetName),
@@ -146,7 +146,7 @@ pub enum Action {
   Acl(AclAction),
 }
 
-#[derive(Display, Debug, Error, From)]
+#[derive(Display, Debug, Error, From, Clone, Serialize, Deserialize)]
 pub enum ActionError {
   SetName(SetNameError),
   SetParent(SetParentError),
