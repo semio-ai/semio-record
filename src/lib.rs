@@ -15,6 +15,9 @@ pub mod schema_version;
 pub mod unfrozen;
 pub mod acl;
 pub mod action;
+pub mod animation;
+pub mod color;
+pub mod math;
 
 macro_rules! impl_lib {
   ($($ty:tt => $module:tt),+) => {
@@ -92,7 +95,8 @@ impl_lib!(
   TYPE_MODULE => module,
   TYPE_STRUCTURE => structure,
   TYPE_ENUMERATION => enumeration,
-  TYPE_FOLDER => folder
+  TYPE_FOLDER => folder,
+  TYPE_ANIMATION => animation
 );
 
 #[derive(Debug, Serialize, Deserialize, GraphQLUnion)]

@@ -20,6 +20,8 @@ pub const TYPE_MODULE: i16 = 0x0020;
 pub const TYPE_STRUCTURE: i16 = 0x0021;
 pub const TYPE_ENUMERATION: i16 = 0x0022;
 
+pub const TYPE_ANIMATION: i16 = 0x0030;
+
 #[derive(Debug, From, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize)]
 pub struct Version(pub semver::Version);
 
