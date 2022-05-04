@@ -4,12 +4,12 @@ use super::unfrozen::{User};
 use derive_more::{Display, Error, From};
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Serialize, Deserialize, Display, GraphQLObject)]
+#[derive(Debug, Serialize, Deserialize, Display, GraphQLObject, Clone)]
 pub struct SetFirstName {
   pub first_name: String,
 }
 
-#[derive(Debug, Serialize, Deserialize, Display, Error, GraphQLEnum)]
+#[derive(Debug, Serialize, Deserialize, Display, Error, GraphQLEnum, Clone)]
 pub enum SetFirstNameError {
   #[display(fmt = "First name can't be empty")]
   Empty,
@@ -29,12 +29,12 @@ impl Apply<SetFirstName> for User {
   }
 }
 
-#[derive(Debug, Serialize, Deserialize, Display, GraphQLObject)]
+#[derive(Debug, Serialize, Deserialize, Display, GraphQLObject, Clone)]
 pub struct SetLastName {
   pub last_name: String,
 }
 
-#[derive(Debug, Serialize, Deserialize, Display, Error, GraphQLEnum)]
+#[derive(Debug, Serialize, Deserialize, Display, Error, GraphQLEnum, Clone)]
 pub enum SetLastNameError {
   #[display(fmt = "Last name can't be empty")]
   Empty,
@@ -54,12 +54,12 @@ impl Apply<SetLastName> for User {
   }
 }
 
-#[derive(Debug, Serialize, Deserialize, Display, GraphQLObject)]
+#[derive(Debug, Serialize, Deserialize, Display, GraphQLObject, Clone)]
 pub struct SetEmail {
   pub email: String,
 }
 
-#[derive(Debug, Serialize, Deserialize, Display, Error, GraphQLEnum)]
+#[derive(Debug, Serialize, Deserialize, Display, Error, GraphQLEnum, Clone)]
 pub enum SetEmailError {
   #[display(fmt = "String isn't an email address")]
   Invalid,
@@ -91,12 +91,12 @@ impl Apply<SetEmail> for User {
   }
 }
 
-#[derive(Debug, Serialize, Deserialize, Display, GraphQLObject)]
+#[derive(Debug, Serialize, Deserialize, Display, GraphQLObject, Clone)]
 pub struct SetEmailVerified {
   pub email_verified: bool,
 }
 
-#[derive(Debug, Serialize, Deserialize, Display, Error, GraphQLEnum)]
+#[derive(Debug, Serialize, Deserialize, Display, Error, GraphQLEnum, Clone)]
 pub enum SetEmailVerifiedError {
   _Dummy,
 }
@@ -110,12 +110,12 @@ impl Apply<SetEmailVerified> for User {
   }
 }
 
-#[derive(Debug, Serialize, Deserialize, Display, GraphQLObject)]
+#[derive(Debug, Serialize, Deserialize, Display, GraphQLObject, Clone)]
 pub struct SetPasswordHash {
   pub password_hash: String,
 }
 
-#[derive(Debug, Serialize, Deserialize, Display, Error, GraphQLEnum)]
+#[derive(Debug, Serialize, Deserialize, Display, Error, GraphQLEnum, Clone)]
 pub enum SetPasswordHashError {
   #[display(fmt = "Password hash can't be empty")]
   Empty,
@@ -135,12 +135,12 @@ impl Apply<SetPasswordHash> for User {
   }
 }
 
-#[derive(Debug, Serialize, Deserialize, Display, GraphQLObject)]
+#[derive(Debug, Serialize, Deserialize, Display, GraphQLObject, Clone)]
 pub struct SetTokenSecret  {
   pub token_secret: String,
 }
 
-#[derive(Debug, Serialize, Deserialize, Display, Error, GraphQLEnum)]
+#[derive(Debug, Serialize, Deserialize, Display, Error, GraphQLEnum, Clone)]
 pub enum SetTokenSecretError {
   #[display(fmt = "Token secret is too short")]
   TooShort,
@@ -162,7 +162,7 @@ impl Apply<SetTokenSecret> for User {
 
 
 
-#[derive(Debug, Serialize, Deserialize, Display, From, GraphQLUnion)]
+#[derive(Debug, Serialize, Deserialize, Display, From, GraphQLUnion, Clone)]
 #[serde(tag = "type", rename_all = "lowercase")]
 pub enum Action {
   SetUserName(SetName),
@@ -174,7 +174,7 @@ pub enum Action {
   SetTokenSecret(SetTokenSecret),
 }
 
-#[derive(Display, Debug, Error, From)]
+#[derive(Display, Debug, Error, From, Clone)]
 pub enum ActionError {
   SetUserName(SetNameError),
   SetFirstName(SetFirstNameError),
