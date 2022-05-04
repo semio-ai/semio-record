@@ -469,7 +469,7 @@ impl Apply<SetKeyTransition> for Animation {
   }
 }
 
-#[derive(Debug, Serialize, Deserialize, From)]
+#[derive(Debug, Serialize, Deserialize, From, Clone)]
 #[serde(tag = "type", rename_all = "lowercase")]
 pub enum Action {
   SetName(SetName),
@@ -489,7 +489,7 @@ pub enum Action {
   Acl(AclAction),
 }
 
-#[derive(Display, Debug, Error, From)]
+#[derive(Display, Debug, Error, From, Clone)]
 pub enum ActionError {
   SetName(SetNameError),
   SetParent(SetParentError),
