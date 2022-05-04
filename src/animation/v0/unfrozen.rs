@@ -147,6 +147,18 @@ pub struct Animation {
   pub acl: Acl,
 }
 
+impl Default for Animation {
+  fn default() -> Self {
+    Self {
+      name: "".to_string(),
+      parent: Uuid::new_v4(),
+      root_id: Uuid::new_v4(),
+      nodes: HashMap::new(),
+      acl: Default::default(),
+    }
+  }
+}
+
 #[derive(Debug, Serialize, Deserialize, Clone, GraphQLObject)]
 pub struct IdNode {
   pub id: Uuid,
