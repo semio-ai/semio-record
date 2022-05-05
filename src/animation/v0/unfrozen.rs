@@ -131,7 +131,7 @@ impl Track {
 }
 
 #[derive(Debug, Serialize, Deserialize, GraphQLUnion, Clone)]
-#[serde(tag = "type", rename_all = "lowercase")]
+#[serde(tag = "type", rename_all = "lowercase", content = "value")]
 pub enum Node {
   Group(Group),
   Track(Track),
