@@ -5,13 +5,14 @@ use derive_more::{Display, Error, From};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize, From, Clone)]
-#[serde(tag = "type", rename_all = "lowercase")]
+#[serde(tag = "type", rename_all = "lowercase", content = "value")]
 pub enum Action {
   SetName(SetName),
   Acl(AclAction),
 }
 
 #[derive(Display, Debug, Error, From, Clone, Serialize, Deserialize)]
+#[serde(tag = "type", rename_all = "snake_case", content = "value")]
 pub enum ActionError {
   SetName(SetNameError),
   Acl(AclActionError),

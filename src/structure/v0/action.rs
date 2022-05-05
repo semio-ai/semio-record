@@ -14,6 +14,7 @@ pub struct AddField {
 }
 
 #[derive(Debug, Serialize, Deserialize, Display, Error, GraphQLEnum, Clone)]
+#[serde(tag = "type", rename_all = "snake_case", content = "value")]
 pub enum AddFieldError {
   #[display(fmt = "ID already exists")]
   IdAlreadyExists,
@@ -55,6 +56,7 @@ pub struct RemoveField  {
 }
 
 #[derive(Debug, Serialize, Deserialize, Display, Error, GraphQLEnum, Clone)]
+#[serde(tag = "type", rename_all = "snake_case", content = "value")]
 pub enum RemoveFieldError {
   #[display(fmt = "Field does not exist")]
   FieldDoesNotExist,
@@ -79,6 +81,7 @@ pub struct SetFieldName  {
 }
 
 #[derive(Debug, Serialize, Deserialize, Display, Error, GraphQLEnum, Clone)]
+#[serde(tag = "type", rename_all = "snake_case", content = "value")]
 pub enum SetFieldNameError {
   #[display(fmt = "Field does not exist")]
   FieldDoesNotExist,
@@ -116,6 +119,7 @@ pub struct SetFieldType  {
 }
 
 #[derive(Debug, Serialize, Deserialize, Display, Error, GraphQLEnum, Clone)]
+#[serde(tag = "type", rename_all = "snake_case", content = "value")]
 pub enum SetFieldTypeError {
   #[display(fmt = "Field does not exist")]
   FieldDoesNotExist,
@@ -135,7 +139,7 @@ impl Apply<SetFieldType> for Structure {
 }
 
 #[derive(Debug, Serialize, Deserialize, From, Clone)]
-#[serde(tag = "type", rename_all = "lowercase")]
+#[serde(tag = "type", rename_all = "snake_case", content = "value")]
 pub enum Action {
   SetName(SetName),
   SetParent(SetParent),
@@ -147,6 +151,7 @@ pub enum Action {
 }
 
 #[derive(Display, Debug, Error, From, Serialize, Deserialize, Clone)]
+#[serde(tag = "type", rename_all = "snake_case", content = "value")]
 pub enum ActionError {
   SetName(SetNameError),
   SetParent(SetParentError),
