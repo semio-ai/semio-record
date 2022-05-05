@@ -14,6 +14,7 @@ pub struct F64 {
 }
 
 #[derive(Debug, Serialize, Deserialize, GraphQLUnion, Clone)]
+#[serde(tag = "type", rename_all = "snake_case", content = "value")]
 pub enum Value {
   F64(F64),
 }
@@ -34,6 +35,7 @@ pub struct MultiBezier {
 }
 
 #[derive(Debug, Serialize, Deserialize, GraphQLUnion, Clone)]
+#[serde(tag = "type", rename_all = "snake_case", content = "value")]
 pub enum Transition {
   None(None),
   Linear(Linear),
