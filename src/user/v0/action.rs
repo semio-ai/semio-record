@@ -10,6 +10,7 @@ pub struct SetFirstName {
 }
 
 #[derive(Debug, Serialize, Deserialize, Display, Error, GraphQLEnum, Clone)]
+#[serde(tag = "type", rename_all = "snake_case", content = "value")]
 pub enum SetFirstNameError {
   #[display(fmt = "First name can't be empty")]
   Empty,
@@ -35,6 +36,7 @@ pub struct SetLastName {
 }
 
 #[derive(Debug, Serialize, Deserialize, Display, Error, GraphQLEnum, Clone)]
+#[serde(tag = "type", rename_all = "snake_case", content = "value")]
 pub enum SetLastNameError {
   #[display(fmt = "Last name can't be empty")]
   Empty,
@@ -60,6 +62,7 @@ pub struct SetEmail {
 }
 
 #[derive(Debug, Serialize, Deserialize, Display, Error, GraphQLEnum, Clone)]
+#[serde(tag = "type", rename_all = "snake_case", content = "value")]
 pub enum SetEmailError {
   #[display(fmt = "String isn't an email address")]
   Invalid,
@@ -97,6 +100,7 @@ pub struct SetEmailVerified {
 }
 
 #[derive(Debug, Serialize, Deserialize, Display, Error, GraphQLEnum, Clone)]
+#[serde(tag = "type", rename_all = "snake_case", content = "value")]
 pub enum SetEmailVerifiedError {
   _Dummy,
 }
@@ -116,6 +120,7 @@ pub struct SetPasswordHash {
 }
 
 #[derive(Debug, Serialize, Deserialize, Display, Error, GraphQLEnum, Clone)]
+#[serde(tag = "type", rename_all = "snake_case", content = "value")]
 pub enum SetPasswordHashError {
   #[display(fmt = "Password hash can't be empty")]
   Empty,
@@ -141,6 +146,7 @@ pub struct SetTokenSecret  {
 }
 
 #[derive(Debug, Serialize, Deserialize, Display, Error, GraphQLEnum, Clone)]
+#[serde(tag = "type", rename_all = "snake_case", content = "value")]
 pub enum SetTokenSecretError {
   #[display(fmt = "Token secret is too short")]
   TooShort,
@@ -163,7 +169,7 @@ impl Apply<SetTokenSecret> for User {
 
 
 #[derive(Debug, Serialize, Deserialize, Display, From, GraphQLUnion, Clone)]
-#[serde(tag = "type", rename_all = "lowercase")]
+#[serde(tag = "type", rename_all = "snake_case", content = "value")]
 pub enum Action {
   SetUserName(SetName),
   SetFirstName(SetFirstName),
@@ -174,7 +180,8 @@ pub enum Action {
   SetTokenSecret(SetTokenSecret),
 }
 
-#[derive(Display, Debug, Error, From, Clone)]
+#[derive(Display, Debug, Error, From, Clone, Serialize, Deserialize)]
+#[serde(tag = "type", rename_all = "snake_case", content = "value")]
 pub enum ActionError {
   SetUserName(SetNameError),
   SetFirstName(SetFirstNameError),

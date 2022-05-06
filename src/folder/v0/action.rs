@@ -10,7 +10,7 @@ use crate::{
 use super::unfrozen::Folder;
 
 #[derive(Debug, Serialize, Deserialize, From, Clone)]
-#[serde(tag = "type", rename_all = "lowercase")]
+#[serde(tag = "type", rename_all = "snake_case", content = "value")]
 pub enum Action {
   SetName(SetName),
   SetParent(SetParent),
@@ -18,6 +18,7 @@ pub enum Action {
 }
 
 #[derive(Display, Debug, Error, From, Serialize, Deserialize, Clone)]
+#[serde(tag = "type", rename_all = "snake_case", content = "value")]
 pub enum ActionError {
   SetName(SetNameError),
   SetParent(SetParentError),

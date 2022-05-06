@@ -14,6 +14,7 @@ pub struct AddVariant  {
 }
 
 #[derive(Debug, Serialize, Deserialize, Display, Error, GraphQLEnum, Clone)]
+#[serde(tag = "type", rename_all = "snake_case", content = "value")]
 pub enum AddVariantError {
   #[display(fmt = "ID already exists")]
   IdAlreadyExists,
@@ -55,6 +56,7 @@ pub struct RemoveVariant  {
 }
 
 #[derive(Debug, Serialize, Deserialize, Display, Error, GraphQLEnum, Clone)]
+#[serde(tag = "type", rename_all = "snake_case", content = "value")]
 pub enum RemoveVariantError {
   #[display(fmt = "Variant does not exist")]
   VariantDoesNotExist,
@@ -79,6 +81,7 @@ pub struct SetVariantName  {
 }
 
 #[derive(Debug, Serialize, Deserialize, Display, Error, GraphQLEnum, Clone)]
+#[serde(tag = "type", rename_all = "snake_case", content = "value")]
 pub enum SetVariantNameError {
   #[display(fmt = "Variant does not exist")]
   VariantDoesNotExist,
@@ -116,6 +119,7 @@ pub struct SetVariantType  {
 }
 
 #[derive(Debug, Serialize, Deserialize, Display, Error, GraphQLEnum, Clone)]
+#[serde(tag = "type", rename_all = "snake_case", content = "value")]
 pub enum SetVariantTypeError {
   #[display(fmt = "Variant does not exist")]
   VariantDoesNotExist,
@@ -135,7 +139,7 @@ impl Apply<SetVariantType> for Enumeration {
 }
 
 #[derive(Debug, Serialize, Deserialize, From, Clone)]
-#[serde(tag = "type", rename_all = "lowercase")]
+#[serde(tag = "type", rename_all = "snake_case", content = "value")]
 pub enum Action {
   SetName(SetName),
   SetParent(SetParent),
@@ -147,6 +151,7 @@ pub enum Action {
 }
 
 #[derive(Display, Debug, Error, From, Clone, Serialize, Deserialize)]
+#[serde(tag = "type", rename_all = "snake_case", content = "value")]
 pub enum ActionError {
   SetName(SetNameError),
   SetParent(SetParentError),

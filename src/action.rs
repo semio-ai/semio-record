@@ -22,6 +22,7 @@ impl SetName {
 }
 
 #[derive(Debug, Display, Error, GraphQLEnum, Serialize, Deserialize, Clone)]
+#[serde(tag = "type", rename_all = "snake_case", content = "value")]
 pub enum SetNameError {
   #[display(fmt = "Name too short")]
   NameTooShort,
@@ -90,6 +91,7 @@ impl SetParent {
 }
 
 #[derive(Debug, Display, Error, GraphQLEnum, Serialize, Deserialize, Clone)]
+#[serde(tag = "type", rename_all = "snake_case", content = "value")]
 pub enum SetParentError {
   #[display(fmt = "Parent is not a valid UUID")]
   Invalid,

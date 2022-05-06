@@ -303,7 +303,7 @@ impl<S: ScalarValue> FromInputValue<S> for Function {
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone, GraphQLUnion, From)]
-#[serde(tag = "type", rename_all = "lowercase")]
+#[serde(tag = "type", rename_all = "lowercase", content = "value")]
 pub enum ExportKind {
   Function(Function),
 }

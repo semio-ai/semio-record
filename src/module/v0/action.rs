@@ -18,6 +18,7 @@ pub struct SetExecutable {
 }
 
 #[derive(Display, Clone, Debug, Error, GraphQLEnum, Serialize, Deserialize)]
+#[serde(tag = "type", rename_all = "snake_case", content = "value")]
 pub enum SetExecutableError {
   _Dummy
 }
@@ -39,6 +40,7 @@ pub struct AddExport {
 }
 
 #[derive(Display, Clone,Debug, Error, GraphQLEnum, Serialize, Deserialize)]
+#[serde(tag = "type", rename_all = "snake_case", content = "value")]
 pub enum AddExportError
 {
   #[display(fmt = "Export name already exists in module")]
@@ -66,6 +68,7 @@ pub struct RemoveExport {
 }
 
 #[derive(Display, Clone, Debug, Error, GraphQLEnum, Serialize, Deserialize)]
+#[serde(tag = "type", rename_all = "snake_case", content = "value")]
 pub enum RemoveExportError {
   #[display(fmt = "Export not found in module")]
   ExportNotFound,
@@ -93,6 +96,7 @@ pub struct RenameExport {
 }
 
 #[derive(Display, Clone, Debug, Error, GraphQLEnum, Serialize, Deserialize)]
+#[serde(tag = "type", rename_all = "snake_case", content = "value")]
 pub enum RenameExportError {
   #[display(fmt = "Export not found in module")]
   ExportNotFound,
@@ -130,6 +134,7 @@ pub struct AppendFunctionParameter {
 }
 
 #[derive(Display, Clone, Debug, Error, GraphQLEnum, Serialize, Deserialize)]
+#[serde(tag = "type", rename_all = "snake_case", content = "value")]
 pub enum AppendFunctionParameterError
 {
   #[display(fmt = "Export not found in module")]
@@ -172,6 +177,7 @@ pub struct RemoveFunctionParameter {
 }
 
 #[derive(Display, Clone, Debug, Error, GraphQLEnum, Serialize, Deserialize)]
+#[serde(tag = "type", rename_all = "snake_case", content = "value")]
 pub enum RemoveFunctionParameterError {
   #[display(fmt = "Export not found in module")]
   ExportNotFound,
@@ -211,6 +217,7 @@ pub struct SetFunctionParameterName {
 }
 
 #[derive(Display, Clone, Debug, Error, GraphQLEnum, Serialize, Deserialize)]
+#[serde(tag = "type", rename_all = "snake_case", content = "value")]
 pub enum SetFunctionParameterNameError {
   #[display(fmt = "Export not found in module")]
   ExportNotFound,
@@ -258,6 +265,7 @@ pub struct SetFunctionParameterType {
 }
 
 #[derive(Display, Clone, Debug, Error, GraphQLEnum, Serialize, Deserialize)]
+#[serde(tag = "type", rename_all = "snake_case", content = "value")]
 pub enum SetFunctionParameterTypeError
 {
   #[display(fmt = "Export not found in module")]
@@ -300,6 +308,7 @@ pub struct SetFunctionParameterMutability {
 }
 
 #[derive(Display, Clone, Debug, Error, GraphQLEnum, Serialize, Deserialize)]
+#[serde(tag = "type", rename_all = "snake_case", content = "value")]
 pub enum SetFunctionParameterMutabilityError {
   #[display(fmt = "Export not found in module")]
   ExportNotFound,
@@ -340,6 +349,7 @@ pub struct SetFunctionReturnType {
 }
 
 #[derive(Display, Clone, Debug, Error, GraphQLEnum, Serialize, Deserialize)]
+#[serde(tag = "type", rename_all = "snake_case", content = "value")]
 pub enum SetFunctionReturnTypeError
 {
   #[display(fmt = "Export not found in module")]
@@ -372,6 +382,7 @@ pub struct AddDependency {
 }
 
 #[derive(Display, Clone, Debug, Error, GraphQLEnum, Serialize, Deserialize)]
+#[serde(tag = "type", rename_all = "snake_case", content = "value")]
 pub enum AddDependencyError
 {
   #[display(fmt = "Dependency already exists")]
@@ -405,6 +416,7 @@ pub struct RemoveDependency {
 }
 
 #[derive(Display, Clone, Debug, Error, GraphQLEnum, Serialize, Deserialize)]
+#[serde(tag = "type", rename_all = "snake_case", content = "value")]
 pub enum RemoveDependencyError {
   #[display(fmt = "Dependency not found")]
   NotFound,
@@ -429,7 +441,7 @@ impl Apply<RemoveDependency> for Module
 
 
 #[derive(Debug, Clone, Serialize, Deserialize, From)]
-#[serde(tag = "type", rename_all = "lowercase")]
+#[serde(tag = "type", rename_all = "snake_case", content = "value")]
 pub enum Action {
   SetParent(SetParent),
   SetName(SetName),
@@ -448,6 +460,7 @@ pub enum Action {
 }
 
 #[derive(Display, Clone, Debug, Error, Serialize, Deserialize, From)]
+#[serde(tag = "type", rename_all = "snake_case", content = "value")]
 pub enum ActionError
 {
   SetParent(SetParentError),
