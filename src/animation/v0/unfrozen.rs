@@ -4,7 +4,15 @@ use async_trait::async_trait;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
-use crate::{record::{Unfrozen, UnfrozenReference, View, Freeze, Freezer}, blob::BlobDependencies, unfrozen::impl_unfrozen, acl::{Acl, action::with_acl}, action::{name, parent}, color::Color, math::MultiBezier2};
+use crate::{
+  record::{Unfrozen, UnfrozenReference, View, Freeze, Freezer},
+  blob::BlobDependencies,
+  unfrozen::impl_unfrozen,
+  acl::{Acl, action::with_acl},
+  action::{name, parent},
+  color::{Color, Rgb},
+  math::MultiBezier2
+};
 
 use super::action::Action;
 
@@ -151,11 +159,27 @@ pub struct Animation {
 
 impl Default for Animation {
   fn default() -> Self {
+    let mut nodes = HashMap::new();
+
+    let root_id = Uuid::new_v4();
+
+    nodes.insert(root_id.clone(), Node::Group(Group {
+      name: "Root".to_string(),
+      children_ids: HashSet::new(),
+      collapsed: false,
+      color: Color::Rgb(Rgb {
+        r: 1.0,
+        g: 0.0,
+        b: 0.0
+      }),
+      locked: false,
+    }));
+
     Self {
       name: "".to_string(),
-      parent: Uuid::new_v4(),
-      root_id: Uuid::new_v4(),
-      nodes: HashMap::new(),
+      parent: Uuid::nil(),
+      root_id,
+      nodes,
       acl: Default::default(),
     }
   }

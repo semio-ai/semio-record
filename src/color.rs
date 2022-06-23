@@ -3,32 +3,32 @@ use juniper::{GraphQLObject, GraphQLUnion};
 
 #[derive(Debug, Serialize, Deserialize, Clone, GraphQLObject)]
 pub struct Rgb {
-  r: f64,
-  g: f64,
-  b: f64,
+  pub r: f64,
+  pub g: f64,
+  pub b: f64,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone, GraphQLObject)]
 pub struct Rgba {
-  r: f64,
-  g: f64,
-  b: f64,
-  a: f64,
+  pub r: f64,
+  pub g: f64,
+  pub b: f64,
+  pub a: f64,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone, GraphQLObject)]
 pub struct Hsl {
-  h: f64,
-  s: f64,
-  l: f64,
+  pub h: f64,
+  pub s: f64,
+  pub l: f64,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone, GraphQLObject)]
 pub struct Hsla {
-  h: f64,
-  s: f64,
-  l: f64,
-  a: f64,
+  pub h: f64,
+  pub s: f64,
+  pub l: f64,
+  pub a: f64,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone, GraphQLUnion)]
