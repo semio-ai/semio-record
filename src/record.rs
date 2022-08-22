@@ -9,7 +9,7 @@ use juniper::{
 use serde::{de::DeserializeOwned, Deserialize, Serialize};
 use uuid::Uuid;
 
-use crate::{acl::Acl, blob::BlobDependencies};
+use crate::{acl::Acl, blob::BlobDependencies, migrate::Migrate};
 
 pub const TYPE_USER: i16 = 0x0000;
 pub const TYPE_ORGANIZATION: i16 = 0x0001;
@@ -21,6 +21,7 @@ pub const TYPE_STRUCTURE: i16 = 0x0021;
 pub const TYPE_ENUMERATION: i16 = 0x0022;
 
 pub const TYPE_ANIMATION: i16 = 0x0030;
+pub const TYPE_SCENE: i16 = 0x0100;
 
 #[derive(Debug, From, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize)]
 pub struct Version(pub semver::Version);
@@ -208,7 +209,7 @@ pub trait View {
   }
 }
 
-pub trait Unfrozen<T>: View + BlobDependencies + Apply<T> + Serialize + DeserializeOwned {
+pub trait Unfrozen<T>: View + BlobDependencies + Apply<T> + Migrate + Serialize + DeserializeOwned {
   fn dependencies<'a>(&'a self, _set: &mut HashSet<&'a UnfrozenReference>) {}
 }
 pub trait Frozen: View + BlobDependencies + Serialize + DeserializeOwned {
@@ -231,7 +232,7 @@ pub trait RecordDefn {
 
   type Action;
   type Unfrozen: Unfrozen<Self::Action>;
-  type Frozen: Frozen;
+  type Frozen: Frozen = ();
   type Public: From<Self::Unfrozen> + GraphQLValue + IsOutputType<DefaultScalarValue>;
   type Private: From<Self::Unfrozen> + GraphQLValue + IsOutputType<DefaultScalarValue>;
 }

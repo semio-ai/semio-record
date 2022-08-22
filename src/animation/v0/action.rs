@@ -1,4 +1,4 @@
-use std::cmp::Ordering;
+use std::{cmp::Ordering, collections::HashSet};
 
 use derive_more::{Display, Error, From};
 use serde::{Deserialize, Serialize};
@@ -164,11 +164,66 @@ impl Apply<RemoveKey> for Animation {
           }
 
           t.keys.remove(&action.key_id);
+          t.key_ordering.retain(|k| k != &action.key_id);
         }
         _ => return Err(RemoveKeyError::NodeIsNotTrack),
       }
     } else {
       return Err(RemoveKeyError::NodeDoesNotExist);
+    }
+
+    Ok(())
+  }
+}
+
+#[derive(Debug, Serialize, Deserialize, From, Clone)]
+pub struct RemoveKeys {
+  pub selectors: Vec<KeySelector>,
+}
+
+#[derive(Display, Debug, Serialize, Deserialize, Error, Clone)]
+#[serde(tag = "type", rename_all = "snake_case", content = "value")]
+pub enum RemoveKeysError {
+  #[display(fmt = "Node does not exist")]
+  NodeDoesNotExist,
+  #[display(fmt = "Key does not exist")]
+  KeyDoesNotExist,
+  #[display(fmt = "Node is not a track")]
+  NodeIsNotTrack,
+}
+
+impl Apply<RemoveKeys> for Animation {
+  type Error = RemoveKeysError;
+
+  fn apply(&mut self, action: &RemoveKeys) -> Result<(), Self::Error> {
+    // Check for errors first
+
+    for selector in &action.selectors {
+      if let Some(node) = self.nodes.get(&selector.node_id) {
+        match node {
+          Node::Track(t) => {
+            if !t.keys.contains_key(&selector.key_id) {
+              return Err(RemoveKeysError::KeyDoesNotExist);
+            }
+          }
+          _ => return Err(RemoveKeysError::NodeIsNotTrack),
+        }
+      } else {
+        return Err(RemoveKeysError::NodeDoesNotExist);
+      }
+    }
+
+    // Apply
+    for selector in &action.selectors {
+      if let Some(node) = self.nodes.get_mut(&selector.node_id) {
+        match node {
+          Node::Track(t) => {
+            t.keys.remove(&selector.key_id);
+            t.key_ordering.retain(|k| k != &selector.key_id);
+          },
+          _ => unreachable!(),
+        }
+      }
     }
 
     Ok(())
@@ -395,6 +450,84 @@ impl Apply<SetKeyAt> for Animation {
   }
 }
 
+#[derive(Debug, Serialize, Deserialize, From, Clone, Hash, PartialEq, Eq)]
+pub struct KeySelector {
+  pub node_id: Uuid,
+  pub key_id: Uuid,
+}
+
+#[derive(Debug, Serialize, Deserialize, From, Clone)]
+pub struct KeySelectorAt {
+  pub selector: KeySelector,
+  pub at: f64,
+}
+
+#[derive(Debug, Serialize, Deserialize, From, Clone)]
+pub struct SetKeysAt {
+  pub ats: Vec<KeySelectorAt>,
+}
+
+#[derive(Display, Debug, Serialize, Deserialize, Error, Clone)]
+#[serde(tag = "type", rename_all = "snake_case", content = "value")]
+pub enum SetKeysAtError {
+  #[display(fmt = "Node does not exist")]
+  NodeDoesNotExist,
+  #[display(fmt = "Key does not exist")]
+  KeyDoesNotExist,
+  #[display(fmt = "Node is not a track")]
+  NodeIsNotTrack,
+}
+
+impl Apply<SetKeysAt> for Animation {
+  type Error = SetKeysAtError;
+
+  fn apply(&mut self, action: &SetKeysAt) -> Result<(), Self::Error> {
+    // Validate all key selectors before mutating
+    for selector in &action.ats {
+      if let Some(node) = self.nodes.get(&selector.selector.node_id) {
+        match node {
+          Node::Group(_) => {
+            return Err(SetKeysAtError::NodeIsNotTrack);
+          }
+          Node::Track(t) => {
+            if let Some(key) = t.keys.get(&selector.selector.key_id) {
+              // do nothing
+            } else {
+              return Err(SetKeysAtError::KeyDoesNotExist);
+            }
+          }
+        }
+      } else {
+        return Err(SetKeysAtError::NodeDoesNotExist);
+      }
+    }
+
+    for at in &action.ats {
+      if let Some(node) = self.nodes.get_mut(&at.selector.node_id) {
+        match node {
+          Node::Group(_) => unreachable!(),
+          Node::Track(t) => {
+            if let Some(key) = t.keys.get_mut(&at.selector.key_id) {
+              key.at = at.at;
+              // sort key ordering
+              t.key_ordering.sort_by(|a, b| {
+                let a = t.keys.get(a).unwrap();
+                let b = t.keys.get(b).unwrap();
+                a.at.partial_cmp(&b.at)
+                  .unwrap_or(Ordering::Equal)
+              });
+            }
+          }
+        }
+      }
+    }
+
+    Ok(())
+  }
+}
+
+
+
 #[derive(Debug, Serialize, Deserialize, From, Clone)]
 pub struct SetKeyValue {
   pub id: Uuid,
@@ -490,12 +623,14 @@ pub enum Action {
   RemoveNode(RemoveNode),
   AddKey(AddKey),
   RemoveKey(RemoveKey),
+  RemoveKeys(RemoveKeys),
   SetNodeName(SetNodeName),
   SetNodeParent(SetNodeParent),
   SetNodeColor(SetNodeColor),
   SetNodeLocked(SetNodeLocked),
   SetNodeCollapsed(SetNodeCollapsed),
   SetKeyAt(SetKeyAt),
+  SetKeysAt(SetKeysAt),
   SetKeyValue(SetKeyValue),
   SetKeyTransition(SetKeyTransition),
   Acl(AclAction),
@@ -510,12 +645,14 @@ pub enum ActionError {
   RemoveNode(RemoveNodeError),
   AddKey(AddKeyError),
   RemoveKey(RemoveKeyError),
+  RemoveKeys(RemoveKeysError),
   SetNodeName(SetNodeNameError),
   SetNodeParent(SetNodeParentError),
   SetNodeColor(SetNodeColorError),
   SetNodeLocked(SetNodeLockedError),
   SetNodeCollapsed(SetNodeCollapsedError),
   SetKeyAt(SetKeyAtError),
+  SetKeysAt(SetKeysAtError),
   SetKeyValue(SetKeyValueError),
   SetKeyTransition(SetKeyTransitionError),
   Acl(AclActionError),
@@ -532,12 +669,14 @@ impl Apply<Action> for Animation {
       Action::RemoveNode(action) => self.apply(action)?,
       Action::AddKey(action) => self.apply(action)?,
       Action::RemoveKey(action) => self.apply(action)?,
+      Action::RemoveKeys(action) => self.apply(action)?,
       Action::SetNodeName(action) => self.apply(action)?,
       Action::SetNodeParent(action) => self.apply(action)?,
       Action::SetNodeColor(action) => self.apply(action)?,
       Action::SetNodeLocked(action) => self.apply(action)?,
       Action::SetNodeCollapsed(action) => self.apply(action)?,
       Action::SetKeyAt(action) => self.apply(action)?,
+      Action::SetKeysAt(action) => self.apply(action)?,
       Action::SetKeyValue(action) => self.apply(action)?,
       Action::SetKeyTransition(action) => self.apply(action)?,
       Action::Acl(action) => self.apply(action)?,

@@ -3,7 +3,7 @@ use std::collections::HashSet;
 use async_trait::async_trait;
 use serde::{Deserialize, Serialize};
 
-use crate::{record::{Unfrozen, UnfrozenReference, View, Freeze, Freezer}, blob::BlobDependencies, unfrozen::impl_unfrozen, action::Name};
+use crate::{record::{Unfrozen, UnfrozenReference, View, Freeze, Freezer}, blob::BlobDependencies, unfrozen::impl_unfrozen, action::Name, migrate::Migrate};
 
 use super::action::Action;
 
@@ -54,5 +54,11 @@ impl<F: Freezer> Freeze<F> for User {
 
   async fn freeze(&self, _: &F) -> Result<Self::Frozen, F::Error> {
     Ok(())
+  }
+}
+
+impl Migrate for User {
+  fn migrate(from_version: i16, _from: &[u8]) -> anyhow::Result<Self> {
+    anyhow::bail!("Migration not implemented for version {}", from_version)
   }
 }

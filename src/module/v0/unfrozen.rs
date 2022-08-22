@@ -5,7 +5,7 @@ use juniper::{GraphQLUnion, GraphQLObject, FromInputValue, ScalarValue, InputVal
 use serde::{Serialize, Deserialize};
 use uuid::Uuid;
 
-use crate::{record::{UnfrozenReference, Freeze, Freezer, View, Unfrozen}, blob::BlobDependencies, unfrozen::impl_unfrozen, action::{name, parent}, ty::UnfrozenTy, acl::{Acl, action::with_acl}};
+use crate::{record::{UnfrozenReference, Freeze, Freezer, View, Unfrozen}, blob::BlobDependencies, unfrozen::impl_unfrozen, action::{name, parent}, ty::UnfrozenTy, acl::{Acl, action::with_acl}, migrate::Migrate};
 
 use super::{frozen, action::Action};
 
@@ -621,3 +621,9 @@ impl<F: Freezer> Freeze<F> for Module {
 
 name!(Module);
 parent!(Module);
+
+impl Migrate for Module {
+  fn migrate(from_version: i16, _from: &[u8]) -> anyhow::Result<Self> {
+    anyhow::bail!("Migration not implemented for version {}", from_version)
+  }
+}

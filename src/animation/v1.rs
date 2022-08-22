@@ -8,7 +8,7 @@ pub struct Animation;
 
 impl RecordDefn for Animation {
   const TYPE: i16 = TYPE_ANIMATION;
-  const SCHEMA_VERSION: i16 = 0;
+  const SCHEMA_VERSION: i16 = 1;
 
   type Action = action::Action;
   type Unfrozen = unfrozen::Animation;

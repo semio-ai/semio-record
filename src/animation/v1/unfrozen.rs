@@ -10,7 +10,6 @@ use crate::{
   unfrozen::impl_unfrozen,
   acl::{Acl, action::with_acl},
   action::{name, parent},
-  color::{Color, Rgb},
   math::MultiBezier2, migrate::Migrate
 };
 
@@ -19,6 +18,12 @@ use super::action::Action;
 #[derive(Debug, Serialize, Deserialize, GraphQLObject, Clone)]
 pub struct F64 {
   pub value: f64,
+}
+
+#[derive(Debug, Serialize, Deserialize, GraphQLEnum, Copy, Clone)]
+#[serde(rename_all = "snake_case")]
+pub enum ValueKind {
+  F64,
 }
 
 #[derive(Debug, Serialize, Deserialize, GraphQLUnion, Clone)]
@@ -58,45 +63,10 @@ pub struct Key {
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
-pub struct Group {
+pub struct Control {
+  pub value_kind: ValueKind,
   pub name: String,
   pub locked: bool,
-  pub collapsed: bool,
-  pub color: Color,
-  // Children nodes (of any type)
-  pub children_ids: HashSet<Uuid>,
-}
-
-#[graphql_object]
-impl Group {
-  fn name(&self) -> &str {
-    &self.name
-  }
-
-  fn locked(&self) -> bool {
-    self.locked
-  }
-
-  fn collapsed(&self) -> bool {
-    self.collapsed
-  }
-
-  fn color(&self) -> &Color {
-    &self.color
-  }
-
-  fn children_ids(&self) -> Vec<Uuid> {
-    self.children_ids.iter().cloned().collect()
-  }
-}
-
-#[derive(Debug, Serialize, Deserialize, Clone)]
-pub struct Track {
-  pub name: String,
-  pub locked: bool,
-  pub collapsed: bool,
-  pub color: Color,
-
   pub keys: HashMap<Uuid, Key>,
   pub key_ordering: Vec<Uuid>,
 }
@@ -108,21 +78,17 @@ pub struct IdKey {
 }
 
 #[graphql_object]
-impl Track {
+impl Control {
+  pub fn value_kind(&self) -> ValueKind {
+    self.value_kind
+  }
+
   pub fn name(&self) -> &String {
     &self.name
   }
 
   pub fn locked(&self) -> bool {
     self.locked
-  }
-
-  pub fn collapsed(&self) -> bool {
-    self.collapsed
-  }
-
-  pub fn color(&self) -> &Color {
-    &self.color
   }
 
   pub fn keys(&self) -> Vec<IdKey> {
@@ -140,45 +106,66 @@ impl Track {
   }
 }
 
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct GroupNode {
+  pub name: String,
+  pub collapsed: bool,
+  // Children nodes (of any type)
+  pub children_ids: HashSet<Uuid>,
+}
+
+#[graphql_object]
+impl GroupNode {
+  fn name(&self) -> &str {
+    &self.name
+  }
+
+  fn collapsed(&self) -> bool {
+    self.collapsed
+  }
+
+  fn children_ids(&self) -> Vec<Uuid> {
+    self.children_ids.iter().cloned().collect()
+  }
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone, GraphQLObject)]
+pub struct ControlNode {
+  pub collapsed: bool,
+  pub id: Uuid,
+}
+
 #[derive(Debug, Serialize, Deserialize, GraphQLUnion, Clone)]
 #[serde(tag = "type", rename_all = "lowercase", content = "value")]
 pub enum Node {
-  Group(Group),
-  Track(Track),
+  Group(GroupNode),
+  Control(ControlNode),
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct Animation {
+  /// Human-readable name of the animation
   pub name: String,
+
+  /// The parent record ID
   pub parent: Uuid,
-  pub root_id: Uuid,
+
+  /// The controls
+  pub controls: HashMap<Uuid, Control>,
+  
+  /// The organization of controls into a forest
   pub nodes: HashMap<Uuid, Node>,
+
   pub acl: Acl,
 }
 
 impl Default for Animation {
   fn default() -> Self {
-    let mut nodes = HashMap::new();
-
-    let root_id = Uuid::new_v4();
-
-    nodes.insert(root_id.clone(), Node::Group(Group {
-      name: "Root".to_string(),
-      children_ids: HashSet::new(),
-      collapsed: false,
-      color: Color::Rgb(Rgb {
-        r: 1.0,
-        g: 0.0,
-        b: 0.0
-      }),
-      locked: false,
-    }));
-
     Self {
       name: "".to_string(),
       parent: Uuid::nil(),
-      root_id,
-      nodes,
+      controls: HashMap::new(),
+      nodes: HashMap::new(),
       acl: Default::default(),
     }
   }
@@ -188,6 +175,12 @@ impl Default for Animation {
 pub struct IdNode {
   pub id: Uuid,
   pub node: Node,
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone, GraphQLObject)]
+pub struct IdControl {
+  pub id: Uuid,
+  pub control: Control,
 }
 
 #[graphql_object]
@@ -200,16 +193,22 @@ impl Animation {
     &self.parent
   }
 
-  pub fn root_id(&self) -> &Uuid {
-    &self.root_id
-  }
-
   pub fn nodes(&self) -> Vec<IdNode> {
     self.nodes
       .iter()
       .map(|(id, node)| IdNode {
         id: *id,
         node: node.clone(),
+      })
+      .collect()
+  }
+
+  pub fn controls(&self) -> Vec<IdControl> {
+    self.controls
+      .iter()
+      .map(|(id, control)| IdControl {
+        id: *id,
+        control: control.clone(),
       })
       .collect()
   }
@@ -256,7 +255,7 @@ impl<F: Freezer> Freeze<F> for Animation {
 }
 
 impl Migrate for Animation {
-  fn migrate(from_version: i16, from: &[u8]) -> anyhow::Result<Self> {
+  fn migrate(from_version: i16, _from: &[u8]) -> anyhow::Result<Self> {
     anyhow::bail!("Migration not implemented for version {}", from_version)
   }
 }

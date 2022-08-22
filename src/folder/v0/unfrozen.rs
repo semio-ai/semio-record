@@ -4,7 +4,14 @@ use async_trait::async_trait;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
-use crate::{record::{Unfrozen, UnfrozenReference, View, Freeze, Freezer}, blob::BlobDependencies, unfrozen::impl_unfrozen, acl::{Acl, action::with_acl}, action::{name, parent}};
+use crate::{
+  record::{Unfrozen, UnfrozenReference, View, Freeze, Freezer},
+  blob::BlobDependencies,
+  unfrozen::impl_unfrozen,
+  acl::{Acl, action::with_acl},
+  action::{name, parent},
+  migrate::Migrate
+};
 
 use super::action::Action;
 
@@ -48,5 +55,11 @@ impl<F: Freezer> Freeze<F> for Folder {
 
   async fn freeze(&self, _: &F) -> Result<Self::Frozen, F::Error> {
     Ok(())
+  }
+}
+
+impl Migrate for Folder {
+  fn migrate(from_version: i16, _from: &[u8]) -> anyhow::Result<Self> {
+    anyhow::bail!("Migration not implemented for version {}", from_version)
   }
 }

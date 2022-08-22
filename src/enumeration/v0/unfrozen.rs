@@ -4,7 +4,7 @@ use serde::{Serialize, Deserialize};
 use uuid::Uuid;
 use async_trait::async_trait;
 
-use crate::{ty::UnfrozenTy, record::{View, Freezer, Freeze, Unfrozen, UnfrozenReference}, action::{name, parent}, acl::Acl, acl::action::with_acl, blob::BlobDependencies, unfrozen::impl_unfrozen};
+use crate::{ty::UnfrozenTy, record::{View, Freezer, Freeze, Unfrozen, UnfrozenReference}, action::{name, parent}, acl::Acl, acl::action::with_acl, blob::BlobDependencies, unfrozen::impl_unfrozen, migrate::Migrate};
 
 use super::{frozen, action::Action};
 
@@ -138,5 +138,11 @@ impl<F: Freezer> Freeze<F> for Enumeration {
       name: self.name.clone(),
       variants,
     })
+  }
+}
+
+impl Migrate for Enumeration {
+  fn migrate(from_version: i16, _from: &[u8]) -> anyhow::Result<Self> {
+    anyhow::bail!("Migration not implemented for version {}", from_version)
   }
 }

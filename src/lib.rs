@@ -1,6 +1,9 @@
+#![feature(associated_type_defaults)]
+
 #[macro_use] extern crate juniper;
 
 pub mod blob;
+pub mod expr;
 pub mod record;
 pub mod module;
 pub mod ty;
@@ -17,7 +20,11 @@ pub mod acl;
 pub mod action;
 pub mod animation;
 pub mod color;
+pub mod mass;
+pub mod angle;
+pub mod distance;
 pub mod math;
+pub mod migrate;
 
 macro_rules! impl_lib {
   ($($ty:tt => $module:tt),+) => {

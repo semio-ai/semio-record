@@ -11,7 +11,7 @@ pub struct Vector2 {
 pub struct MultiBezier2Chunk {
   p0: Vector2,
   p1: Vector2,
-  p3: Vector2,
+  p2: Vector2,
 }
 
 #[derive(Debug, Serialize, Deserialize, GraphQLObject, Clone)]
