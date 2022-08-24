@@ -4,7 +4,7 @@ use uuid::Uuid;
 
 use crate::record::Apply;
 
-use super::super::unfrozen::{Animation, Node};
+use super::super::unfrozen::{Animation, NodeKind};
 
 #[derive(Debug, Serialize, Deserialize, From, Clone)]
 pub struct RemoveNode {
@@ -30,7 +30,7 @@ impl Apply<RemoveNode> for Animation {
 
     // Remove id from other nodes
     for node in self.nodes.values_mut() {
-      if let Node::Group(g) = node {
+      if let NodeKind::Group(g) = &mut node.kind {
         g.children_ids.retain(|id| id != &action.node_id);
       }
     }
@@ -43,17 +43,20 @@ impl Apply<RemoveNode> for Animation {
 mod tests {
   use std::collections::{HashMap, HashSet};
   use uuid::Uuid;
-  use crate::{animation::v1::unfrozen::{Animation, Node, ControlNode, GroupNode}, record::Apply};
+  use crate::{animation::v1::unfrozen::{Animation, Node, NodeKind, ControlNode, GroupNode}, record::Apply};
   use super::RemoveNode;
 
   #[test]
   fn simple() {
     let node_id = Uuid::new_v4();
     let mut nodes = HashMap::new();
-    nodes.insert(node_id.clone(), ControlNode {
+    nodes.insert(node_id.clone(), Node {
+      name: None,
       collapsed: false,
-      id: Uuid::new_v4(),
-    }.into());
+      kind: ControlNode {
+        id: Uuid::new_v4(),
+      }.into()
+    });
 
 
     let mut animation = Animation {
@@ -74,20 +77,25 @@ mod tests {
     let group_node_id = Uuid::new_v4();
     
     let mut nodes = HashMap::new();
-    nodes.insert(control_node_id.clone(), ControlNode {
+    nodes.insert(control_node_id.clone(), Node {
       collapsed: false,
-      id: Uuid::new_v4(),
-    }.into());
+      name: None,
+      kind: ControlNode {
+        id: Uuid::new_v4(),
+      }.into()
+    });
 
-    nodes.insert(group_node_id, GroupNode {
+    nodes.insert(group_node_id, Node {
       collapsed: false,
-      name: "Group".to_string(),
-      children_ids: {
-        let mut ret = HashSet::new();
-        ret.insert(control_node_id.clone());
-        ret
-      },
-    }.into());
+      name: None,
+      kind: GroupNode {
+        children_ids: {
+          let mut ret = HashSet::new();
+          ret.insert(control_node_id.clone());
+          ret
+        },
+      }.into()
+    });
 
 
     let mut animation = Animation {
@@ -103,7 +111,7 @@ mod tests {
 
     let group_node = animation.nodes.get(&group_node_id).unwrap();
 
-    if let Node::Group(g) = group_node {
+    if let NodeKind::Group(g) = &group_node.kind {
       assert_eq!(g.children_ids.len(), 0);
     } else {
       panic!("Expected group node");

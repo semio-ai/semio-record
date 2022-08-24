@@ -6,7 +6,7 @@ use uuid::Uuid;
 
 use crate::record::Apply;
 
-use super::super::unfrozen::{Animation, Node};
+use super::super::unfrozen::{Animation, NodeKind};
 
 #[derive(Debug, Serialize, Deserialize, From, Clone)]
 pub struct RemoveControl {
@@ -30,7 +30,7 @@ impl Apply<RemoveControl> for Animation {
 
     let mut remove_ids = HashSet::new();
     for (id, node) in self.nodes.iter() {
-      if let Node::Control(c) = node {
+      if let NodeKind::Control(c) = &node.kind {
         if c.id == action.control_id {
           remove_ids.insert(id.clone());
         }
@@ -43,7 +43,7 @@ impl Apply<RemoveControl> for Animation {
 
     // Remove children_ids
     for node in self.nodes.values_mut() {
-      if let Node::Group(g) = node {
+      if let NodeKind::Group(g) = &mut node.kind {
         g.children_ids.retain(|id| !remove_ids.contains(id));
       }
     }

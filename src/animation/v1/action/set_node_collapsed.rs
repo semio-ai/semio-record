@@ -4,7 +4,7 @@ use uuid::Uuid;
 
 use crate::record::Apply;
 
-use super::super::unfrozen::{Animation, Node};
+use super::super::unfrozen::Animation;
 
 #[derive(Debug, Serialize, Deserialize, From, Clone)]
 pub struct SetNodeCollapsed {
@@ -24,10 +24,7 @@ impl Apply<SetNodeCollapsed> for Animation {
 
   fn apply(&mut self, action: &SetNodeCollapsed) -> Result<(), Self::Error> {
     if let Some(node) = self.nodes.get_mut(&action.id) {
-      match node {
-        Node::Group(g) => g.collapsed = action.collapsed,
-        Node::Control(t) => t.collapsed = action.collapsed,
-      }
+      node.collapsed = action.collapsed
     } else {
       return Err(SetNodeCollapsedError::NodeDoesNotExist);
     }

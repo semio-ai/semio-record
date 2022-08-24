@@ -2,9 +2,9 @@ use derive_more::{Display, Error, From};
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
-use crate::record::Apply;
+use crate::{record::Apply, animation::v1::unfrozen::NodeKind};
 
-use super::super::unfrozen::{Animation, Node};
+use super::super::unfrozen::Animation;
 
 #[derive(Debug, Serialize, Deserialize, From, Clone)]
 pub struct SetNodeParent {
@@ -34,15 +34,15 @@ impl Apply<SetNodeParent> for Animation {
 
     // Remove node from old parent
     for node in self.nodes.values_mut() {
-      if let Node::Group(g) = node {
+      if let NodeKind::Group(g) = &mut node.kind {
         g.children_ids.remove(&action.id);
       }
     }
 
     // Add node to new parent
     if let Some(parent_node) = self.nodes.get_mut(&action.parent_id) {
-      match parent_node {
-        Node::Group(g) => {
+      match &mut parent_node.kind {
+        NodeKind::Group(g) => {
           g.children_ids.insert(action.id);
         }
         _ => return Err(SetNodeParentError::ParentNodeIsNotGroup),

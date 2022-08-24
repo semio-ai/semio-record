@@ -22,6 +22,14 @@ pub struct F64 {
   pub value: f64,
 }
 
+impl From<crate::animation::v0::unfrozen::F64> for F64 {
+  fn from(value: crate::animation::v0::unfrozen::F64) -> Self {
+    Self {
+      value: value.value,
+    }
+  }
+}
+
 #[derive(Debug, Serialize, Deserialize, GraphQLEnum, Copy, Clone)]
 #[serde(rename_all = "snake_case")]
 pub enum ValueKind {
@@ -34,9 +42,25 @@ pub enum Value {
   F64(F64),
 }
 
+impl From<crate::animation::v0::unfrozen::Value> for Value {
+  fn from(value: crate::animation::v0::unfrozen::Value) -> Self {
+    match value {
+      crate::animation::v0::unfrozen::Value::F64(value) => Self::F64(value.into())
+    }
+  }
+}
+
 #[derive(Debug, Serialize, Deserialize, GraphQLObject, Clone)]
 pub struct None {
   pub _dummy: i32,
+}
+
+impl From<crate::animation::v0::unfrozen::None> for None {
+  fn from(_: crate::animation::v0::unfrozen::None) -> Self {
+    Self {
+      _dummy: 0,
+    }
+  }
 }
 
 #[derive(Debug, Serialize, Deserialize, GraphQLObject, Clone)]
@@ -44,9 +68,25 @@ pub struct Linear {
   pub _dummy: i32,
 }
 
+impl From<crate::animation::v0::unfrozen::Linear> for Linear {
+  fn from(_: crate::animation::v0::unfrozen::Linear) -> Self {
+    Self {
+      _dummy: 0,
+    }
+  }
+}
+
 #[derive(Debug, Serialize, Deserialize, GraphQLObject, Clone)]
 pub struct MultiBezier {
   pub multi_bezier: MultiBezier2,
+}
+
+impl From<crate::animation::v0::unfrozen::MultiBezier> for MultiBezier {
+  fn from(value: crate::animation::v0::unfrozen::MultiBezier) -> Self {
+    Self {
+      multi_bezier: value.multi_bezier,
+    }
+  }
 }
 
 #[derive(Debug, Serialize, Deserialize, GraphQLUnion, Clone)]
@@ -57,11 +97,31 @@ pub enum Transition {
   MultiBezier(MultiBezier),
 }
 
+impl From<crate::animation::v0::unfrozen::Transition> for Transition {
+  fn from(value: crate::animation::v0::unfrozen::Transition) -> Self {
+    match value {
+      crate::animation::v0::unfrozen::Transition::None(value) => Self::None(value.into()),
+      crate::animation::v0::unfrozen::Transition::Linear(value) => Self::Linear(value.into()),
+      crate::animation::v0::unfrozen::Transition::MultiBezier(value) => Self::MultiBezier(value.into()),
+    }
+  }
+}
+
 #[derive(Debug, Serialize, Deserialize, GraphQLObject, Clone)]
 pub struct Key {
   pub at: f64,
   pub value: Value,
   pub transition: Transition,
+}
+
+impl From<crate::animation::v0::unfrozen::Key> for Key {
+  fn from(key: crate::animation::v0::unfrozen::Key) -> Self {
+    Key {
+      at: key.at,
+      value: key.value.into(),
+      transition: key.transition.into()
+    }
+  }
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
@@ -110,22 +170,12 @@ impl Control {
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct GroupNode {
-  pub name: String,
-  pub collapsed: bool,
   // Children nodes (of any type)
   pub children_ids: HashSet<Uuid>,
 }
 
 #[graphql_object]
 impl GroupNode {
-  fn name(&self) -> &str {
-    &self.name
-  }
-
-  fn collapsed(&self) -> bool {
-    self.collapsed
-  }
-
   fn children_ids(&self) -> Vec<Uuid> {
     self.children_ids.iter().cloned().collect()
   }
@@ -133,15 +183,36 @@ impl GroupNode {
 
 #[derive(Debug, Serialize, Deserialize, Clone, GraphQLObject)]
 pub struct ControlNode {
-  pub collapsed: bool,
   pub id: Uuid,
 }
 
 #[derive(Debug, Serialize, Deserialize, GraphQLUnion, Clone, From)]
 #[serde(tag = "type", rename_all = "lowercase", content = "value")]
-pub enum Node {
+pub enum NodeKind {
   Group(GroupNode),
   Control(ControlNode),
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct Node {
+  pub name: Option<String>,
+  pub collapsed: bool,
+  pub kind: NodeKind,
+}
+
+#[graphql_object]
+impl Node {
+  fn name(&self) -> &Option<String> {
+    &self.name
+  }
+
+  fn collapsed(&self) -> bool {
+    self.collapsed
+  }
+
+  fn kind(&self) -> &NodeKind {
+    &self.kind
+  }
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
@@ -220,6 +291,57 @@ impl Animation {
   }
 }
 
+impl From<crate::animation::v0::unfrozen::Animation> for Animation {
+  fn from(v0: crate::animation::v0::unfrozen::Animation) -> Self {
+    use crate::animation::v0::unfrozen as unfrozen;
+    
+    let mut controls = HashMap::new();
+    let mut nodes = HashMap::new();
+
+    for (id, node) in v0.nodes.into_iter() {
+      match node {
+        unfrozen::Node::Track(track) => {
+          let control = Control {
+            locked: track.locked,
+            name: track.name.clone(),
+            value_kind: match track.keys.get(&track.key_ordering[0]).unwrap().value {
+              unfrozen::Value::F64(_) => ValueKind::F64,
+            },
+            keys: track.keys
+              .into_iter()
+              .map(|(id, key)| (id, key.into()))
+              .collect(),
+            key_ordering: track.key_ordering,
+          };
+
+          let control_id = Uuid::new_v4();
+          controls.insert(control_id, control);
+          nodes.insert(id, Node {
+            name: None,
+            collapsed: track.collapsed,
+            kind: NodeKind::Control(ControlNode { id: control_id }),
+          });
+        }
+        unfrozen::Node::Group(group) => {
+          nodes.insert(id, Node {
+            name: Some(group.name),
+            collapsed: group.collapsed,
+            kind: NodeKind::Group(GroupNode { children_ids: group.children_ids }),
+          });
+        }
+      }
+    }
+    
+    Self {
+      name: v0.name,
+      parent: v0.parent,
+      controls,
+      nodes,
+      acl: v0.acl,
+    }
+  }
+}
+
 impl_unfrozen!(Animation, Action);
 name!(Animation);
 parent!(Animation);
@@ -257,7 +379,16 @@ impl<F: Freezer> Freeze<F> for Animation {
 }
 
 impl Migrate for Animation {
-  fn migrate(from_version: i16, _from: &[u8]) -> anyhow::Result<Self> {
-    anyhow::bail!("Migration not implemented for version {}", from_version)
+  fn migrate(from_version: i16, from: &[u8]) -> anyhow::Result<Self> {
+    
+    match from_version {
+      0 => {
+        let v0: crate::animation::v0::unfrozen::Animation = crate::deserialize(from)?;
+        Ok(v0.into())
+      }
+      _ => {
+        anyhow::bail!("Unsupported version: {}", from_version)
+      }
+    }
   }
 }
