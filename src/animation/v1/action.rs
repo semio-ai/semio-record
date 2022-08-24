@@ -16,9 +16,11 @@ pub struct KeySelectorAt {
 
 pub mod add_control;
 pub mod add_key;
+pub mod add_node;
 pub mod remove_control;
 pub mod remove_key;
 pub mod remove_keys;
+pub mod remove_node;
 pub mod set_control_locked;
 pub mod set_control_name;
 pub mod set_key_at;
@@ -43,7 +45,9 @@ pub enum Action {
   SetName(SetName),
   SetParent(SetParent),
   AddControl(add_control::AddControl),
+  AddNode(add_node::AddNode),
   RemoveControl(remove_control::RemoveControl),
+  RemoveNode(remove_node::RemoveNode),
   AddKey(add_key::AddKey),
   RemoveKey(remove_key::RemoveKey),
   RemoveKeys(remove_keys::RemoveKeys),
@@ -64,7 +68,9 @@ pub enum ActionError {
   SetName(SetNameError),
   SetParent(SetParentError),
   AddControl(add_control::AddControlError),
+  AddNode(add_node::AddNodeError),
   RemoveControl(remove_control::RemoveControlError),
+  RemoveNode(remove_node::RemoveNodeError),
   AddKey(add_key::AddKeyError),
   RemoveKey(remove_key::RemoveKeyError),
   RemoveKeys(remove_keys::RemoveKeysError),
@@ -87,7 +93,9 @@ impl Apply<Action> for Animation {
       Action::SetName(action) => self.apply(action)?,
       Action::SetParent(action) => self.apply(action)?,
       Action::AddControl(action) => self.apply(action)?,
+      Action::AddNode(action) => self.apply(action)?,
       Action::RemoveControl(action) => self.apply(action)?,
+      Action::RemoveNode(action) => self.apply(action)?,
       Action::AddKey(action) => self.apply(action)?,
       Action::RemoveKey(action) => self.apply(action)?,
       Action::RemoveKeys(action) => self.apply(action)?,

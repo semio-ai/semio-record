@@ -4,6 +4,8 @@ use async_trait::async_trait;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
+use derive_more::From;
+
 use crate::{
   record::{Unfrozen, UnfrozenReference, View, Freeze, Freezer},
   blob::BlobDependencies,
@@ -135,7 +137,7 @@ pub struct ControlNode {
   pub id: Uuid,
 }
 
-#[derive(Debug, Serialize, Deserialize, GraphQLUnion, Clone)]
+#[derive(Debug, Serialize, Deserialize, GraphQLUnion, Clone, From)]
 #[serde(tag = "type", rename_all = "lowercase", content = "value")]
 pub enum Node {
   Group(GroupNode),
