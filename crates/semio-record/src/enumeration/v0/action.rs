@@ -10,13 +10,14 @@ use super::unfrozen::{EnumerationVariant, Enumeration};
 use schemars::JsonSchema;
 
 #[derive(Debug, Serialize, Deserialize, GraphQLObject, Clone, JsonSchema)]
+#[serde(rename = "enumeration_v0_Action_AddVariant")]
 pub struct AddVariant  {
   pub id: Uuid,
   pub variant: EnumerationVariant
 }
 
 #[derive(Debug, Serialize, Deserialize, Display, Error, GraphQLEnum, Clone, JsonSchema)]
-#[serde(tag = "type", rename_all = "snake_case", content = "value")]
+#[serde(rename = "enumeration_v0_Action_AddVariantError", tag = "type", rename_all = "camelCase")]
 pub enum AddVariantError {
   #[display(fmt = "ID already exists")]
   IdAlreadyExists,
@@ -53,12 +54,13 @@ impl Apply<AddVariant> for Enumeration {
 }
 
 #[derive(Debug, Serialize, Deserialize, GraphQLObject, Clone, JsonSchema)]
+#[serde(rename = "enumeration_v0_Action_RemoveVariant")]
 pub struct RemoveVariant  {
   pub id: Uuid,
 }
 
 #[derive(Debug, Serialize, Deserialize, Display, Error, GraphQLEnum, Clone, JsonSchema)]
-#[serde(tag = "type", rename_all = "snake_case", content = "value")]
+#[serde(rename = "enumeration_v0_Action_RemoveVariantError", tag = "type", rename_all = "camelCase")]
 pub enum RemoveVariantError {
   #[display(fmt = "Variant does not exist")]
   VariantDoesNotExist,
@@ -77,13 +79,14 @@ impl Apply<RemoveVariant> for Enumeration {
 }
 
 #[derive(Debug, Serialize, Deserialize, GraphQLObject, Clone, JsonSchema)]
+#[serde(rename = "enumeration_v0_Action_SetVariantName")]
 pub struct SetVariantName  {
   pub id: Uuid,
   pub name: String,
 }
 
 #[derive(Debug, Serialize, Deserialize, Display, Error, GraphQLEnum, Clone, JsonSchema)]
-#[serde(tag = "type", rename_all = "snake_case", content = "value")]
+#[serde(rename = "enumeration_v0_Action_SetVariantNameError", tag = "type", rename_all = "camelCase")]
 pub enum SetVariantNameError {
   #[display(fmt = "Variant does not exist")]
   VariantDoesNotExist,
@@ -115,13 +118,14 @@ impl Apply<SetVariantName> for Enumeration {
 }
 
 #[derive(Debug, Serialize, Deserialize, GraphQLObject, Clone, JsonSchema)]
-pub struct SetVariantType  {
+#[serde(rename = "enumeration_v0_Action_SetVariantType")]
+pub struct SetVariantType {
   pub id: Uuid,
   pub ty: UnfrozenTy,
 }
 
 #[derive(Debug, Serialize, Deserialize, Display, Error, GraphQLEnum, Clone, JsonSchema)]
-#[serde(tag = "type", rename_all = "snake_case", content = "value")]
+#[serde(rename = "enumeration_v0_Action_SetVariantTypeError", tag = "type", rename_all = "camelCase")]
 pub enum SetVariantTypeError {
   #[display(fmt = "Variant does not exist")]
   VariantDoesNotExist,
@@ -141,7 +145,7 @@ impl Apply<SetVariantType> for Enumeration {
 }
 
 #[derive(Debug, Serialize, Deserialize, From, Clone, JsonSchema)]
-#[serde(tag = "type", rename_all = "snake_case", content = "value")]
+#[serde(rename = "enumeration_v0_Action", tag = "type", rename_all = "camelCase", content = "value")]
 pub enum Action {
   SetName(SetName),
   SetParent(SetParent),
@@ -153,7 +157,7 @@ pub enum Action {
 }
 
 #[derive(Display, Debug, Error, From, Clone, Serialize, Deserialize, JsonSchema)]
-#[serde(tag = "type", rename_all = "snake_case", content = "value")]
+#[serde(rename = "enumeration_v0_ActionError", tag = "type", rename_all = "camelCase", content = "value")]
 pub enum ActionError {
   SetName(SetNameError),
   SetParent(SetParentError),

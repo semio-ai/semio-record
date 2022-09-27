@@ -31,12 +31,13 @@ use crate::record::Apply;
 use super::{WithPermissions, Acl};
 
 #[derive(Debug, Serialize, Deserialize, GraphQLObject, Clone, JsonSchema)]
+#[serde(rename = "acl_Action_SetDefault")]
 pub struct SetDefault {
   pub with_permissions: WithPermissions,
 }
 
 #[derive(Debug, Serialize, Deserialize, Display, Error, GraphQLEnum, Clone, JsonSchema)]
-#[serde(tag = "type", rename_all = "snake_case", content = "value")]
+#[serde(rename = "acl_Action_SetDefaultError", tag = "type", rename_all = "camelCase")]
 pub enum SetDefaultError {
   #[display(fmt = "Invalid permissions")]
   InvalidPermissions,
@@ -54,13 +55,14 @@ impl<T: WithAcl> Apply<SetDefault> for T {
 }
 
 #[derive(Debug, Serialize, Deserialize, GraphQLObject, Clone, JsonSchema)]
+#[serde(rename = "acl_Action_AddPermissions")]
 pub struct AddPermissions {
   pub agent: Uuid,
   pub with_permissions: WithPermissions,
 }
 
 #[derive(Debug, Serialize, Deserialize, Display, Error, GraphQLEnum, Clone, JsonSchema)]
-#[serde(tag = "type", rename_all = "snake_case", content = "value")]
+#[serde(rename = "acl_Action_AddPermissionsError", tag = "type", rename_all = "camelCase")]
 pub enum AddPermissionsError {
   #[display(fmt = "Invalid permissions")]
   InvalidPermissions,
@@ -85,12 +87,13 @@ impl<T: WithAcl> Apply<AddPermissions> for T {
 }
 
 #[derive(Debug, Serialize, Deserialize, GraphQLObject, Clone, JsonSchema)]
+#[serde(rename = "acl_Action_RemovePermissions")]
 pub struct RemovePermissions {
   pub agent: Uuid,
 }
 
 #[derive(Debug, Serialize, Deserialize, Display, Error, GraphQLEnum, Clone, JsonSchema)]
-#[serde(tag = "type", rename_all = "snake_case", content = "value")]
+#[serde(rename = "acl_Action_RemovePermissionsError", tag = "type", rename_all = "camelCase")]
 pub enum RemovePermissionsError {
   #[display(fmt = "Agent does not exists")]
   AgentDoesNotExists,
@@ -112,13 +115,14 @@ impl<T: WithAcl> Apply<RemovePermissions> for T {
 }
 
 #[derive(Debug, Serialize, Deserialize, GraphQLObject, Clone, JsonSchema)]
+#[serde(rename = "acl_Action_SetPermissions")]
 pub struct SetPermissions {
   pub agent: Uuid,
   pub with_permissions: WithPermissions,
 }
 
 #[derive(Debug, Serialize, Deserialize, Display, Error, GraphQLEnum, Clone, JsonSchema)]
-#[serde(tag = "type", rename_all = "snake_case", content = "value")]
+#[serde(rename = "acl_Action_SetPermissionsError", tag = "type", rename_all = "camelCase")]
 pub enum SetPermissionsError {
   #[display(fmt = "Invalid permissions")]
   InvalidPermissions,
@@ -144,7 +148,7 @@ impl<T: WithAcl> Apply<SetPermissions> for T {
 }
 
 #[derive(Debug, Serialize, Deserialize, GraphQLUnion, Clone, JsonSchema)]
-#[serde(tag = "type", rename_all = "snake_case", content = "value")]
+#[serde(rename = "acl_Action", tag = "type", rename_all = "camelCase", content = "value")]
 pub enum Action {
   SetDefault(SetDefault),
   AddPermissions(AddPermissions),
@@ -154,7 +158,7 @@ pub enum Action {
 
 
 #[derive(Debug, Serialize, Deserialize, Display, Error, From, Clone, JsonSchema)]
-#[serde(tag = "type", rename_all = "snake_case", content = "value")]
+#[serde(rename = "acl_ActionError", tag = "type", rename_all = "camelCase", content = "value")]
 pub enum ActionError {
   SetDefault(SetDefaultError),
   AddPermissions(AddPermissionsError),

@@ -94,13 +94,14 @@ impl Apply<RemoveExport> for Module
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, GraphQLObject, JsonSchema)]
+#[serde(rename = "module_v0_Action_RenameExport")]
 pub struct RenameExport {
   pub id: Uuid,
   pub name: String,
 }
 
 #[derive(Display, Clone, Debug, Error, GraphQLEnum, Serialize, Deserialize, JsonSchema)]
-#[serde(tag = "type", rename_all = "snake_case", content = "value")]
+#[serde(rename = "module_v0_Action_RenameExportError", tag = "type", rename_all = "camelCase")]
 pub enum RenameExportError {
   #[display(fmt = "Export not found in module")]
   ExportNotFound,
@@ -131,6 +132,7 @@ impl Apply<RenameExport> for Module
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, GraphQLObject, JsonSchema)]
+#[serde(rename = "module_v0_Action_AppendFunctionParameter")]
 pub struct AppendFunctionParameter {
   pub export: Uuid,
   pub parameter_id: Uuid,
@@ -138,7 +140,7 @@ pub struct AppendFunctionParameter {
 }
 
 #[derive(Display, Clone, Debug, Error, GraphQLEnum, Serialize, Deserialize, JsonSchema)]
-#[serde(tag = "type", rename_all = "snake_case", content = "value")]
+#[serde(rename = "module_v0_Action_AppendFunctionParameterError", tag = "type", rename_all = "camelCase")]
 pub enum AppendFunctionParameterError
 {
   #[display(fmt = "Export not found in module")]
@@ -175,13 +177,14 @@ impl Apply<AppendFunctionParameter> for Module
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, GraphQLObject, JsonSchema)]
+#[serde(rename = "module_v0_Action_RemoveFunctionParameter")]
 pub struct RemoveFunctionParameter {
   pub export: Uuid,
   pub parameter: Uuid,
 }
 
 #[derive(Display, Clone, Debug, Error, GraphQLEnum, Serialize, Deserialize, JsonSchema)]
-#[serde(tag = "type", rename_all = "snake_case", content = "value")]
+#[serde(rename = "module_v0_Action_RemoveFunctionParameterError", tag = "type", rename_all = "camelCase")]
 pub enum RemoveFunctionParameterError {
   #[display(fmt = "Export not found in module")]
   ExportNotFound,
@@ -385,12 +388,13 @@ impl Apply<SetFunctionReturnType> for Module
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, GraphQLObject, JsonSchema)]
+#[serde(rename = "module_v0_Action_AddDependency")]
 pub struct AddDependency {
   pub dependency: UnfrozenReference,
 }
 
 #[derive(Display, Clone, Debug, Error, GraphQLEnum, Serialize, Deserialize, JsonSchema)]
-#[serde(tag = "type", rename_all = "snake_case", content = "value")]
+#[serde(rename = "module_v0_Action_AddDependencyError", tag = "type", rename_all = "camelCase")]
 pub enum AddDependencyError
 {
   #[display(fmt = "Dependency already exists")]

@@ -54,6 +54,7 @@ impl Apply<SetLastName> for User {
       return Err(SetLastNameError::Empty);
     }
 
+    
     self.last_name = action.last_name.clone();
 
     Ok(())
@@ -61,12 +62,13 @@ impl Apply<SetLastName> for User {
 }
 
 #[derive(Debug, Serialize, Deserialize, Display, GraphQLObject, Clone, JsonSchema)]
+#[serde(rename = "user_v0_Action_SetEmail")]
 pub struct SetEmail {
   pub email: String,
 }
 
 #[derive(Debug, Serialize, Deserialize, Display, Error, GraphQLEnum, Clone, JsonSchema)]
-#[serde(tag = "type", rename_all = "snake_case", content = "value")]
+#[serde(rename = "user_v0_Action_SetEmailError", tag = "type", rename_all = "camelCase")]
 pub enum SetEmailError {
   #[display(fmt = "String isn't an email address")]
   Invalid,
@@ -99,12 +101,13 @@ impl Apply<SetEmail> for User {
 }
 
 #[derive(Debug, Serialize, Deserialize, Display, GraphQLObject, Clone, JsonSchema)]
+#[serde(rename = "user_v0_Action_SetEmailVerified")]
 pub struct SetEmailVerified {
   pub email_verified: bool,
 }
 
 #[derive(Debug, Serialize, Deserialize, Display, Error, GraphQLEnum, Clone, JsonSchema)]
-#[serde(tag = "type", rename_all = "snake_case", content = "value")]
+#[serde(rename = "user_v0_Action_SetEmailVerifiedError", tag = "type", rename_all = "camelCase")]
 pub enum SetEmailVerifiedError {
   _Dummy,
 }
@@ -119,12 +122,13 @@ impl Apply<SetEmailVerified> for User {
 }
 
 #[derive(Debug, Serialize, Deserialize, Display, GraphQLObject, Clone, JsonSchema)]
+#[serde(rename = "user_v0_Action_SetPasswordHash")]
 pub struct SetPasswordHash {
   pub password_hash: String,
 }
 
 #[derive(Debug, Serialize, Deserialize, Display, Error, GraphQLEnum, Clone, JsonSchema)]
-#[serde(tag = "type", rename_all = "snake_case", content = "value")]
+#[serde(rename = "user_v0_Action_SetPasswordHashError", tag = "type", rename_all = "camelCase")]
 pub enum SetPasswordHashError {
   #[display(fmt = "Password hash can't be empty")]
   Empty,
@@ -145,12 +149,13 @@ impl Apply<SetPasswordHash> for User {
 }
 
 #[derive(Debug, Serialize, Deserialize, Display, GraphQLObject, Clone, JsonSchema)]
-pub struct SetTokenSecret  {
+#[serde(rename = "user_v0_Action_SetTokenSecret")]
+pub struct SetTokenSecret {
   pub token_secret: String,
 }
 
 #[derive(Debug, Serialize, Deserialize, Display, Error, GraphQLEnum, Clone, JsonSchema)]
-#[serde(tag = "type", rename_all = "snake_case", content = "value")]
+#[serde(rename = "user_v0_Action_SetTokenSecretError", tag = "type", rename_all = "camelCase")]
 pub enum SetTokenSecretError {
   #[display(fmt = "Token secret is too short")]
   TooShort,
@@ -173,7 +178,7 @@ impl Apply<SetTokenSecret> for User {
 
 
 #[derive(Debug, Serialize, Deserialize, Display, From, GraphQLUnion, Clone, JsonSchema)]
-#[serde(tag = "type", rename_all = "snake_case", content = "value")]
+#[serde(rename = "user_v0_Action", tag = "type", rename_all = "camelCase", content = "value")]
 pub enum Action {
   SetUserName(SetName),
   SetFirstName(SetFirstName),
@@ -185,7 +190,7 @@ pub enum Action {
 }
 
 #[derive(Display, Debug, Error, From, Clone, Serialize, Deserialize, JsonSchema)]
-#[serde(tag = "type", rename_all = "snake_case", content = "value")]
+#[serde(rename = "user_v0_ActionError", tag = "type", rename_all = "camelCase", content = "value")]
 pub enum ActionError {
   SetUserName(SetNameError),
   SetFirstName(SetFirstNameError),

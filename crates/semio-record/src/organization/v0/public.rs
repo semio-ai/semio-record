@@ -6,6 +6,7 @@ use super::unfrozen::Organization;
 use schemars::JsonSchema;
 
 #[derive(Debug, Clone, Serialize, Deserialize, JsonSchema)]
+#[serde(rename = "organization_v0_Public")]
 pub struct Public {
   pub name: String,
 }

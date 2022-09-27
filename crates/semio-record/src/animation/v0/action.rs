@@ -15,6 +15,7 @@ use crate::{
 use super::unfrozen::{Animation, Node, Key, Value, Transition};
 
 #[derive(Debug, Serialize, Deserialize, From, Clone, JsonSchema)]
+#[serde(rename = "animation_v0_Action_AddNode")]
 pub struct AddNode {
   pub parent_id: Uuid,
   pub id: Uuid,
@@ -22,7 +23,7 @@ pub struct AddNode {
 }
 
 #[derive(Display, Debug, Serialize, Deserialize, Error, Clone, JsonSchema)]
-#[serde(tag = "type", rename_all = "snake_case", content = "value")]
+#[serde(rename = "animation_v0_Action_AddNodeError", tag = "type", rename_all = "camelCase")]
 pub enum AddNodeError {
   #[display(fmt = "Node already exists")]
   NodeExists,
@@ -59,12 +60,13 @@ impl Apply<AddNode> for Animation {
 }
 
 #[derive(Debug, Serialize, Deserialize, From, Clone, JsonSchema)]
+#[serde(rename = "animation_v0_Action_RemoveNode")]
 pub struct RemoveNode {
   pub id: Uuid,
 }
 
 #[derive(Display, Debug, Serialize, Deserialize, Error, Clone, JsonSchema)]
-#[serde(tag = "type", rename_all = "snake_case", content = "value")]
+#[serde(rename = "animation_v0_Action_RemoveNodeError", tag = "type", rename_all = "camelCase")]
 pub enum RemoveNodeError {
   #[display(fmt = "Node does not exist")]
   NodeDoesNotExist,
@@ -89,6 +91,7 @@ impl Apply<RemoveNode> for Animation {
 }
 
 #[derive(Debug, Serialize, Deserialize, From, Clone, JsonSchema)]
+#[serde(rename = "animation_v0_Action_AddKey")]
 pub struct AddKey {
   pub node_id: Uuid,
   pub key_id: Uuid,
@@ -96,7 +99,7 @@ pub struct AddKey {
 }
 
 #[derive(Display, Debug, Serialize, Deserialize, Error, Clone, JsonSchema)]
-#[serde(tag = "type", rename_all = "snake_case", content = "value")]
+#[serde(rename = "animation_v0_Action_AddKeyError", tag = "type", rename_all = "camelCase")]
 pub enum AddKeyError {
   #[display(fmt = "Node does not exist")]
   NodeDoesNotExist,
@@ -138,13 +141,14 @@ impl Apply<AddKey> for Animation {
 }
 
 #[derive(Debug, Serialize, Deserialize, From, Clone, JsonSchema)]
+#[serde(rename = "animation_v0_Action_RemoveKey")]
 pub struct RemoveKey {
   pub node_id: Uuid,
   pub key_id: Uuid,
 }
 
 #[derive(Display, Debug, Serialize, Deserialize, Error, Clone, JsonSchema)]
-#[serde(tag = "type", rename_all = "snake_case", content = "value")]
+#[serde(rename = "animation_v0_Action_RemoveKeyError", tag = "type", rename_all = "camelCase")]
 pub enum RemoveKeyError {
   #[display(fmt = "Node does not exist")]
   NodeDoesNotExist,
@@ -179,12 +183,13 @@ impl Apply<RemoveKey> for Animation {
 }
 
 #[derive(Debug, Serialize, Deserialize, From, Clone, JsonSchema)]
+#[serde(rename = "animation_v0_Action_RemoveKeys")]
 pub struct RemoveKeys {
   pub selectors: Vec<KeySelector>,
 }
 
 #[derive(Display, Debug, Serialize, Deserialize, Error, Clone, JsonSchema)]
-#[serde(tag = "type", rename_all = "snake_case", content = "value")]
+#[serde(rename = "animation_v0_Action_RemoveKeysError", tag = "type", rename_all = "camelCase")]
 pub enum RemoveKeysError {
   #[display(fmt = "Node does not exist")]
   NodeDoesNotExist,
@@ -233,13 +238,14 @@ impl Apply<RemoveKeys> for Animation {
 }
 
 #[derive(Debug, Serialize, Deserialize, From, Clone, JsonSchema)]
+#[serde(rename = "animation_v0_Action_SetNodeName")]
 pub struct SetNodeName {
   pub id: Uuid,
   pub name: String,
 }
 
 #[derive(Display, Debug, Serialize, Deserialize, Error, Clone, JsonSchema)]
-#[serde(tag = "type", rename_all = "snake_case", content = "value")]
+#[serde(rename = "animation_v0_Action_SetNodeNameError", tag = "type", rename_all = "camelCase")]
 pub enum SetNodeNameError {
   #[display(fmt = "Node does not exist")]
   NodeDoesNotExist,
@@ -263,13 +269,14 @@ impl Apply<SetNodeName> for Animation {
 }
 
 #[derive(Debug, Serialize, Deserialize, From, Clone, JsonSchema)]
+#[serde(rename = "animation_v0_Action_SetNodeParent")]
 pub struct SetNodeParent {
   pub id: Uuid,
   pub parent_id: Uuid,
 }
 
 #[derive(Display, Debug, Serialize, Deserialize, Error, Clone, JsonSchema)]
-#[serde(tag = "type", rename_all = "snake_case", content = "value")]
+#[serde(rename = "animation_v0_Action_SetNodeParentError", tag = "type", rename_all = "camelCase")]
 pub enum SetNodeParentError {
   #[display(fmt = "Node does not exist")]
   NodeDoesNotExist,
@@ -313,13 +320,14 @@ impl Apply<SetNodeParent> for Animation {
 }
 
 #[derive(Debug, Serialize, Deserialize, From, Clone, JsonSchema)]
+#[serde(rename = "animation_v0_Action_SetNodeColor")]
 pub struct SetNodeColor {
   pub id: Uuid,
   pub color: Color,
 }
 
 #[derive(Display, Debug, Serialize, Deserialize, Error, Clone, JsonSchema)]
-#[serde(tag = "type", rename_all = "snake_case", content = "value")]
+#[serde(rename = "animation_v0_Action_SetNodeColorError", tag = "type", rename_all = "camelCase")]
 pub enum SetNodeColorError {
   #[display(fmt = "Node does not exist")]
   NodeDoesNotExist,
@@ -343,13 +351,14 @@ impl Apply<SetNodeColor> for Animation {
 }
 
 #[derive(Debug, Serialize, Deserialize, From, Clone, JsonSchema)]
+#[serde(rename = "animation_v0_Action_SetNodeLocked")]
 pub struct SetNodeLocked {
   pub id: Uuid,
   pub locked: bool,
 }
 
 #[derive(Display, Debug, Serialize, Deserialize, Error, Clone, JsonSchema)]
-#[serde(tag = "type", rename_all = "snake_case", content = "value")]
+#[serde(rename = "animation_v0_Action_SetNodeLockedError", tag = "type", rename_all = "camelCase")]
 pub enum SetNodeLockedError {
   #[display(fmt = "Node does not exist")]
   NodeDoesNotExist,
@@ -373,13 +382,14 @@ impl Apply<SetNodeLocked> for Animation {
 }
 
 #[derive(Debug, Serialize, Deserialize, From, Clone, JsonSchema)]
+#[serde(rename = "animation_v0_Action_SetNodeCollapsed")]
 pub struct SetNodeCollapsed {
   pub id: Uuid,
   pub collapsed: bool,
 }
 
 #[derive(Display, Debug, Serialize, Deserialize, Error, Clone, JsonSchema)]
-#[serde(tag = "type", rename_all = "snake_case", content = "value")]
+#[serde(rename = "animation_v0_Action_SetNodeCollapsedError", tag = "type", rename_all = "camelCase")]
 pub enum SetNodeCollapsedError {
   #[display(fmt = "Node does not exist")]
   NodeDoesNotExist,
@@ -403,6 +413,7 @@ impl Apply<SetNodeCollapsed> for Animation {
 }
 
 #[derive(Debug, Serialize, Deserialize, From, Clone, JsonSchema)]
+#[serde(rename = "animation_v0_Action_SetKeyAt")]
 pub struct SetKeyAt {
   pub id: Uuid,
   pub key_id: Uuid,
@@ -410,7 +421,7 @@ pub struct SetKeyAt {
 }
 
 #[derive(Display, Debug, Serialize, Deserialize, Error, Clone, JsonSchema)]
-#[serde(tag = "type", rename_all = "snake_case", content = "value")]
+#[serde(rename = "animation_v0_Action_SetKeyAtError", tag = "type", rename_all = "camelCase")]
 pub enum SetKeyAtError {
   #[display(fmt = "Node does not exist")]
   NodeDoesNotExist,
@@ -453,24 +464,27 @@ impl Apply<SetKeyAt> for Animation {
 }
 
 #[derive(Debug, Serialize, Deserialize, From, Clone, Hash, PartialEq, Eq, JsonSchema)]
+#[serde(rename = "animation_v0_KeySelector")]
 pub struct KeySelector {
   pub node_id: Uuid,
   pub key_id: Uuid,
 }
 
 #[derive(Debug, Serialize, Deserialize, From, Clone, JsonSchema)]
+#[serde(rename = "animation_v0_KeySelectorAt")]
 pub struct KeySelectorAt {
   pub selector: KeySelector,
   pub at: f64,
 }
 
 #[derive(Debug, Serialize, Deserialize, From, Clone, JsonSchema)]
+#[serde(rename = "animation_v0_Action_SetKeysAt")]
 pub struct SetKeysAt {
   pub ats: Vec<KeySelectorAt>,
 }
 
 #[derive(Display, Debug, Serialize, Deserialize, Error, Clone, JsonSchema)]
-#[serde(tag = "type", rename_all = "snake_case", content = "value")]
+#[serde(rename = "animation_v0_Action_SetKeysAtError", tag = "type", rename_all = "camelCase")]
 pub enum SetKeysAtError {
   #[display(fmt = "Node does not exist")]
   NodeDoesNotExist,
@@ -531,6 +545,7 @@ impl Apply<SetKeysAt> for Animation {
 
 
 #[derive(Debug, Serialize, Deserialize, From, Clone, JsonSchema)]
+#[serde(rename = "animation_v0_Action_SetKeyValue")]
 pub struct SetKeyValue {
   pub id: Uuid,
   pub key_id: Uuid,
@@ -538,7 +553,7 @@ pub struct SetKeyValue {
 }
 
 #[derive(Display, Debug, Serialize, Deserialize, Error, Clone, JsonSchema)]
-#[serde(tag = "type", rename_all = "snake_case", content = "value")]
+#[serde(rename = "animation_v0_Action_SetKeyValueError", tag = "type", rename_all = "camelCase")]
 pub enum SetKeyValueError {
   #[display(fmt = "Node does not exist")]
   NodeDoesNotExist,
@@ -574,6 +589,7 @@ impl Apply<SetKeyValue> for Animation {
 }
 
 #[derive(Debug, Serialize, Deserialize, From, Clone, JsonSchema)]
+#[serde(rename = "animation_v0_Action_SetKeyTransition")]
 pub struct SetKeyTransition {
   pub id: Uuid,
   pub key_id: Uuid,
@@ -581,7 +597,7 @@ pub struct SetKeyTransition {
 }
 
 #[derive(Display, Debug, Serialize, Deserialize, Error, Clone, JsonSchema)]
-#[serde(tag = "type", rename_all = "snake_case", content = "value")]
+#[serde(rename = "animation_v0_Action_SetKeyTransitionError", tag = "type", rename_all = "camelCase")]
 pub enum SetKeyTransitionError {
   #[display(fmt = "Node does not exist")]
   NodeDoesNotExist,
@@ -617,7 +633,7 @@ impl Apply<SetKeyTransition> for Animation {
 }
 
 #[derive(Debug, Serialize, Deserialize, From, Clone, JsonSchema)]
-#[serde(tag = "type", rename_all = "snake_case", content = "value")]
+#[serde(rename = "animation_v0_Action", tag = "type", rename_all = "camelCase", content = "value")]
 pub enum Action {
   SetName(SetName),
   SetParent(SetParent),
@@ -639,7 +655,7 @@ pub enum Action {
 }
 
 #[derive(Display, Debug, Error, From, Clone, Serialize, Deserialize, JsonSchema)]
-#[serde(tag = "type", rename_all = "snake_case", content = "value")]
+#[serde(rename = "animation_v0_ActionError", tag = "type", rename_all = "camelCase", content = "value")]
 pub enum ActionError {
   SetName(SetNameError),
   SetParent(SetParentError),

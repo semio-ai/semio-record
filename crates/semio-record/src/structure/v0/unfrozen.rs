@@ -11,6 +11,7 @@ use super::{frozen, action::Action};
 use schemars::JsonSchema;
 
 #[derive(Clone, Debug, Serialize, Deserialize, GraphQLObject, JsonSchema)]
+#[serde(rename = "structure_v0_Field")]
 pub struct StructureField {
   pub name: String,
   #[serde(rename = "type")]
@@ -31,6 +32,7 @@ impl<F: Freezer> Freeze<F> for StructureField {
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+#[serde(rename = "structure_v0_Private")]
 pub struct Structure {
   pub parent: Uuid,
   pub name: String,

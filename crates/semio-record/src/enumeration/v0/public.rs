@@ -8,6 +8,7 @@ use super::unfrozen::{Enumeration, EnumerationVariant, IdEnumerationVariant};
 use schemars::JsonSchema;
 
 #[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq, JsonSchema)]
+#[serde(rename = "enumeration_v0_Public")]
 pub struct Public {
   pub name: String,
   pub parent: Uuid,

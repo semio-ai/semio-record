@@ -10,13 +10,14 @@ use super::unfrozen::{StructureField, Structure};
 use schemars::JsonSchema;
 
 #[derive(Debug, Serialize, Deserialize, GraphQLObject, Clone, JsonSchema)]
+#[serde(rename = "structure_v0_Action_AddField")]
 pub struct AddField {
   pub id: Uuid,
   pub field: StructureField
 }
 
 #[derive(Debug, Serialize, Deserialize, Display, Error, GraphQLEnum, Clone, JsonSchema)]
-#[serde(tag = "type", rename_all = "snake_case", content = "value")]
+#[serde(rename = "structure_v0_Action_AddFieldError", tag = "type", rename_all = "camelCase")]
 pub enum AddFieldError {
   #[display(fmt = "ID already exists")]
   IdAlreadyExists,
@@ -53,12 +54,13 @@ impl Apply<AddField> for Structure {
 }
 
 #[derive(Debug, Serialize, Deserialize, GraphQLObject, Clone, JsonSchema)]
+#[serde(rename = "structure_v0_Action_RemoveField")]
 pub struct RemoveField  {
   pub id: Uuid,
 }
 
 #[derive(Debug, Serialize, Deserialize, Display, Error, GraphQLEnum, Clone, JsonSchema)]
-#[serde(tag = "type", rename_all = "snake_case", content = "value")]
+#[serde(rename = "structure_v0_Action_RemoveFieldError", tag = "type", rename_all = "camelCase")]
 pub enum RemoveFieldError {
   #[display(fmt = "Field does not exist")]
   FieldDoesNotExist,
@@ -77,13 +79,14 @@ impl Apply<RemoveField> for Structure {
 }
 
 #[derive(Debug, Serialize, Deserialize, GraphQLObject, Clone, JsonSchema)]
+#[serde(rename = "structure_v0_Action_SetFieldName")]
 pub struct SetFieldName  {
   pub id: Uuid,
   pub name: String,
 }
 
 #[derive(Debug, Serialize, Deserialize, Display, Error, GraphQLEnum, Clone, JsonSchema)]
-#[serde(tag = "type", rename_all = "snake_case", content = "value")]
+#[serde(rename = "structure_v0_Action_SetFieldNameError", tag = "type", rename_all = "camelCase")]
 pub enum SetFieldNameError {
   #[display(fmt = "Field does not exist")]
   FieldDoesNotExist,
@@ -115,13 +118,14 @@ impl Apply<SetFieldName> for Structure {
 }
 
 #[derive(Debug, Serialize, Deserialize, GraphQLObject, Clone, JsonSchema)]
+#[serde(rename = "structure_v0_Action_SetFieldType")]
 pub struct SetFieldType  {
   pub id: Uuid,
   pub ty: UnfrozenTy,
 }
 
 #[derive(Debug, Serialize, Deserialize, Display, Error, GraphQLEnum, Clone, JsonSchema)]
-#[serde(tag = "type", rename_all = "snake_case", content = "value")]
+#[serde(rename = "structure_v0_Action_SetFieldTypeError", tag = "type", rename_all = "camelCase")]
 pub enum SetFieldTypeError {
   #[display(fmt = "Field does not exist")]
   FieldDoesNotExist,
@@ -141,7 +145,7 @@ impl Apply<SetFieldType> for Structure {
 }
 
 #[derive(Debug, Serialize, Deserialize, From, Clone, JsonSchema)]
-#[serde(tag = "type", rename_all = "snake_case", content = "value")]
+#[serde(rename = "structure_v0_Action", tag = "type", rename_all = "camelCase", content = "value")]
 pub enum Action {
   SetName(SetName),
   SetParent(SetParent),
@@ -153,7 +157,7 @@ pub enum Action {
 }
 
 #[derive(Display, Debug, Error, From, Serialize, Deserialize, Clone, JsonSchema)]
-#[serde(tag = "type", rename_all = "snake_case", content = "value")]
+#[serde(rename = "structure_v0_ActionError", tag = "type", rename_all = "camelCase", content = "value")]
 pub enum ActionError {
   SetName(SetNameError),
   SetParent(SetParentError),

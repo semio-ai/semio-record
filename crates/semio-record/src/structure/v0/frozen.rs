@@ -12,6 +12,7 @@ use crate::{
 };
 
 #[derive(Debug, Clone, Serialize, Deserialize, GraphQLObject, JsonSchema)]
+#[serde(rename = "enumeration_v0_Frozen_Field")]
 #[graphql(name = "FrozenStructureField")]
 pub struct StructureField {
   pub name: String,
@@ -21,6 +22,7 @@ pub struct StructureField {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, JsonSchema)]
+#[serde(rename = "structure_v0_Frozen")]
 pub struct Structure {
   pub parent: Uuid,
   pub name: String,

@@ -53,6 +53,7 @@ pub enum Transition {
 }
 
 #[derive(Debug, Serialize, Deserialize, GraphQLObject, Clone, JsonSchema)]
+#[serde(rename = "animation_v0_Key")]
 pub struct Key {
   pub at: f64,
   pub value: Value,
@@ -60,6 +61,7 @@ pub struct Key {
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone, JsonSchema)]
+#[serde(rename = "animation_v0_Group")]
 pub struct Group {
   pub name: String,
   pub locked: bool,
@@ -93,6 +95,7 @@ impl Group {
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone, JsonSchema)]
+#[serde(rename = "animation_v0_Track")]
 pub struct Track {
   pub name: String,
   pub locked: bool,
@@ -143,13 +146,14 @@ impl Track {
 }
 
 #[derive(Debug, Serialize, Deserialize, GraphQLUnion, Clone, JsonSchema)]
-#[serde(tag = "type", rename_all = "lowercase", content = "value")]
+#[serde(rename = "animation_v0_Node", tag = "type", rename_all = "camelCase", content = "value")]
 pub enum Node {
   Group(Group),
   Track(Track),
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone, JsonSchema)]
+#[serde(rename = "animation_v0_Private")]
 pub struct Animation {
   pub name: String,
   pub parent: Uuid,

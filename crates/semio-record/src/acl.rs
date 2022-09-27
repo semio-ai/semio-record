@@ -18,6 +18,7 @@ pub struct IdWithPermissions {
 /// An Access Control List (ACL) is a list of rules that specify which agents
 /// can perform which actions, if any.
 #[derive(Debug, Serialize, Deserialize, Clone, JsonSchema)]
+#[serde(rename = "Acl")]
 pub struct Acl {
   /// A map of agent IDs to their permissions.
   pub permissions: HashMap<Uuid, WithPermissions>,
@@ -117,6 +118,7 @@ impl Default for PermissionLevel {
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone, Eq, PartialEq, GraphQLObject, JsonSchema)]
+#[serde(rename = "Acl_WithPermissions_None")]
 pub struct None {
   pub _dummy: i32,
 }
@@ -124,6 +126,7 @@ pub struct None {
 const NONE: None = None { _dummy: 0 };
 
 #[derive(Debug, Serialize, Deserialize, Clone, Eq, PartialEq, GraphQLObject, JsonSchema)]
+#[serde(rename = "Acl_WithPermissions_Inherit")]
 pub struct Inherit {
   /// Inherit permissions from the following record with a ACL.
   /// If `Option::None`, the record's logical parent will be used.
@@ -134,6 +137,7 @@ pub struct Inherit {
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone, Eq, PartialEq, GraphQLObject, JsonSchema)]
+#[serde(rename = "Acl_Permissions")]
 pub struct Permissions {
   pub read: PermissionLevel,
   pub write: PermissionLevel,
@@ -204,7 +208,7 @@ pub const PRIVATE_READ_WRITE: Permissions = Permissions {
 };
 
 #[derive(Debug, Serialize, Deserialize, Clone, Eq, PartialEq, GraphQLUnion, JsonSchema)]
-#[serde(tag = "type", rename_all = "lowercase")]
+#[serde(rename = "Acl_WithPermissions", tag = "type", rename_all = "camelCase", content = "value")]
 pub enum WithPermissions {
   /// No permissions
   None(None),

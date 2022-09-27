@@ -8,6 +8,7 @@ use schemars::JsonSchema;
 use super::unfrozen::{IdStructureField, Structure, StructureField};
 
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+#[serde(rename = "structure_v0_Public")]
 pub struct Public {
   pub name: String,
   pub parent: Uuid,

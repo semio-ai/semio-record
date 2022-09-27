@@ -10,6 +10,7 @@ use schemars::JsonSchema;
 use super::action::Action;
 
 #[derive(Debug, Serialize, Deserialize, Clone, JsonSchema)]
+#[serde(rename = "user_v0_Unfrozen")]
 pub struct User {
   pub user_name: String,
   pub first_name: String,

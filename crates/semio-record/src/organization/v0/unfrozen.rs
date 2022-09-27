@@ -10,6 +10,7 @@ use super::action::Action;
 use schemars::JsonSchema;
 
 #[derive(Debug, Serialize, Deserialize, GraphQLObject, Clone, JsonSchema)]
+#[serde(rename = "organization_v0_Private")]
 pub struct Organization {
   pub name: String,
   pub acl: Acl,

@@ -18,6 +18,7 @@ use crate::{
 use super::action::Action;
 
 #[derive(Debug, Serialize, Deserialize, GraphQLObject, Clone, JsonSchema)]
+#[serde(rename = "folder_v0_Private")]
 pub struct Folder {
   pub name: String,
   pub parent: Uuid,

@@ -1,7 +1,7 @@
 use serde::{Serialize, Deserialize};
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
-#[serde(tag = "type", content = "value", rename_all = "snake_case")]
+#[serde(rename = "unit_Mass", tag = "type", content = "value", rename_all = "camelCase")]
 pub enum Mass {
   Grams(f64),
   Kilograms(f64),

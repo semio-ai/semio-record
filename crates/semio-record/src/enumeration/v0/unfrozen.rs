@@ -11,6 +11,7 @@ use crate::{ty::UnfrozenTy, record::{View, Freezer, Freeze, Unfrozen, UnfrozenRe
 use super::{frozen, action::Action};
 
 #[derive(Clone, Debug, Serialize, Deserialize, GraphQLObject, PartialEq, Eq, JsonSchema)]
+#[serde(rename = "enumeration_v0_Variant")]
 pub struct EnumerationVariant {
   pub name: String,
   #[serde(rename = "type")]
@@ -31,6 +32,7 @@ impl<F: Freezer> Freeze<F> for EnumerationVariant {
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+#[serde(rename = "enumeration_v0_Private")]
 pub struct Enumeration {
   pub parent: Uuid,
   pub name: String,

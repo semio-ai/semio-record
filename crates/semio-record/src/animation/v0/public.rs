@@ -8,6 +8,7 @@ use schemars::JsonSchema;
 use super::unfrozen::{Animation, Node, IdNode};
 
 #[derive(Debug, Serialize, Deserialize, Clone, JsonSchema)]
+#[serde(rename = "animation_v0_Public")]
 pub struct Public {
   pub name: String,
   pub parent: Uuid,

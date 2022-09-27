@@ -12,6 +12,7 @@ pub trait Name {
 }
 
 #[derive(Debug, Serialize, Deserialize, GraphQLObject, Display, Clone, JsonSchema)]
+#[serde(rename = "SetName")]
 pub struct SetName {
   pub name: String,
 }
@@ -23,7 +24,7 @@ impl SetName {
 }
 
 #[derive(Debug, Display, Error, GraphQLEnum, Serialize, Deserialize, Clone, JsonSchema)]
-#[serde(tag = "type", rename_all = "snake_case", content = "value")]
+#[serde(rename = "SetNameError", tag = "type", rename_all = "camelCase")]
 pub enum SetNameError {
   #[display(fmt = "Name too short")]
   NameTooShort,
@@ -81,6 +82,7 @@ pub trait Parent {
 }
 
 #[derive(Debug, Serialize, Deserialize, GraphQLObject, Clone, JsonSchema)]
+#[serde(rename = "SetParent")]
 pub struct SetParent {
   pub id: Uuid,
 }
@@ -92,7 +94,7 @@ impl SetParent {
 }
 
 #[derive(Debug, Display, Error, GraphQLEnum, Serialize, Deserialize, Clone, JsonSchema)]
-#[serde(tag = "type", rename_all = "snake_case", content = "value")]
+#[serde(rename = "SetParentError", tag = "type", rename_all = "camelCase")]
 pub enum SetParentError {
   #[display(fmt = "Parent is not a valid UUID")]
   Invalid,

@@ -8,6 +8,7 @@ use crate::{ty::FrozenTy, record::{View, Frozen, FrozenReference}, blob::BlobDep
 use schemars::JsonSchema;
 
 #[derive(Debug, Clone, Serialize, Deserialize, GraphQLObject, PartialEq, Eq, JsonSchema)]
+#[serde(rename = "enumeration_v0_Frozen_Variant")]
 #[graphql(name = "FrozenEnumerationVariant")]
 pub struct EnumerationVariant {
   pub name: String,
@@ -17,6 +18,7 @@ pub struct EnumerationVariant {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq, JsonSchema)]
+#[serde(rename = "enumeration_v0_Frozen")]
 pub struct Enumeration {
   pub parent: Uuid,
   pub name: String,
