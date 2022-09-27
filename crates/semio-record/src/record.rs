@@ -310,6 +310,15 @@ macro_rules! impl_record {
         _ => None,
       }
     }
+
+    pub fn schema(schema_version: i16) -> Result<crate::schema_version::Schema, Box<dyn std::error::Error>> {
+      match schema_version {
+        $(
+          $version => Ok($module::schema()),
+        )+
+        _ => Err(format!("Unsupported schema version: {}", schema_version).into()),
+      }
+    }
   };
 }
 

@@ -7,12 +7,13 @@ use serde::{Deserialize, Serialize};
 use schemars::JsonSchema;
 
 #[derive(Debug, Serialize, Deserialize, Display, GraphQLObject, Clone, JsonSchema)]
+#[serde(rename = "user_v0_Action_SetFirstName")]
 pub struct SetFirstName {
   pub first_name: String,
 }
 
 #[derive(Debug, Serialize, Deserialize, Display, Error, GraphQLEnum, Clone, JsonSchema)]
-#[serde(tag = "type", rename_all = "snake_case", content = "value")]
+#[serde(rename = "user_v0_Action_SetFirstNameError", tag = "type", rename_all = "camelCase")]
 pub enum SetFirstNameError {
   #[display(fmt = "First name can't be empty")]
   Empty,
@@ -33,12 +34,13 @@ impl Apply<SetFirstName> for User {
 }
 
 #[derive(Debug, Serialize, Deserialize, Display, GraphQLObject, Clone, JsonSchema)]
+#[serde(rename = "user_v0_Action_SetLastName")]
 pub struct SetLastName {
   pub last_name: String,
 }
 
 #[derive(Debug, Serialize, Deserialize, Display, Error, GraphQLEnum, Clone, JsonSchema)]
-#[serde(tag = "type", rename_all = "snake_case", content = "value")]
+#[serde(rename = "user_v0_Action_SetLastNameError", tag = "type", rename_all = "camelCase")]
 pub enum SetLastNameError {
   #[display(fmt = "Last name can't be empty")]
   Empty,

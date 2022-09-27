@@ -15,12 +15,13 @@ use super::unfrozen::{Export, Module, Parameter};
 
 
 #[derive(Debug, Clone, Serialize, Deserialize, GraphQLObject, JsonSchema)]
+#[serde(rename = "module_v0_Action_SetExecutable")]
 pub struct SetExecutable {
   pub blob_id: Uuid,
 }
 
 #[derive(Display, Clone, Debug, Error, GraphQLEnum, Serialize, Deserialize, JsonSchema)]
-#[serde(tag = "type", rename_all = "snake_case", content = "value")]
+#[serde(rename = "module_v0_Action_SetExecutableError", tag = "type", rename_all = "snake_case")]
 pub enum SetExecutableError {
   _Dummy
 }
@@ -36,13 +37,14 @@ impl Apply<SetExecutable> for Module
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, GraphQLObject, JsonSchema)]
+#[serde(rename = "module_v0_Action_AddExport")]
 pub struct AddExport {
   pub id: Uuid,
   pub export: Export
 }
 
 #[derive(Display, Clone,Debug, Error, GraphQLEnum, Serialize, Deserialize, JsonSchema)]
-#[serde(tag = "type", rename_all = "snake_case", content = "value")]
+#[serde(rename = "module_v0_Action_AddExportError", tag = "type", rename_all = "snake_case")]
 pub enum AddExportError
 {
   #[display(fmt = "Export name already exists in module")]
@@ -212,6 +214,7 @@ impl Apply<RemoveFunctionParameter> for Module
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, GraphQLObject, JsonSchema)]
+#[serde(rename = "module_v0_Action_SetFunctionParameterName", rename_all = "camelCase")]
 pub struct SetFunctionParameterName {
   pub export: Uuid,
   pub parameter: Uuid,
@@ -219,7 +222,7 @@ pub struct SetFunctionParameterName {
 }
 
 #[derive(Display, Clone, Debug, Error, GraphQLEnum, Serialize, Deserialize, JsonSchema)]
-#[serde(tag = "type", rename_all = "snake_case", content = "value")]
+#[serde(rename = "module_v0_Action_SetFunctionParameterNameError", tag = "type", rename_all = "camelCase")]
 pub enum SetFunctionParameterNameError {
   #[display(fmt = "Export not found in module")]
   ExportNotFound,
@@ -260,6 +263,7 @@ impl Apply<SetFunctionParameterName> for Module
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, GraphQLObject, JsonSchema)]
+#[serde(rename = "module_v0_Action_SetFunctionParameterType")]
 pub struct SetFunctionParameterType {
   pub export: Uuid,
   pub parameter: Uuid,
@@ -267,7 +271,7 @@ pub struct SetFunctionParameterType {
 }
 
 #[derive(Display, Clone, Debug, Error, GraphQLEnum, Serialize, Deserialize, JsonSchema)]
-#[serde(tag = "type", rename_all = "snake_case", content = "value")]
+#[serde(rename = "module_v0_Action_SetFunctionParameterTypeError", tag = "type", rename_all = "camelCase")]
 pub enum SetFunctionParameterTypeError
 {
   #[display(fmt = "Export not found in module")]
@@ -303,6 +307,7 @@ impl Apply<SetFunctionParameterType> for Module
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, GraphQLObject, JsonSchema)]
+#[serde(rename = "module_v0_Action_SetFunctionParameterMutability")]
 pub struct SetFunctionParameterMutability {
   pub export: Uuid,
   pub parameter: Uuid,
@@ -310,7 +315,7 @@ pub struct SetFunctionParameterMutability {
 }
 
 #[derive(Display, Clone, Debug, Error, GraphQLEnum, Serialize, Deserialize, JsonSchema)]
-#[serde(tag = "type", rename_all = "snake_case", content = "value")]
+#[serde(rename = "module_v0_Action_SetFunctionParameterMutabilityError", tag = "type", rename_all = "camelCase")]
 pub enum SetFunctionParameterMutabilityError {
   #[display(fmt = "Export not found in module")]
   ExportNotFound,
@@ -345,13 +350,14 @@ impl Apply<SetFunctionParameterMutability> for Module
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, GraphQLObject, JsonSchema)]
+#[serde(rename = "module_v0_Action_SetFunctionReturnType")]
 pub struct SetFunctionReturnType {
   pub export: Uuid,
   pub ty: UnfrozenTy,
 }
 
 #[derive(Display, Clone, Debug, Error, GraphQLEnum, Serialize, Deserialize, JsonSchema)]
-#[serde(tag = "type", rename_all = "snake_case", content = "value")]
+#[serde(rename = "module_v0_Action_SetFunctionReturnTypeError", tag = "type", rename_all = "camelCase")]
 pub enum SetFunctionReturnTypeError
 {
   #[display(fmt = "Export not found in module")]
@@ -443,7 +449,7 @@ impl Apply<RemoveDependency> for Module
 
 
 #[derive(Debug, Clone, Serialize, Deserialize, From, JsonSchema)]
-#[serde(tag = "type", rename_all = "snake_case", content = "value")]
+#[serde(rename = "module_v0_Action", tag = "type", rename_all = "snake_case", content = "value")]
 pub enum Action {
   SetParent(SetParent),
   SetName(SetName),
@@ -462,7 +468,7 @@ pub enum Action {
 }
 
 #[derive(Display, Clone, Debug, Error, Serialize, Deserialize, From, JsonSchema)]
-#[serde(tag = "type", rename_all = "snake_case", content = "value")]
+#[serde(rename = "module_v0_ActionError", tag = "type", rename_all = "camelCase")]
 pub enum ActionError
 {
   SetParent(SetParentError),

@@ -96,6 +96,15 @@ macro_rules! impl_lib {
         _ => None,
       }
     }
+
+    pub fn schema(ty: i16, schema_version: i16) -> Result<crate::schema_version::Schema, Box<dyn std::error::Error>> {
+      match ty {
+        $(
+          crate::record::$ty => $module::schema(schema_version),
+        )+
+        _ => Err(format!("Unsupported record type: {}", ty).into()),
+      }
+    }
   }
 }
 

@@ -1,5 +1,7 @@
 use schemars::{schema::RootSchema};
+use serde::{Serialize, Deserialize};
 
+#[derive(Debug, Serialize, Deserialize)]
 pub struct Schema {
   pub private: RootSchema,
   pub public: RootSchema,

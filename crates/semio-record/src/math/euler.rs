@@ -3,7 +3,7 @@ use serde::{Serialize, Deserialize};
 use schemars::JsonSchema;
 
 #[derive(Debug, Serialize, Deserialize, Clone, JsonSchema)]
-#[serde(rename_all = "lowercase")]
+#[serde(rename = "math_Euler_Order", rename_all = "lowercase")]
 pub enum EulerOrder {
   XYZ,
   XZY,
@@ -14,6 +14,7 @@ pub enum EulerOrder {
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone, JsonSchema)]
+#[serde(rename = "math_Euler")]
 pub struct Euler {
   pub x: f64,
   pub y: f64,

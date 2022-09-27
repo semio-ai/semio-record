@@ -18,6 +18,7 @@ pub use quaternion::*;
 use schemars::JsonSchema;
 
 #[derive(Debug, Serialize, Deserialize, GraphQLObject, Clone, JsonSchema)]
+#[serde(rename = "math_MultiBezier2_Chunk")]
 pub struct MultiBezier2Chunk {
   p0: Vector2,
   p1: Vector2,
@@ -25,6 +26,7 @@ pub struct MultiBezier2Chunk {
 }
 
 #[derive(Debug, Serialize, Deserialize, GraphQLObject, Clone, JsonSchema)]
+#[serde(rename = "math_MultiBezier2")]
 pub struct MultiBezier2 {
   chunks: Vec<MultiBezier2Chunk>,
   last: Vector2
