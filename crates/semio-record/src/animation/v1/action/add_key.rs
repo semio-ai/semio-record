@@ -9,7 +9,7 @@ use schemars::JsonSchema;
 use super::super::unfrozen::{Animation, Key};
 
 #[derive(Debug, Serialize, Deserialize, From, Clone, JsonSchema)]
-#[serde(rename = "animation_v1_Action_AddKey")]
+#[serde(rename = "animation_v1_Action_AddKey", rename_all = "camelCase")]
 pub struct AddKey {
   pub control_id: Uuid,
   pub key_id: Uuid,

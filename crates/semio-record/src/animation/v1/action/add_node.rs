@@ -9,7 +9,7 @@ use super::super::unfrozen::{Animation, Node};
 use schemars::JsonSchema;
 
 #[derive(Debug, Serialize, Deserialize, From, Clone, JsonSchema)]
-#[serde(rename = "animation_v1_Action_AddNode")]
+#[serde(rename = "animation_v1_Action_AddNode", rename_all = "camelCase")]
 pub struct AddNode {
   pub parent_id: Option<Uuid>,
   pub node_id: Uuid,

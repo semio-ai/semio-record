@@ -7,7 +7,7 @@ use serde::{Deserialize, Serialize};
 use schemars::JsonSchema;
 
 #[derive(Debug, Serialize, Deserialize, Display, GraphQLObject, Clone, JsonSchema)]
-#[serde(rename = "user_v0_Action_SetFirstName")]
+#[serde(rename = "user_v0_Action_SetFirstName", rename_all = "camelCase")]
 pub struct SetFirstName {
   pub first_name: String,
 }
@@ -34,7 +34,7 @@ impl Apply<SetFirstName> for User {
 }
 
 #[derive(Debug, Serialize, Deserialize, Display, GraphQLObject, Clone, JsonSchema)]
-#[serde(rename = "user_v0_Action_SetLastName")]
+#[serde(rename = "user_v0_Action_SetLastName", rename_all = "camelCase")]
 pub struct SetLastName {
   pub last_name: String,
 }
@@ -62,7 +62,7 @@ impl Apply<SetLastName> for User {
 }
 
 #[derive(Debug, Serialize, Deserialize, Display, GraphQLObject, Clone, JsonSchema)]
-#[serde(rename = "user_v0_Action_SetEmail")]
+#[serde(rename = "user_v0_Action_SetEmail", rename_all = "camelCase")]
 pub struct SetEmail {
   pub email: String,
 }
@@ -101,7 +101,7 @@ impl Apply<SetEmail> for User {
 }
 
 #[derive(Debug, Serialize, Deserialize, Display, GraphQLObject, Clone, JsonSchema)]
-#[serde(rename = "user_v0_Action_SetEmailVerified")]
+#[serde(rename = "user_v0_Action_SetEmailVerified", rename_all = "camelCase")]
 pub struct SetEmailVerified {
   pub email_verified: bool,
 }
@@ -122,7 +122,7 @@ impl Apply<SetEmailVerified> for User {
 }
 
 #[derive(Debug, Serialize, Deserialize, Display, GraphQLObject, Clone, JsonSchema)]
-#[serde(rename = "user_v0_Action_SetPasswordHash")]
+#[serde(rename = "user_v0_Action_SetPasswordHash", rename_all = "camelCase")]
 pub struct SetPasswordHash {
   pub password_hash: String,
 }
@@ -149,7 +149,7 @@ impl Apply<SetPasswordHash> for User {
 }
 
 #[derive(Debug, Serialize, Deserialize, Display, GraphQLObject, Clone, JsonSchema)]
-#[serde(rename = "user_v0_Action_SetTokenSecret")]
+#[serde(rename = "user_v0_Action_SetTokenSecret", rename_all = "camelCase")]
 pub struct SetTokenSecret {
   pub token_secret: String,
 }

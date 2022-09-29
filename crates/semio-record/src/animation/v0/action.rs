@@ -464,7 +464,7 @@ impl Apply<SetKeyAt> for Animation {
 }
 
 #[derive(Debug, Serialize, Deserialize, From, Clone, Hash, PartialEq, Eq, JsonSchema)]
-#[serde(rename = "animation_v0_KeySelector")]
+#[serde(rename = "animation_v0_KeySelector", rename_all = "camelCase")]
 pub struct KeySelector {
   pub node_id: Uuid,
   pub key_id: Uuid,
@@ -545,7 +545,7 @@ impl Apply<SetKeysAt> for Animation {
 
 
 #[derive(Debug, Serialize, Deserialize, From, Clone, JsonSchema)]
-#[serde(rename = "animation_v0_Action_SetKeyValue")]
+#[serde(rename = "animation_v0_Action_SetKeyValue", rename_all = "camelCase")]
 pub struct SetKeyValue {
   pub id: Uuid,
   pub key_id: Uuid,
@@ -589,7 +589,7 @@ impl Apply<SetKeyValue> for Animation {
 }
 
 #[derive(Debug, Serialize, Deserialize, From, Clone, JsonSchema)]
-#[serde(rename = "animation_v0_Action_SetKeyTransition")]
+#[serde(rename = "animation_v0_Action_SetKeyTransition", rename_all = "camelCase")]
 pub struct SetKeyTransition {
   pub id: Uuid,
   pub key_id: Uuid,

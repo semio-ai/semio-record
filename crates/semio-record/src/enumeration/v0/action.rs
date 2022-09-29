@@ -10,7 +10,7 @@ use super::unfrozen::{EnumerationVariant, Enumeration};
 use schemars::JsonSchema;
 
 #[derive(Debug, Serialize, Deserialize, GraphQLObject, Clone, JsonSchema)]
-#[serde(rename = "enumeration_v0_Action_AddVariant")]
+#[serde(rename = "enumeration_v0_Action_AddVariant", rename_all = "camelCase")]
 pub struct AddVariant  {
   pub id: Uuid,
   pub variant: EnumerationVariant
@@ -54,7 +54,7 @@ impl Apply<AddVariant> for Enumeration {
 }
 
 #[derive(Debug, Serialize, Deserialize, GraphQLObject, Clone, JsonSchema)]
-#[serde(rename = "enumeration_v0_Action_RemoveVariant")]
+#[serde(rename = "enumeration_v0_Action_RemoveVariant", rename_all = "camelCase")]
 pub struct RemoveVariant  {
   pub id: Uuid,
 }
@@ -118,9 +118,10 @@ impl Apply<SetVariantName> for Enumeration {
 }
 
 #[derive(Debug, Serialize, Deserialize, GraphQLObject, Clone, JsonSchema)]
-#[serde(rename = "enumeration_v0_Action_SetVariantType")]
+#[serde(rename = "enumeration_v0_Action_SetVariantType", rename_all = "camelCase")]
 pub struct SetVariantType {
   pub id: Uuid,
+  #[serde(rename = "type")]
   pub ty: UnfrozenTy,
 }
 

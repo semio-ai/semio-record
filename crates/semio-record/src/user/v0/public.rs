@@ -7,7 +7,7 @@ use schemars::JsonSchema;
 
 #[derive(Debug, Clone, GraphQLObject, Serialize, Deserialize, JsonSchema)]
 #[graphql(name = "UserPublic")]
-#[serde(rename = "user_v0_Public")]
+#[serde(rename = "user_v0_Public", rename_all = "camelCase")]
 pub struct Public {
   pub user_name: String,
 }

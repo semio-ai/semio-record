@@ -11,7 +11,7 @@ use schemars::JsonSchema;
 use super::super::unfrozen::{Animation, NodeKind};
 
 #[derive(Debug, Serialize, Deserialize, From, Clone, JsonSchema)]
-#[serde(rename = "animation_v1_Action_RemoveControl")]
+#[serde(rename = "animation_v1_Action_RemoveControl", rename_all = "camelCase")]
 pub struct RemoveControl {
   pub control_id: Uuid,
 }

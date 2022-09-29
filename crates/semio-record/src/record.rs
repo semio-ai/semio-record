@@ -3,7 +3,7 @@ use std::{collections::HashSet, fmt::Display};
 use async_trait::async_trait;
 use derive_more::From;
 use juniper::{
-  marker::IsOutputType, DefaultScalarValue, FromInputValue, GraphQLObject, GraphQLValue,
+  FromInputValue, GraphQLObject,
   InputValue, ScalarValue,
 };
 use serde::{de::DeserializeOwned, Deserialize, Serialize};
@@ -124,12 +124,14 @@ pub struct Path {
 #[derive(
   Debug, Serialize, Deserialize, Hash, PartialEq, Eq, Clone, PartialOrd, Ord, GraphQLObject, JsonSchema
 )]
+#[serde(rename_all = "camelCase")]
 pub struct FrozenReference {
   pub id: Uuid,
   pub version: Version,
 }
 
 #[derive(Debug, Serialize, Deserialize, Hash, PartialEq, Eq, Clone, GraphQLObject, JsonSchema)]
+#[serde(rename_all = "camelCase")]
 pub struct UnfrozenReference {
   pub id: Uuid,
   pub version_req: VersionReq,

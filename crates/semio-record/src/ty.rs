@@ -269,7 +269,7 @@ pub struct FrozenScalar {
 }
 
 #[derive(Debug, Serialize, Deserialize, GraphQLUnion, From, Clone, PartialEq, Eq, JsonSchema)]
-#[serde(rename = "FrozenType", rename_all = "camelCase")]
+#[serde(rename = "FrozenType", rename_all = "camelCase", tag = "type", content = "value")]
 pub enum FrozenTy {
   Primitive(Primitive),
   FrozenScalar(FrozenScalar),
@@ -404,7 +404,7 @@ impl<F: Freezer> Freeze<F> for UnfrozenArray {
 }
 
 #[derive(Debug, Serialize, Deserialize, GraphQLUnion, From, Clone, PartialEq, Eq, JsonSchema)]
-#[serde(rename = "UnfrozenType", rename_all = "camelCase")]
+#[serde(rename = "UnfrozenType", rename_all = "camelCase", tag = "type", content = "value")]
 pub enum UnfrozenTy {
   Primitive(Primitive),
   UnfrozenScalar(UnfrozenScalar),

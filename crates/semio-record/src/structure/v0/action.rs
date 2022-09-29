@@ -10,7 +10,7 @@ use super::unfrozen::{StructureField, Structure};
 use schemars::JsonSchema;
 
 #[derive(Debug, Serialize, Deserialize, GraphQLObject, Clone, JsonSchema)]
-#[serde(rename = "structure_v0_Action_AddField")]
+#[serde(rename = "structure_v0_Action_AddField", rename_all = "camelCase")]
 pub struct AddField {
   pub id: Uuid,
   pub field: StructureField
@@ -54,7 +54,7 @@ impl Apply<AddField> for Structure {
 }
 
 #[derive(Debug, Serialize, Deserialize, GraphQLObject, Clone, JsonSchema)]
-#[serde(rename = "structure_v0_Action_RemoveField")]
+#[serde(rename = "structure_v0_Action_RemoveField", rename_all = "camelCase")]
 pub struct RemoveField  {
   pub id: Uuid,
 }
@@ -79,7 +79,7 @@ impl Apply<RemoveField> for Structure {
 }
 
 #[derive(Debug, Serialize, Deserialize, GraphQLObject, Clone, JsonSchema)]
-#[serde(rename = "structure_v0_Action_SetFieldName")]
+#[serde(rename = "structure_v0_Action_SetFieldName", rename_all = "camelCase")]
 pub struct SetFieldName  {
   pub id: Uuid,
   pub name: String,
@@ -118,9 +118,10 @@ impl Apply<SetFieldName> for Structure {
 }
 
 #[derive(Debug, Serialize, Deserialize, GraphQLObject, Clone, JsonSchema)]
-#[serde(rename = "structure_v0_Action_SetFieldType")]
+#[serde(rename = "structure_v0_Action_SetFieldType", rename_all = "camelCase")]
 pub struct SetFieldType  {
   pub id: Uuid,
+  #[serde(rename = "type")]
   pub ty: UnfrozenTy,
 }
 

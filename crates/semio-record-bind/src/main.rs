@@ -82,6 +82,37 @@ fn instance_type_to_ts(instance_type: &InstanceType) -> String {
   }
 }
 
+fn schema_object_to_type(schema_object: &SchemaObject, imports: &mut Imports) -> TypeExpr {
+  if let Some(enum_values) = &schema_object.enum_values {
+    TypeExpr::union(enum_values.iter().map(|v| match v {
+      Value::String(s) => TypeExpr::string_literal(s),
+      Value::Number(n) => TypeExpr::number_literal(n.as_i64().unwrap()),
+      _ => TypeExpr::identifier("never"),
+    }).collect())
+  } else if let Some(reference) = &schema_object.reference {
+    let reference = reference.trim_start_matches("#/definitions/");
+    let path = name_to_path(reference);
+    let name = path.file_name().unwrap().to_string();
+    let import_name = imports.add(name, path);
+    TypeExpr::Identifier(import_name)
+  } else if let Some(instance_type) = &schema_object.instance_type {
+    match instance_type {
+      SingleOrVec::Single(single) => {
+        TypeExpr::identifier(&instance_type_to_ts(single))
+      },
+      SingleOrVec::Vec(vec) => {
+        TypeExpr::union(vec
+          .iter()
+          .map(|v| TypeExpr::identifier(&instance_type_to_ts(v)))
+          .collect()
+        )
+      }
+    }
+  } else {
+    TypeExpr::identifier("any")
+  }
+}
+
 fn parse_schema_object(name: &str, mut logical_path: Utf8PathBuf, object: &SchemaObject) -> String {
   // Remove file name
   logical_path.pop();
@@ -96,39 +127,20 @@ fn parse_schema_object(name: &str, mut logical_path: Utf8PathBuf, object: &Schem
         file.append(TypeDecl::new(name, TypeExpr::identifier("void")));
       }
 
-      let mut members = HashSet::new();
-      
       let mut namespace = NamespaceDecl::new(name);
       // Union
       for schema in one_of {
         let variant_name = schema::name(schema);
         if let Some(variant_name) = variant_name {
-          members.insert(format!("{name}.{variant_name}"));
           let mut interface = InterfaceDecl::export(variant_name);
           if let Some(properties) = schema::object_properties(&schema) {
             for (name, property) in properties {
               if let Schema::Object(object) = property.schema {
-                let ty = if let Some(enum_values) = &object.enum_values {
-                  TypeExpr::union(enum_values.iter().map(|v| match v {
-                    Value::String(s) => TypeExpr::string_literal(s),
-                    Value::Number(n) => TypeExpr::number_literal(n.as_i64().unwrap()),
-                    _ => TypeExpr::identifier("never"),
-                  }).collect())
-                } else if let Some(reference) = &object.reference {
-                  let reference = reference.trim_start_matches("#/definitions/");
-                  let path = name_to_path(reference);
-                  let name = path.file_name().unwrap().to_string();
-                  let import_name = imports.add(name, path);
-                  TypeExpr::Identifier(import_name)
-                } else {
-                  TypeExpr::identifier("any")
-                };
-
                 interface.add_field(InterfaceField {
                   name: name.to_string(),
                   optional: Some(!property.required),
                   description: None,
-                  ty
+                  ty: schema_object_to_type(object, &mut imports)
                 });
               }
             }
@@ -137,37 +149,36 @@ fn parse_schema_object(name: &str, mut logical_path: Utf8PathBuf, object: &Schem
         }
       }
 
+      let union = namespace.decls.iter().filter_map(|decl| {
+        if let Decl::Interface(interface) = decl {
+          Some(TypeExpr::identifier(format!("{}.{}", &name, &interface.name)))
+        } else {
+          None
+        }
+      }).collect();
+
       file.append(namespace);
-      file.append(TypeDecl::new(name, TypeExpr::union(members.into_iter().map(|m| TypeExpr::identifier(m)).collect())));
+      file.append(TypeDecl::new(name, TypeExpr::union(union)));
     }
   } else if let Some(object_validation) = &object.object {
     let mut interface = InterfaceDecl::new(name);
     for (name, property) in &object_validation.properties {
       if let Schema::Object(property_object) = &property {
-        let ty = if let Some(enum_values) = &object.enum_values {
-          TypeExpr::union(enum_values.iter().map(|v| match v {
-            Value::String(s) => TypeExpr::string_literal(s),
-            Value::Number(n) => TypeExpr::number_literal(n.as_i64().unwrap()),
-            _ => TypeExpr::identifier("never"),
-          }).collect())
-        } else if let Some(reference) = &object.reference {
-          let reference = reference.trim_start_matches("#/definitions/");
-          let path = name_to_path(reference);
-          let name = path.file_name().unwrap().to_string();
-          let import_name = imports.add(name, path);
-          TypeExpr::Identifier(import_name)
-        } else {
-          TypeExpr::identifier("any")
-        };
         interface.add_field(InterfaceField {
           name: name.to_string(),
           optional: Some(!object_validation.required.contains(name)),
           description: None,
-          ty
+          ty: schema_object_to_type(property_object, &mut imports)
         });
       }
     }
     file.append(interface);
+  } else if let Some(enum_values) = &object.enum_values {
+    file.append(TypeDecl::new(name, TypeExpr::union(enum_values.iter().map(|v| match v {
+      Value::String(s) => TypeExpr::string_literal(s),
+      Value::Number(n) => TypeExpr::number_literal(n.as_i64().unwrap()),
+      _ => TypeExpr::identifier("never"),
+    }).collect())));
   } else if let Some(instance_type) = &object.instance_type {
     match instance_type {
       SingleOrVec::Single(single) => {
