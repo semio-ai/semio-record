@@ -9,13 +9,14 @@ use schemars::JsonSchema;
 use super::super::unfrozen::{Animation, Control};
 
 #[derive(Debug, Serialize, Deserialize, From, Clone, JsonSchema)]
+#[serde(rename = "animation_v1_Action_AddControl", rename_all = "camelCase")]
 pub struct AddControl {
   pub control_id: Uuid,
   pub control: Control,
 }
 
 #[derive(Display, Debug, Serialize, Deserialize, Error, Clone, JsonSchema)]
-#[serde(tag = "type", rename_all = "snake_case", content = "value")]
+#[serde(rename = "animation_v1_Action_AddControlError", tag = "type", rename_all = "camelCase")]
 pub enum AddControlError {
   #[display(fmt = "Control already exists")]
   ControlExists,

@@ -14,7 +14,7 @@ pub struct Number<T> {
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
-#[serde(tag = "type", content = "value", rename_all = "snake_case")]
+#[serde(tag = "type", content = "value", rename_all = "camelCase")]
 pub enum ControlKind {
   Real(Number<f64>),
   Integer(Number<i32>),

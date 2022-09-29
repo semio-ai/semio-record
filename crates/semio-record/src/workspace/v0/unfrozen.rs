@@ -13,7 +13,7 @@ use serde::{Serialize, Deserialize};
 use derive_more::From;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(tag = "type", content = "value", rename_all = "snake_case")]
+#[serde(tag = "type", content = "value", rename_all = "camelCase")]
 pub enum AnimationBindingTarget {
   Scene,
   Node(Uuid)
@@ -67,7 +67,7 @@ pub struct SceneBinding {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(tag = "type", content = "value", rename_all = "snake_case")]
+#[serde(tag = "type", content = "value", rename_all = "camelCase")]
 pub enum ContextKind {
   Scene(SceneBinding),
 }

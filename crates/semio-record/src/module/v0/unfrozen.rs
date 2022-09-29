@@ -14,6 +14,7 @@ use schemars::JsonSchema;
 use derive_more::From;
 
 #[derive(Debug, Serialize, Deserialize, Clone, GraphQLObject, JsonSchema)]
+#[serde(rename = "module_v0_Parameter", rename_all = "camelCase")]
 pub struct Parameter {
   pub name: String,
   #[serde(rename = "type")]
@@ -78,6 +79,7 @@ impl<F: Freezer> Freeze<F> for Parameter {
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone, JsonSchema)]
+#[serde(rename = "module_v0_Function", rename_all = "camelCase")]
 pub struct Function {
   pub parameters: HashMap<Uuid, Parameter>,
   pub parameter_ordering: Vec<Uuid>,
@@ -305,7 +307,7 @@ impl<S: ScalarValue> FromInputValue<S> for Function {
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone, GraphQLUnion, From, JsonSchema)]
-#[serde(tag = "type", rename_all = "lowercase", content = "value")]
+#[serde(rename = "module_v0_Export_Kind", tag = "type", rename_all = "camelCase", content = "value")]
 pub enum ExportKind {
   Function(Function),
 }
@@ -354,6 +356,7 @@ impl<S: ScalarValue> FromInputValue<S> for ExportKind {
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone, GraphQLObject, JsonSchema)]
+#[serde(rename = "module_v0_Export", rename_all = "camelCase")]
 pub struct Export {
   pub name: String,
   pub kind: ExportKind,
@@ -417,6 +420,7 @@ impl<F: Freezer> Freeze<F> for Export {
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone, JsonSchema)]
+#[serde(rename = "module_v0_Private", rename_all = "camelCase")]
 pub struct Module {
   pub acl: Acl,
   pub parent: Uuid,

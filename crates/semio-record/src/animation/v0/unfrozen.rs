@@ -19,33 +19,37 @@ use super::action::Action;
 use schemars::JsonSchema;
 
 #[derive(Debug, Serialize, Deserialize, GraphQLObject, Clone, JsonSchema)]
+#[serde(rename = "animation_v0_Value_F64", rename_all = "camelCase")]
 pub struct F64 {
   pub value: f64,
 }
 
 #[derive(Debug, Serialize, Deserialize, GraphQLUnion, Clone, JsonSchema)]
-#[serde(tag = "type", rename_all = "snake_case", content = "value")]
+#[serde(rename = "animation_v0_Value", tag = "type", rename_all = "camelCase", content = "value")]
 pub enum Value {
   F64(F64),
 }
 
 #[derive(Debug, Serialize, Deserialize, GraphQLObject, Clone, JsonSchema)]
+#[serde(rename = "animation_v0_Transition_None")]
 pub struct None {
   pub _dummy: i32,
 }
 
 #[derive(Debug, Serialize, Deserialize, GraphQLObject, Clone, JsonSchema)]
+#[serde(rename = "animation_v0_Transition_Linear")]
 pub struct Linear {
   pub _dummy: i32,
 }
 
 #[derive(Debug, Serialize, Deserialize, GraphQLObject, Clone, JsonSchema)]
+#[serde(rename = "animation_v0_Transition_MultiBezier")]
 pub struct MultiBezier {
   pub multi_bezier: MultiBezier2,
 }
 
 #[derive(Debug, Serialize, Deserialize, GraphQLUnion, Clone, JsonSchema)]
-#[serde(tag = "type", rename_all = "snake_case", content = "value")]
+#[serde(rename = "animation_v0_Transition", tag = "type", rename_all = "camelCase", content = "value")]
 pub enum Transition {
   None(None),
   Linear(Linear),

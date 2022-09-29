@@ -11,6 +11,7 @@ use super::unfrozen::{Export, Module};
 use schemars::JsonSchema;
 
 #[derive(Debug, Serialize, Deserialize, Clone, JsonSchema)]
+#[serde(rename = "module_v0_Public", rename_all = "camelCase")]
 pub struct Public {
   pub parent: Uuid,
   pub name: String,

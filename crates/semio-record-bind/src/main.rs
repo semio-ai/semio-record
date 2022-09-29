@@ -1,9 +1,9 @@
 use std::{
-  collections::{BTreeMap, HashMap, LinkedList, HashSet},
+  collections::{BTreeMap, HashMap, HashSet, LinkedList},
   path::PathBuf,
 };
 
-use schemars::schema::{RootSchema, Schema, SchemaObject};
+use schemars::{schema::{RootSchema, Schema, SchemaObject, SingleOrVec, InstanceType}, _serde_json::Value};
 use semio_record::{record::*, schema, schema_version::Schema as VersionSchema};
 use serde::{Deserialize, Serialize};
 
@@ -16,8 +16,12 @@ use tokio::io::AsyncWriteExt;
 
 use camino::Utf8PathBuf;
 
+use crate::{imports::Imports, ast::{File, TypeExpr, TypeDecl, NamespaceDecl, InterfaceDecl, InterfaceField, Decl, ExportDefaultDecl, ToTypescript}};
+
+mod imports;
 mod merge;
 mod schema;
+mod ast;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Scope {
@@ -66,111 +70,122 @@ fn name_to_path(name: &str) -> Utf8PathBuf {
   path
 }
 
+fn instance_type_to_ts(instance_type: &InstanceType) -> String {
+  match instance_type {
+    InstanceType::Null => "null".to_string(),
+    InstanceType::Boolean => "boolean".to_string(),
+    InstanceType::Integer => "number".to_string(),
+    InstanceType::Number => "number".to_string(),
+    InstanceType::String => "string".to_string(),
+    InstanceType::Array => "Array".to_string(),
+    InstanceType::Object => "object".to_string(),
+  }
+}
+
 fn parse_schema_object(name: &str, mut logical_path: Utf8PathBuf, object: &SchemaObject) -> String {
-  println!("{}: {:#?}", name, object);
   // Remove file name
   logical_path.pop();
 
-  let mut imports = HashMap::<String, Utf8PathBuf>::new();
+  let mut imports = Imports::new(name, logical_path);
 
-  let mut ret = String::new();
+  let mut file = File::new();
 
   if let Some(subschemas) = &object.subschemas {
     if let Some(one_of) = &subschemas.one_of {
       if one_of.len() == 0 {
-        ret += &format!("type {name} = void;\n");
+        file.append(TypeDecl::new(name, TypeExpr::identifier("void")));
       }
 
-      ret += &format!("namespace {name} {{\n");
-
       let mut members = HashSet::new();
+      
+      let mut namespace = NamespaceDecl::new(name);
       // Union
       for schema in one_of {
         let variant_name = schema::name(schema);
         if let Some(variant_name) = variant_name {
           members.insert(format!("{name}.{variant_name}"));
-          ret += &format!("  export interface {variant_name} {{\n");
+          let mut interface = InterfaceDecl::export(variant_name);
           if let Some(properties) = schema::object_properties(&schema) {
             for (name, property) in properties {
               if let Schema::Object(object) = property.schema {
-                ret += &format!("    {name}");
-                if !property.required {
-                  ret += "?";
-                }
-                ret += ": ";
-                if let Some(enum_values) = &object.enum_values {
-                  for (i, enum_value) in enum_values.iter().enumerate() {
-                    if i > 0 {
-                      ret += " | ";
-                    }
-                    ret += &format!("{enum_value}");
-                  }
+                let ty = if let Some(enum_values) = &object.enum_values {
+                  TypeExpr::union(enum_values.iter().map(|v| match v {
+                    Value::String(s) => TypeExpr::string_literal(s),
+                    Value::Number(n) => TypeExpr::number_literal(n.as_i64().unwrap()),
+                    _ => TypeExpr::identifier("never"),
+                  }).collect())
                 } else if let Some(reference) = &object.reference {
                   let reference = reference.trim_start_matches("#/definitions/");
                   let path = name_to_path(reference);
                   let name = path.file_name().unwrap().to_string();
-                  ret += &format!("{name}");
-                  imports.insert(name, path);
-                }
-                ret += ";\n";
+                  let import_name = imports.add(name, path);
+                  TypeExpr::Identifier(import_name)
+                } else {
+                  TypeExpr::identifier("any")
+                };
+
+                interface.add_field(InterfaceField {
+                  name: name.to_string(),
+                  optional: Some(!property.required),
+                  description: None,
+                  ty
+                });
               }
             }
           }
-          ret += &format!("  }}\n");
+          namespace.append(interface);
         }
       }
-      ret += &format!("}}\n");
 
-      ret += &format!("type {name} = ");
-      for (i, member) in members.iter().enumerate() {
-        if i > 0 {
-          ret += " | ";
-        }
-        ret += &format!("{member}");
-      }
-      ret += ";\n";
+      file.append(namespace);
+      file.append(TypeDecl::new(name, TypeExpr::union(members.into_iter().map(|m| TypeExpr::identifier(m)).collect())));
     }
   } else if let Some(object_validation) = &object.object {
-    ret += &format!("interface {name} {{\n");
+    let mut interface = InterfaceDecl::new(name);
     for (name, property) in &object_validation.properties {
       if let Schema::Object(property_object) = &property {
-        ret += &format!("  {name}");
-        if !object_validation.required.contains(name) {
-          ret += "?";
-        }
-        ret += ": ";
-        if let Some(enum_values) = &property_object.enum_values {
-          for (i, enum_value) in enum_values.iter().enumerate() {
-            if i > 0 {
-              ret += " | ";
-            }
-            ret += &format!("{enum_value}");
-          }
-        } else if let Some(reference) = &property_object.reference {
+        let ty = if let Some(enum_values) = &object.enum_values {
+          TypeExpr::union(enum_values.iter().map(|v| match v {
+            Value::String(s) => TypeExpr::string_literal(s),
+            Value::Number(n) => TypeExpr::number_literal(n.as_i64().unwrap()),
+            _ => TypeExpr::identifier("never"),
+          }).collect())
+        } else if let Some(reference) = &object.reference {
           let reference = reference.trim_start_matches("#/definitions/");
           let path = name_to_path(reference);
           let name = path.file_name().unwrap().to_string();
-          ret += &format!("{name}");
-          imports.insert(name, path);
+          let import_name = imports.add(name, path);
+          TypeExpr::Identifier(import_name)
         } else {
-          ret += &format!("any");
-        }
-        ret += ";\n";
+          TypeExpr::identifier("any")
+        };
+        interface.add_field(InterfaceField {
+          name: name.to_string(),
+          optional: Some(!object_validation.required.contains(name)),
+          description: None,
+          ty
+        });
       }
     }
-    ret += &format!("}}\n");
-  } else {
-    ret += &format!("{:#?}", object);
+    file.append(interface);
+  } else if let Some(instance_type) = &object.instance_type {
+    match instance_type {
+      SingleOrVec::Single(single) => {
+        file.append(TypeDecl::new(name, TypeExpr::identifier(&instance_type_to_ts(single))))
+      },
+      SingleOrVec::Vec(vec) => {
+        file.append(TypeDecl::new(name, TypeExpr::union(vec.iter().map(|v| TypeExpr::identifier(&instance_type_to_ts(v))).collect())))
+      }
+    }
+
   }
 
-  for (name, path) in imports {
-    let relative_path = pathdiff::diff_utf8_paths(path, &logical_path).unwrap();
-    ret = format!("import {name} from \"./{relative_path}\";\n") + ret.as_str();
-  }
+  file.prepend_all(imports.decls().into_iter());
+  file.append(Decl::ExportDefault(ExportDefaultDecl {
+    identifier: name.to_string(),
+  }));
 
-  ret += &format!("export default {name};");
-
-  ret
+  file.to_typescript().to_string(0)
 }
 
 fn parse_schema(name: &str, logical_path: Utf8PathBuf, schema: &Schema) -> String {
@@ -180,7 +195,12 @@ fn parse_schema(name: &str, logical_path: Utf8PathBuf, schema: &Schema) -> Strin
   }
 }
 
-async fn write_file(path: PathBuf, name: &str, logical_path: Utf8PathBuf, schema: &Schema) -> tokio::io::Result<()> {
+async fn write_file(
+  path: PathBuf,
+  name: &str,
+  logical_path: Utf8PathBuf,
+  schema: &Schema,
+) -> tokio::io::Result<()> {
   let mut file = tokio::fs::File::create(path).await?;
   file
     .write_all(parse_schema(name, logical_path, schema).as_bytes())

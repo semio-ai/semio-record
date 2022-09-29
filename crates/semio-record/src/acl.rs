@@ -104,7 +104,7 @@ impl Acl {
 #[derive(
   Debug, Display, Serialize, Deserialize, Clone, Eq, PartialEq, PartialOrd, Ord, GraphQLEnum, JsonSchema
 )]
-#[serde(rename_all = "lowercase")]
+#[serde(rename = "Acl_PermissionLevel", rename_all = "camelCase")]
 pub enum PermissionLevel {
   None,
   Public,

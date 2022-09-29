@@ -6,45 +6,15 @@ use uuid::Uuid;
 
 use schemars::JsonSchema;
 
-use super::unfrozen::{Animation, Node, IdNode, IdControl, Control};
+use super::unfrozen::{Animation, Node, Control};
 
 #[derive(Debug, Serialize, Deserialize, Clone, JsonSchema)]
+#[serde(rename = "animation_v1_Public", rename_all = "camelCase")]
 pub struct Public {
   pub name: String,
   pub parent: Uuid,
   pub controls: HashMap<Uuid, Control>,
   pub nodes: HashMap<Uuid, Node>,
-}
-
-#[graphql_object(name = "AnimationPublic")]
-impl Public {
-  fn name(&self) -> &str {
-    &self.name
-  }
-
-  fn parent(&self) -> &Uuid {
-    &self.parent
-  }
-
-  fn controls(&self) -> Vec<IdControl> {
-    self.controls
-      .iter()
-      .map(|(id, control)| IdControl {
-        id: *id,
-        control: control.clone(),
-      })
-      .collect()
-  }
-
-  fn nodes(&self) -> Vec<IdNode> {
-    self.nodes
-      .iter()
-      .map(|(id, node)| IdNode {
-        id: *id,
-        node: node.clone(),
-      })
-      .collect()
-  }
 }
 
 impl From<Animation> for Public {

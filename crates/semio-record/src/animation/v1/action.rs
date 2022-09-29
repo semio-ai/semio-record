@@ -5,12 +5,14 @@ use uuid::Uuid;
 use schemars::JsonSchema;
 
 #[derive(Debug, Serialize, Deserialize, From, Clone, Hash, PartialEq, Eq, JsonSchema)]
+#[serde(rename = "animation_v1_KeySelector")]
 pub struct KeySelector {
   pub control_id: Uuid,
   pub key_id: Uuid,
 }
 
 #[derive(Debug, Serialize, Deserialize, From, Clone, JsonSchema)]
+#[serde(rename = "animation_v1_KeySelectorAt")]
 pub struct KeySelectorAt {
   pub selector: KeySelector,
   pub at: f64,
@@ -43,7 +45,7 @@ use super::unfrozen::Animation;
 
 
 #[derive(Debug, Serialize, Deserialize, From, Clone, JsonSchema)]
-#[serde(tag = "type", rename_all = "snake_case", content = "value")]
+#[serde(rename = "animation_v1_Action", tag = "type", rename_all = "camelCase", content = "value")]
 pub enum Action {
   SetName(SetName),
   SetParent(SetParent),
@@ -67,7 +69,7 @@ pub enum Action {
 }
 
 #[derive(Display, Debug, Error, From, Clone, Serialize, Deserialize, JsonSchema)]
-#[serde(tag = "type", rename_all = "snake_case", content = "value")]
+#[serde(rename = "animation_v1_ActionError", tag = "type", rename_all = "camelCase", content = "value")]
 pub enum ActionError {
   SetName(SetNameError),
   SetParent(SetParentError),

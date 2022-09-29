@@ -237,8 +237,8 @@ pub trait RecordDefn {
   type Action;
   type Unfrozen: Unfrozen<Self::Action>;
   type Frozen: Frozen = ();
-  type Public: From<Self::Unfrozen> + GraphQLValue + IsOutputType<DefaultScalarValue>;
-  type Private: From<Self::Unfrozen> + GraphQLValue + IsOutputType<DefaultScalarValue>;
+  type Public: From<Self::Unfrozen>;
+  type Private: From<Self::Unfrozen>;
 }
 
 pub enum RecordContent<R: RecordDefn> {

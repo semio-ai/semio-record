@@ -9,12 +9,13 @@ use super::KeySelector;
 use super::super::unfrozen::Animation;
 
 #[derive(Debug, Serialize, Deserialize, From, Clone, JsonSchema)]
+#[serde(rename = "animation_v1_Action_RemoveKeys", rename_all = "camelCase")]
 pub struct RemoveKeys {
   pub selectors: Vec<KeySelector>,
 }
 
 #[derive(Display, Debug, Serialize, Deserialize, Error, Clone, JsonSchema)]
-#[serde(tag = "type", rename_all = "snake_case", content = "value")]
+#[serde(rename = "animation_v1_Action_RemoveKeysError", tag = "type", rename_all = "camelCase")]
 pub enum RemoveKeysError {
   #[display(fmt = "Control does not exist")]
   ControlDoesNotExist,

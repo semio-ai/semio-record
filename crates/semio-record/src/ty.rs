@@ -20,6 +20,7 @@ use crate::record::UnfrozenReference;
 use crate::record::VersionReq;
 
 #[derive(Debug, GraphQLEnum, Serialize, Deserialize, Clone, PartialEq, Eq, Hash, JsonSchema)]
+#[serde(rename = "Primitive_Kind", rename_all = "camelCase")]
 pub enum PrimitiveKind {
   Unit,
   Boolean,
@@ -268,6 +269,7 @@ pub struct FrozenScalar {
 }
 
 #[derive(Debug, Serialize, Deserialize, GraphQLUnion, From, Clone, PartialEq, Eq, JsonSchema)]
+#[serde(rename = "FrozenType", rename_all = "camelCase")]
 pub enum FrozenTy {
   Primitive(Primitive),
   FrozenScalar(FrozenScalar),
@@ -402,6 +404,7 @@ impl<F: Freezer> Freeze<F> for UnfrozenArray {
 }
 
 #[derive(Debug, Serialize, Deserialize, GraphQLUnion, From, Clone, PartialEq, Eq, JsonSchema)]
+#[serde(rename = "UnfrozenType", rename_all = "camelCase")]
 pub enum UnfrozenTy {
   Primitive(Primitive),
   UnfrozenScalar(UnfrozenScalar),

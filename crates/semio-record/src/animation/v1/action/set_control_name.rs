@@ -9,13 +9,14 @@ use schemars::JsonSchema;
 use super::super::unfrozen::Animation;
 
 #[derive(Debug, Serialize, Deserialize, From, Clone, JsonSchema)]
+#[serde(rename = "animation_v1_Action_RemoveControl", rename_all = "camelCase")]
 pub struct SetControlName {
   pub control_id: Uuid,
   pub name: String,
 }
 
 #[derive(Display, Debug, Serialize, Deserialize, Error, Clone, JsonSchema)]
-#[serde(tag = "type", rename_all = "snake_case", content = "value")]
+#[serde(rename = "animation_v1_Action_SetControlNameError", tag = "type", rename_all = "camelCase")]
 pub enum SetControlNameError {
   #[display(fmt = "Control does not exist")]
   ControlDoesNotExist,

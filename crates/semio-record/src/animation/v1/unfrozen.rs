@@ -19,7 +19,8 @@ use crate::{
 
 use super::action::Action;
 
-#[derive(Debug, Serialize, Deserialize, GraphQLObject, Clone, JsonSchema)]
+#[derive(Debug, Serialize, Deserialize, Clone, JsonSchema)]
+#[serde(rename = "animation_v1_Value_F64", rename_all = "camelCase")]
 pub struct F64 {
   pub value: f64,
 }
@@ -32,14 +33,14 @@ impl From<crate::animation::v0::unfrozen::F64> for F64 {
   }
 }
 
-#[derive(Debug, Serialize, Deserialize, GraphQLEnum, Copy, Clone, JsonSchema)]
-#[serde(rename_all = "snake_case")]
+#[derive(Debug, Serialize, Deserialize, Copy, Clone, JsonSchema)]
+#[serde(rename = "animation_v1_Value_Kind", rename_all = "camelCase")]
 pub enum ValueKind {
   F64,
 }
 
-#[derive(Debug, Serialize, Deserialize, GraphQLUnion, Clone, JsonSchema)]
-#[serde(tag = "type", rename_all = "snake_case", content = "value")]
+#[derive(Debug, Serialize, Deserialize, Clone, JsonSchema)]
+#[serde(rename = "animation_v1_Value", tag = "type", rename_all = "camelCase", content = "value")]
 pub enum Value {
   F64(F64),
 }
@@ -52,33 +53,8 @@ impl From<crate::animation::v0::unfrozen::Value> for Value {
   }
 }
 
-#[derive(Debug, Serialize, Deserialize, GraphQLObject, Clone, JsonSchema)]
-pub struct None {
-  pub _dummy: i32,
-}
-
-impl From<crate::animation::v0::unfrozen::None> for None {
-  fn from(_: crate::animation::v0::unfrozen::None) -> Self {
-    Self {
-      _dummy: 0,
-    }
-  }
-}
-
-#[derive(Debug, Serialize, Deserialize, GraphQLObject, Clone, JsonSchema)]
-pub struct Linear {
-  pub _dummy: i32,
-}
-
-impl From<crate::animation::v0::unfrozen::Linear> for Linear {
-  fn from(_: crate::animation::v0::unfrozen::Linear) -> Self {
-    Self {
-      _dummy: 0,
-    }
-  }
-}
-
-#[derive(Debug, Serialize, Deserialize, GraphQLObject, Clone, JsonSchema)]
+#[derive(Debug, Serialize, Deserialize, Clone, JsonSchema)]
+#[serde(rename = "animation_v1_Transition_MultiBezier", rename_all = "camelCase")]
 pub struct MultiBezier {
   pub multi_bezier: MultiBezier2,
 }
@@ -91,25 +67,26 @@ impl From<crate::animation::v0::unfrozen::MultiBezier> for MultiBezier {
   }
 }
 
-#[derive(Debug, Serialize, Deserialize, GraphQLUnion, Clone, JsonSchema)]
-#[serde(tag = "type", rename_all = "snake_case", content = "value")]
+#[derive(Debug, Serialize, Deserialize, Clone, JsonSchema)]
+#[serde(rename = "animation_v1_Transition", tag = "type", rename_all = "camelCase", content = "value")]
 pub enum Transition {
-  None(None),
-  Linear(Linear),
+  None,
+  Linear,
   MultiBezier(MultiBezier),
 }
 
 impl From<crate::animation::v0::unfrozen::Transition> for Transition {
   fn from(value: crate::animation::v0::unfrozen::Transition) -> Self {
     match value {
-      crate::animation::v0::unfrozen::Transition::None(value) => Self::None(value.into()),
-      crate::animation::v0::unfrozen::Transition::Linear(value) => Self::Linear(value.into()),
+      crate::animation::v0::unfrozen::Transition::None(value) => Self::None,
+      crate::animation::v0::unfrozen::Transition::Linear(value) => Self::Linear,
       crate::animation::v0::unfrozen::Transition::MultiBezier(value) => Self::MultiBezier(value.into()),
     }
   }
 }
 
-#[derive(Debug, Serialize, Deserialize, GraphQLObject, Clone, JsonSchema)]
+#[derive(Debug, Serialize, Deserialize, Clone, JsonSchema)]
+#[serde(rename = "animation_v1_Key", rename_all = "camelCase")]
 pub struct Key {
   pub at: f64,
   pub value: Value,
@@ -127,6 +104,7 @@ impl From<crate::animation::v0::unfrozen::Key> for Key {
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone, JsonSchema)]
+#[serde(rename = "animation_v1_Control", rename_all = "camelCase")]
 pub struct Control {
   pub value_kind: ValueKind,
   pub name: String,
@@ -135,89 +113,36 @@ pub struct Control {
   pub key_ordering: Vec<Uuid>,
 }
 
-#[derive(Debug, Serialize, Deserialize, Clone, GraphQLObject, JsonSchema)]
-pub struct IdKey {
-  pub id: Uuid,
-  pub key: Key,
-}
-
-#[graphql_object]
-impl Control {
-  pub fn value_kind(&self) -> ValueKind {
-    self.value_kind
-  }
-
-  pub fn name(&self) -> &String {
-    &self.name
-  }
-
-  pub fn locked(&self) -> bool {
-    self.locked
-  }
-
-  pub fn keys(&self) -> Vec<IdKey> {
-    self.key_ordering
-      .iter()
-      .map(|id| IdKey {
-        id: *id,
-        key: self.keys.get(id).unwrap().clone(),
-      })
-      .collect()
-  }
-
-  pub fn key_ordering(&self) -> &Vec<Uuid> {
-    &self.key_ordering
-  }
-}
-
 #[derive(Debug, Serialize, Deserialize, Clone, JsonSchema)]
+#[serde(rename = "animation_v1_Node_Kind_Group", rename_all = "camelCase")]
 pub struct GroupNode {
   // Children nodes (of any type)
   pub children_ids: HashSet<Uuid>,
 }
 
-#[graphql_object]
-impl GroupNode {
-  fn children_ids(&self) -> Vec<Uuid> {
-    self.children_ids.iter().cloned().collect()
-  }
-}
-
-#[derive(Debug, Serialize, Deserialize, Clone, GraphQLObject, JsonSchema)]
+#[derive(Debug, Serialize, Deserialize, Clone, JsonSchema)]
+#[serde(rename = "animation_v1_Node_Kind_Control", rename_all = "camelCase")]
 pub struct ControlNode {
   pub id: Uuid,
 }
 
-#[derive(Debug, Serialize, Deserialize, GraphQLUnion, Clone, From, JsonSchema)]
-#[serde(tag = "type", rename_all = "lowercase", content = "value")]
+#[derive(Debug, Serialize, Deserialize, Clone, From, JsonSchema)]
+#[serde(rename = "animation_v1_Node_Kind", tag = "type", rename_all = "camelCase", content = "value")]
 pub enum NodeKind {
   Group(GroupNode),
   Control(ControlNode),
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone, JsonSchema)]
+#[serde(rename = "animation_v1_Node", rename_all = "camelCase")]
 pub struct Node {
   pub name: Option<String>,
   pub collapsed: bool,
   pub kind: NodeKind,
 }
 
-#[graphql_object]
-impl Node {
-  fn name(&self) -> &Option<String> {
-    &self.name
-  }
-
-  fn collapsed(&self) -> bool {
-    self.collapsed
-  }
-
-  fn kind(&self) -> &NodeKind {
-    &self.kind
-  }
-}
-
 #[derive(Debug, Serialize, Deserialize, Clone, JsonSchema)]
+#[serde(rename = "animation_v1_Private", rename_all = "camelCase")]
 pub struct Animation {
   /// Human-readable name of the animation
   pub name: String,
@@ -243,53 +168,6 @@ impl Default for Animation {
       nodes: HashMap::new(),
       acl: Default::default(),
     }
-  }
-}
-
-#[derive(Debug, Serialize, Deserialize, Clone, GraphQLObject)]
-pub struct IdNode {
-  pub id: Uuid,
-  pub node: Node,
-}
-
-#[derive(Debug, Serialize, Deserialize, Clone, GraphQLObject)]
-pub struct IdControl {
-  pub id: Uuid,
-  pub control: Control,
-}
-
-#[graphql_object]
-impl Animation {
-  pub fn name(&self) -> &str {
-    &self.name
-  }
-
-  pub fn parent(&self) -> &Uuid {
-    &self.parent
-  }
-
-  pub fn nodes(&self) -> Vec<IdNode> {
-    self.nodes
-      .iter()
-      .map(|(id, node)| IdNode {
-        id: *id,
-        node: node.clone(),
-      })
-      .collect()
-  }
-
-  pub fn controls(&self) -> Vec<IdControl> {
-    self.controls
-      .iter()
-      .map(|(id, control)| IdControl {
-        id: *id,
-        control: control.clone(),
-      })
-      .collect()
-  }
-
-  pub fn acl(&self) -> &Acl {
-    &self.acl
   }
 }
 

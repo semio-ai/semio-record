@@ -21,7 +21,7 @@ pub struct SetExecutable {
 }
 
 #[derive(Display, Clone, Debug, Error, GraphQLEnum, Serialize, Deserialize, JsonSchema)]
-#[serde(rename = "module_v0_Action_SetExecutableError", tag = "type", rename_all = "snake_case")]
+#[serde(rename = "module_v0_Action_SetExecutableError", tag = "type", rename_all = "camelCase")]
 pub enum SetExecutableError {
   _Dummy
 }
@@ -44,7 +44,7 @@ pub struct AddExport {
 }
 
 #[derive(Display, Clone,Debug, Error, GraphQLEnum, Serialize, Deserialize, JsonSchema)]
-#[serde(rename = "module_v0_Action_AddExportError", tag = "type", rename_all = "snake_case")]
+#[serde(rename = "module_v0_Action_AddExportError", tag = "type", rename_all = "camelCase")]
 pub enum AddExportError
 {
   #[display(fmt = "Export name already exists in module")]
@@ -67,12 +67,13 @@ impl Apply<AddExport> for Module
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, GraphQLObject, JsonSchema)]
+#[serde(rename = "module_v0_Action_RemoveExport")]
 pub struct RemoveExport {
   pub id: Uuid,
 }
 
 #[derive(Display, Clone, Debug, Error, GraphQLEnum, Serialize, Deserialize, JsonSchema)]
-#[serde(tag = "type", rename_all = "snake_case", content = "value")]
+#[serde(rename = "module_v0_Action_RemoveExportError", tag = "type", rename_all = "camelCase")]
 pub enum RemoveExportError {
   #[display(fmt = "Export not found in module")]
   ExportNotFound,
@@ -423,12 +424,13 @@ impl Apply<AddDependency> for Module
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, GraphQLObject, JsonSchema)]
+#[serde(rename = "module_v0_Action_RemoveDependency")]
 pub struct RemoveDependency {
   pub id: Uuid,
 }
 
 #[derive(Display, Clone, Debug, Error, GraphQLEnum, Serialize, Deserialize, JsonSchema)]
-#[serde(tag = "type", rename_all = "snake_case", content = "value")]
+#[serde(rename = "module_v0_Action_RemoveDependencyError", tag = "type", rename_all = "camelCase")]
 pub enum RemoveDependencyError {
   #[display(fmt = "Dependency not found")]
   NotFound,
@@ -453,7 +455,7 @@ impl Apply<RemoveDependency> for Module
 
 
 #[derive(Debug, Clone, Serialize, Deserialize, From, JsonSchema)]
-#[serde(rename = "module_v0_Action", tag = "type", rename_all = "snake_case", content = "value")]
+#[serde(rename = "module_v0_Action", tag = "type", rename_all = "camelCase", content = "value")]
 pub enum Action {
   SetParent(SetParent),
   SetName(SetName),

@@ -9,6 +9,7 @@ use schemars::JsonSchema;
 use super::super::unfrozen::{Animation, Key};
 
 #[derive(Debug, Serialize, Deserialize, From, Clone, JsonSchema)]
+#[serde(rename = "animation_v1_Action_AddKey")]
 pub struct AddKey {
   pub control_id: Uuid,
   pub key_id: Uuid,
@@ -16,7 +17,7 @@ pub struct AddKey {
 }
 
 #[derive(Display, Debug, Serialize, Deserialize, Error, Clone, JsonSchema)]
-#[serde(tag = "type", rename_all = "snake_case", content = "value")]
+#[serde(rename = "animation_v1_Action_AddKeyError", tag = "type", rename_all = "camelCase")]
 pub enum AddKeyError {
   #[display(fmt = "Control does not exist")]
   ControlDoesNotExist,

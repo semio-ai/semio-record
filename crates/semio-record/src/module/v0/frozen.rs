@@ -12,6 +12,7 @@ use crate::{
 
 #[derive(Debug, Clone, Serialize, Deserialize, GraphQLObject, JsonSchema)]
 #[graphql(name = "FrozenParameter")]
+#[serde(rename = "module_v0_Frozen_Parameter", rename_all = "camelCase")]
 pub struct Parameter {
   pub name: String,
   #[graphql(name = "type")]
@@ -26,6 +27,7 @@ impl Parameter {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, JsonSchema)]
+#[serde(rename = "module_v0_Frozen_Function", rename_all = "camelCase")]
 pub struct Function {
   pub parameters: HashMap<Uuid, Parameter>,
   pub parameter_ordering: Vec<Uuid>,
@@ -124,7 +126,7 @@ impl Function {
 }
 
 #[derive(Debug, GraphQLUnion, Clone, Serialize, Deserialize, JsonSchema)]
-#[serde(tag = "type", rename_all = "lowercase")]
+#[serde(rename = "module_v0_Frozen_Export_Kind", tag = "type", rename_all = "camelCase", content = "value")]
 #[graphql(name = "FrozenExportKind")]
 pub enum ExportKind {
   Function(Function),
@@ -146,6 +148,7 @@ impl ExportKind {
 
 #[derive(Debug, Clone, GraphQLObject, Serialize, Deserialize, JsonSchema)]
 #[graphql(name = "FrozenExport")]
+#[serde(rename = "module_v0_Frozen_Export", rename_all = "camelCase")]
 pub struct Export {
   pub name: String,
   pub kind: ExportKind,
@@ -158,6 +161,7 @@ impl Export {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, JsonSchema)]
+#[serde(rename = "module_v0_Frozen", rename_all = "camelCase")]
 pub struct Module {
   pub parent: Uuid,
   pub name: String,

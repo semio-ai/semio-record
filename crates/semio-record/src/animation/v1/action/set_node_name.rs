@@ -9,13 +9,14 @@ use schemars::JsonSchema;
 use super::super::unfrozen::Animation;
 
 #[derive(Debug, Serialize, Deserialize, From, Clone, JsonSchema)]
+#[serde(rename = "animation_v1_Action_SetNodeName", rename_all = "camelCase")]
 pub struct SetNodeName {
   pub node_id: Uuid,
   pub name: Option<String>,
 }
 
 #[derive(Display, Debug, Serialize, Deserialize, Error, Clone, JsonSchema)]
-#[serde(tag = "type", rename_all = "snake_case", content = "value")]
+#[serde(rename = "animation_v1_Action_SetNodeNameError", tag = "type", rename_all = "camelCase")]
 pub enum SetNodeNameError {
   #[display(fmt = "Node does not exist")]
   NodeDoesNotExist,
