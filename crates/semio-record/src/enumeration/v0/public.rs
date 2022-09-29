@@ -34,3 +34,14 @@ impl From<Enumeration> for Public {
     }
   }
 }
+
+impl From<Public> for Enumeration {
+  fn from(public: Public) -> Self {
+    Self {
+      name: public.name,
+      parent: public.parent,
+      variants: public.variants,
+      ..Default::default()
+    }
+  }
+}

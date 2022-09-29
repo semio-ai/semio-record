@@ -54,6 +54,24 @@ macro_rules! impl_lib {
       }
     }
 
+    pub fn apply_public_raw(ty: i16, schema_version: i16, data: &[u8], action: &[u8]) -> Result<Vec<u8>, Box<dyn std::error::Error>> {
+      match ty {
+        $(
+          crate::record::$ty => $module::apply_public_raw(schema_version, data, action),
+        )+
+        _ => Err(format!("Unsupported record type: {}", ty).into()),
+      }
+    }
+
+    pub fn apply_private_raw(ty: i16, schema_version: i16, data: &[u8], action: &[u8]) -> Result<Vec<u8>, Box<dyn std::error::Error>> {
+      match ty {
+        $(
+          crate::record::$ty => $module::apply_private_raw(schema_version, data, action),
+        )+
+        _ => Err(format!("Unsupported record type: {}", ty).into()),
+      }
+    }
+
     pub fn apply_raw_iter<B: AsRef<[u8]>, I: Iterator<Item = B>>(ty: i16, schema_version: i16, data: &[u8], actions: I) -> Result<Vec<u8>, Box<dyn std::error::Error>> {
       match ty {
         $(

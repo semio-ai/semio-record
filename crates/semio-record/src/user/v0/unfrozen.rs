@@ -20,6 +20,21 @@ pub struct User {
   pub token_secret: String,
 }
 
+impl Default for User {
+  fn default() -> Self {
+    Self {
+      user_name: String::new(),
+      first_name: String::new(),
+      last_name: String::new(),
+      email: String::new(),
+      password_hash: String::new(),
+      email_verified: false,
+      token_secret: String::new(),
+    }
+  }
+}
+
+
 impl_unfrozen!(User, Action);
 
 impl Unfrozen<Action> for User {

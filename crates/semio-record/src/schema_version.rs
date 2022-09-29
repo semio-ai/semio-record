@@ -23,6 +23,20 @@ macro_rules! impl_schema_version {
       unfrozen.apply_raw(action)?;
       Ok(crate::serialize(&unfrozen)?)
     }
+
+    pub fn apply_public_raw(data: &[u8], action: &[u8]) -> Result<Vec<u8>, Box<dyn std::error::Error>> {
+      type Public = <$t as crate::record::RecordDefn>::Public;
+      let mut unfrozen: <$t as crate::record::RecordDefn>::Unfrozen = crate::deserialize::<Public>(data)?.into();
+      unfrozen.apply_raw(action)?;
+      Ok(crate::serialize::<Public>(&unfrozen.into())?)
+    }
+
+    pub fn apply_private_raw(data: &[u8], action: &[u8]) -> Result<Vec<u8>, Box<dyn std::error::Error>> {
+      type Private = <$t as crate::record::RecordDefn>::Private;
+      let mut unfrozen: <$t as crate::record::RecordDefn>::Unfrozen = crate::deserialize::<Private>(data)?.into();
+      unfrozen.apply_raw(action)?;
+      Ok(crate::serialize::<Private>(&unfrozen.into())?)
+    }
     
     pub fn apply_raw_iter<B: AsRef<[u8]>, I: Iterator<Item = B>>(data: &[u8], actions: I) -> Result<Vec<u8>, Box<dyn std::error::Error>> {
       let mut unfrozen: <$t as crate::record::RecordDefn>::Unfrozen = crate::deserialize(data)?;

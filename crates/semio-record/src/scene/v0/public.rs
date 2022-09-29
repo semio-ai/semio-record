@@ -25,3 +25,15 @@ impl From<Scene> for Public {
     }
   }
 }
+
+impl From<Public> for Scene {
+  fn from(public: Public) -> Self {
+    Self {
+      name: public.name,
+      description: public.description,
+      geometry: public.geometry,
+      nodes: public.nodes,
+      ..Default::default()
+    }
+  }
+}

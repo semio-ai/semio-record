@@ -180,10 +180,29 @@ macro_rules! impl_record {
         _ => Err(format!("Unsupported schema version: {}", schema_version).into()),
       }
     }
+
     pub fn apply_raw(schema_version: i16, module: &[u8], action: &[u8]) -> Result<Vec<u8>, Box<dyn std::error::Error>> {
       match schema_version {
         $(
           $version => $module::apply_raw(module, action),
+        )+
+        _ => Err(format!("Unsupported schema version: {}", schema_version).into()),
+      }
+    }
+
+    pub fn apply_public_raw(schema_version: i16, module: &[u8], action: &[u8]) -> Result<Vec<u8>, Box<dyn std::error::Error>> {
+      match schema_version {
+        $(
+          $version => $module::apply_public_raw(module, action),
+        )+
+        _ => Err(format!("Unsupported schema version: {}", schema_version).into()),
+      }
+    }
+
+    pub fn apply_private_raw(schema_version: i16, module: &[u8], action: &[u8]) -> Result<Vec<u8>, Box<dyn std::error::Error>> {
+      match schema_version {
+        $(
+          $version => $module::apply_private_raw(module, action),
         )+
         _ => Err(format!("Unsupported schema version: {}", schema_version).into()),
       }

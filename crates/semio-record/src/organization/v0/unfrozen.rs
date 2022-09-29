@@ -15,6 +15,15 @@ pub struct Organization {
   pub acl: Acl,
 }
 
+impl Default for Organization {
+  fn default() -> Self {
+    Self {
+      name: String::new(),
+      acl: Default::default(),
+    }
+  }
+}
+
 impl_unfrozen!(Organization, Action);
 
 impl Unfrozen<Action> for Organization {

@@ -59,3 +59,20 @@ impl From<Module> for Public {
     }
   }
 }
+
+impl From<Public> for Module {
+  fn from(public: Public) -> Self {
+    Self {
+      parent: public.parent,
+      name: public.name,
+      exports: public
+        .exports
+        .into_iter()
+        .map(|(k, v)| (k, v.into()))
+        .collect(),
+      executable: public.executable,
+      dependencies: public.dependencies,
+      ..Default::default()
+    }
+  }
+}

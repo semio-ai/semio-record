@@ -24,3 +24,16 @@ impl From<User> for Private {
     }
   }
 }
+
+impl From<Private> for User {
+  fn from(private: Private) -> Self {
+    Self {
+      user_name: private.user_name,
+      first_name: private.first_name,
+      last_name: private.last_name,
+      email: private.email,
+      email_verified: private.email_verified,
+      ..Default::default()
+    }
+  }
+}

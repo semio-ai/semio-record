@@ -20,3 +20,13 @@ impl From<Folder> for Public {
     }
   }
 }
+
+impl From<Public> for Folder {
+  fn from(public: Public) -> Self {
+    Self {
+      name: public.name,
+      parent: public.parent,
+      ..Default::default()
+    }
+  }
+}

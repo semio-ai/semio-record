@@ -311,7 +311,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
   let mut tsconfig_path = args.outdir.clone();
   tsconfig_path.push("tsconfig.json");
 
-  write_scope(args.outdir.join("src"), logical_root_path, &root).await?;
+  write_scope(args.outdir, logical_root_path, &root).await?;
   // Write out blank marker file
   tokio::fs::File::create(marker_path).await?;
 

@@ -26,3 +26,15 @@ impl From<Animation> for Public {
     }
   }
 }
+
+impl From<Public> for Animation {
+  fn from(public: Public) -> Self {
+    Self {
+      name: public.name,
+      parent: public.parent,
+      root_id: public.root_id,
+      nodes: public.nodes,
+      ..Default::default()
+    }
+  }
+}

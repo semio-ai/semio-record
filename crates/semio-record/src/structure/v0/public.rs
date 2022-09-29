@@ -34,3 +34,14 @@ impl From<Structure> for Public {
     }
   }
 }
+
+impl From<Public> for Structure {
+  fn from(public: Public) -> Self {
+    Self {
+      name: public.name,
+      parent: public.parent,
+      fields: public.fields,
+      ..Default::default()
+    }
+  }
+}

@@ -17,3 +17,12 @@ impl From<Organization> for Public {
     }
   }
 }
+
+impl From<Public> for Organization {
+  fn from(public: Public) -> Self {
+    Self {
+      name: public.name,
+      ..Default::default()
+    }
+  }
+}

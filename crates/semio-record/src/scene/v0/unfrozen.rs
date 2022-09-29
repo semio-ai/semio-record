@@ -162,6 +162,18 @@ pub struct Scene {
   pub nodes: HashMap<Uuid, Node>
 }
 
+impl Default for Scene {
+  fn default() -> Self {
+    Self {
+      name: String::new(),
+      description: String::new(),
+      acl: Default::default(),
+      geometry: HashMap::new(),
+      nodes: HashMap::new()
+    }
+  }
+}
+
 impl_unfrozen!(Scene, Action);
 
 impl Unfrozen<Action> for Scene {

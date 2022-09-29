@@ -16,3 +16,12 @@ impl From<User> for Public {
     }
   }
 }
+
+impl From<Public> for User {
+  fn from(public: Public) -> Self {
+    Self {
+      user_name: public.user_name,
+      ..Default::default()
+    }
+  }
+}

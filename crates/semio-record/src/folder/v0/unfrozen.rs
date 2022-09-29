@@ -26,6 +26,16 @@ pub struct Folder {
   pub acl: Acl,
 }
 
+impl Default for Folder {
+  fn default() -> Self {
+    Self {
+      name: String::new(),
+      parent: Uuid::nil(),
+      acl: Default::default(),
+    }
+  }
+}
+
 impl_unfrozen!(Folder, Action);
 name!(Folder);
 parent!(Folder);
