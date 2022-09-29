@@ -3,8 +3,6 @@ use uuid::Uuid;
 
 use derive_more::{Display, Error, From};
 
-use schemars::JsonSchema;
-
 macro_rules! with_acl {
   ($t: tt) => {
     impl crate::acl::action::WithAcl for $t {
@@ -30,13 +28,15 @@ use crate::record::Apply;
 
 use super::{WithPermissions, Acl};
 
-#[derive(Debug, Serialize, Deserialize, GraphQLObject, Clone, JsonSchema)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
+#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[serde(rename = "Acl_Action_SetDefault")]
 pub struct SetDefault {
   pub with_permissions: WithPermissions,
 }
 
-#[derive(Debug, Serialize, Deserialize, Display, Error, GraphQLEnum, Clone, JsonSchema)]
+#[derive(Debug, Serialize, Deserialize, Display, Error, Clone)]
+#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[serde(rename = "Acl_Action_SetDefaultError", tag = "type", rename_all = "camelCase")]
 pub enum SetDefaultError {
   #[display(fmt = "Invalid permissions")]
@@ -54,14 +54,16 @@ impl<T: WithAcl> Apply<SetDefault> for T {
   }
 }
 
-#[derive(Debug, Serialize, Deserialize, GraphQLObject, Clone, JsonSchema)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
+#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[serde(rename = "Acl_Action_AddPermissions")]
 pub struct AddPermissions {
   pub agent: Uuid,
   pub with_permissions: WithPermissions,
 }
 
-#[derive(Debug, Serialize, Deserialize, Display, Error, GraphQLEnum, Clone, JsonSchema)]
+#[derive(Debug, Serialize, Deserialize, Display, Error, Clone)]
+#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[serde(rename = "Acl_Action_AddPermissionsError", tag = "type", rename_all = "camelCase")]
 pub enum AddPermissionsError {
   #[display(fmt = "Invalid permissions")]
@@ -86,13 +88,15 @@ impl<T: WithAcl> Apply<AddPermissions> for T {
   }
 }
 
-#[derive(Debug, Serialize, Deserialize, GraphQLObject, Clone, JsonSchema)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
+#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[serde(rename = "Acl_Action_RemovePermissions")]
 pub struct RemovePermissions {
   pub agent: Uuid,
 }
 
-#[derive(Debug, Serialize, Deserialize, Display, Error, GraphQLEnum, Clone, JsonSchema)]
+#[derive(Debug, Serialize, Deserialize, Display, Error, Clone)]
+#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[serde(rename = "Acl_Action_RemovePermissionsError", tag = "type", rename_all = "camelCase")]
 pub enum RemovePermissionsError {
   #[display(fmt = "Agent does not exists")]
@@ -114,14 +118,16 @@ impl<T: WithAcl> Apply<RemovePermissions> for T {
   }
 }
 
-#[derive(Debug, Serialize, Deserialize, GraphQLObject, Clone, JsonSchema)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
+#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[serde(rename = "Acl_Action_SetPermissions")]
 pub struct SetPermissions {
   pub agent: Uuid,
   pub with_permissions: WithPermissions,
 }
 
-#[derive(Debug, Serialize, Deserialize, Display, Error, GraphQLEnum, Clone, JsonSchema)]
+#[derive(Debug, Serialize, Deserialize, Display, Error, Clone)]
+#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[serde(rename = "Acl_Action_SetPermissionsError", tag = "type", rename_all = "camelCase")]
 pub enum SetPermissionsError {
   #[display(fmt = "Invalid permissions")]
@@ -147,7 +153,8 @@ impl<T: WithAcl> Apply<SetPermissions> for T {
   }
 }
 
-#[derive(Debug, Serialize, Deserialize, GraphQLUnion, Clone, JsonSchema)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
+#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[serde(rename = "Acl_Action", tag = "type", rename_all = "camelCase", content = "value")]
 pub enum Action {
   SetDefault(SetDefault),
@@ -157,7 +164,8 @@ pub enum Action {
 }
 
 
-#[derive(Debug, Serialize, Deserialize, Display, Error, From, Clone, JsonSchema)]
+#[derive(Debug, Serialize, Deserialize, Display, Error, From, Clone)]
+#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[serde(rename = "Acl_ActionError", tag = "type", rename_all = "camelCase", content = "value")]
 pub enum ActionError {
   SetDefault(SetDefaultError),

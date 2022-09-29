@@ -1,9 +1,7 @@
 use serde::{Serialize, Deserialize};
-use juniper::GraphQLObject;
 
-use schemars::JsonSchema;
-
-#[derive(Debug, Serialize, Deserialize, Clone, GraphQLObject, JsonSchema)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
+#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[serde(rename = "math_Vector3")]
 pub struct Vector3 {
   pub x: f64,

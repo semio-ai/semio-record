@@ -1,7 +1,7 @@
 use serde::{Serialize, Deserialize};
-use schemars::JsonSchema;
 
-#[derive(Debug, Serialize, Deserialize, Clone, JsonSchema)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
+#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[serde(rename = "unit_Distance_Kind", rename_all = "camelCase")]
 pub enum DistanceKind {
   Meters,
@@ -11,7 +11,8 @@ pub enum DistanceKind {
   Inches,
 }
 
-#[derive(Debug, Serialize, Deserialize, Clone, JsonSchema)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
+#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[serde(rename = "unit_Distance", tag = "type", content = "value", rename_all = "camelCase")]
 pub enum Distance {
   Meters(f64),

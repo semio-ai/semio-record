@@ -1,6 +1,5 @@
 use std::collections::HashMap;
 
-use juniper::GraphQLObject;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
@@ -8,9 +7,8 @@ use crate::record::UnfrozenReference;
 
 use super::unfrozen::{Export, Module};
 
-use schemars::JsonSchema;
-
-#[derive(Debug, Serialize, Deserialize, Clone, JsonSchema)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
+#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[serde(rename = "module_v0_Public", rename_all = "camelCase")]
 pub struct Public {
   pub parent: Uuid,
@@ -43,78 +41,6 @@ impl Public {
 
   pub fn export_named(&self, name: &str) -> Option<&Export> {
     self.exports.get(&self.export_id(name)?.clone())
-  }
-}
-
-#[derive(GraphQLObject)]
-pub struct IdExport {
-  pub id: Uuid,
-  pub export: Export,
-}
-
-impl From<(Uuid, Export)> for IdExport {
-  fn from(pair: (Uuid, Export)) -> Self {
-    Self {
-      id: pair.0,
-      export: pair.1,
-    }
-  }
-}
-
-#[graphql_object(name = "ModulePublic")]
-impl Public {
-  #[graphql(name = "parent")]
-  pub fn gql_parent(&self) -> Uuid {
-    self.parent.clone()
-  }
-
-  #[graphql(name = "name")]
-  pub fn gql_name(&self) -> String {
-    self.name.clone()
-  }
-
-  #[graphql(name = "exports")]
-  pub fn gql_exports(&self) -> Vec<IdExport> {
-    self
-      .exports
-      .iter()
-      .map(|(k, v)| (k.clone(), v.clone()).into())
-      .collect()
-  }
-
-  #[graphql(name = "executable")]
-  pub fn gql_executable(&self) -> Option<Uuid> {
-    self.executable.clone()
-  }
-
-  #[graphql(name = "exportId")]
-  pub fn gql_export_id(&self, name: String) -> Option<Uuid> {
-    self.export_id(&name).map(Clone::clone)
-  }
-
-  #[graphql(name = "hasExport")]
-  pub fn gql_has_export(&self, id: Uuid) -> bool {
-    self.has_export(&id)
-  }
-
-  #[graphql(name = "hasExportNamed")]
-  pub fn gql_has_export_named(&self, name: String) -> bool {
-    self.has_export_named(&name)
-  }
-
-  #[graphql(name = "export")]
-  pub fn gql_export(&self, id: Uuid) -> Option<&Export> {
-    self.export(&id)
-  }
-
-  #[graphql(name = "exportNamed")]
-  pub fn gql_export_named(&self, name: String) -> Option<&Export> {
-    self.export_named(&name)
-  }
-
-  #[graphql(name = "dependencies")]
-  pub fn gql_dependencies(&self) -> &Vec<UnfrozenReference> {
-    &self.dependencies
   }
 }
 

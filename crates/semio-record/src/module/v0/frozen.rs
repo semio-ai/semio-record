@@ -2,7 +2,6 @@ use std::collections::{HashMap, HashSet};
 
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
-use schemars::JsonSchema;
 
 use crate::{
   blob::BlobDependencies,
@@ -10,12 +9,12 @@ use crate::{
   ty::FrozenTy,
 };
 
-#[derive(Debug, Clone, Serialize, Deserialize, GraphQLObject, JsonSchema)]
-#[graphql(name = "FrozenParameter")]
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[serde(rename = "module_v0_Frozen_Parameter", rename_all = "camelCase")]
 pub struct Parameter {
   pub name: String,
-  #[graphql(name = "type")]
+  #[serde(rename = "type")]
   pub ty: FrozenTy,
   pub mutable: bool,
 }
@@ -26,7 +25,8 @@ impl Parameter {
   }
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, JsonSchema)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[serde(rename = "module_v0_Frozen_Function", rename_all = "camelCase")]
 pub struct Function {
   pub parameters: HashMap<Uuid, Parameter>,
@@ -67,68 +67,12 @@ impl Function {
   }
 }
 
-#[derive(Debug, Serialize, Deserialize, GraphQLObject, JsonSchema)]
-#[graphql(name = "FrozenIdParameter")]
-pub struct IdParameter {
-  pub id: Uuid,
-  pub parameter: Parameter,
-}
-
-#[graphql_object(name = "FrozenFunction")]
-impl Function {
-  #[graphql(name = "parameterId")]
-  pub fn gql_parameter_id(&self, name: String) -> Option<Uuid> {
-    self.parameter_id(&name).cloned()
-  }
-
-  #[graphql(name = "hasParameter")]
-  pub fn gql_has_parameter(&self, id: Uuid) -> bool {
-    self.has_parameter(&id)
-  }
-
-  #[graphql(name = "hasParameterNamed")]
-  pub fn gql_has_parameter_named(&self, name: String) -> bool {
-    self.has_parameter_named(&name)
-  }
-
-  #[graphql(name = "parameter")]
-  pub fn gql_parameter(&self, id: Uuid) -> Option<Parameter> {
-    self.parameter(&id).cloned()
-  }
-
-  #[graphql(name = "parameterNamed")]
-  pub fn gql_parameter_named(&self, name: String) -> Option<Parameter> {
-    self.parameter_named(&name).cloned()
-  }
-
-  #[graphql(name = "parameters")]
-  pub fn gql_parameters(&self) -> Vec<IdParameter> {
-    self
-      .parameter_ordering
-      .iter()
-      .filter_map(|id| {
-        if let Some(parameter) = self.parameters.get(id) {
-          Some(IdParameter {
-            id: id.clone(),
-            parameter: parameter.clone(),
-          })
-        } else {
-          None
-        }
-      })
-      .collect()
-  }
-
-  #[graphql(name = "returnType")]
-  pub fn gql_return_type(&self) -> FrozenTy {
-    self.return_ty.clone()
-  }
-}
-
-#[derive(Debug, GraphQLUnion, Clone, Serialize, Deserialize, JsonSchema)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[serde(rename = "module_v0_Frozen_Export_Kind", tag = "type", rename_all = "camelCase", content = "value")]
-#[graphql(name = "FrozenExportKind")]
 pub enum ExportKind {
+  // `function` is a reserved keyword in JS/TS.
+  #[serde(rename = "func")]
   Function(Function),
 }
 
@@ -146,8 +90,8 @@ impl ExportKind {
   }
 }
 
-#[derive(Debug, Clone, GraphQLObject, Serialize, Deserialize, JsonSchema)]
-#[graphql(name = "FrozenExport")]
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[serde(rename = "module_v0_Frozen_Export", rename_all = "camelCase")]
 pub struct Export {
   pub name: String,
@@ -160,7 +104,8 @@ impl Export {
   }
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, JsonSchema)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[serde(rename = "module_v0_Frozen", rename_all = "camelCase")]
 pub struct Module {
   pub parent: Uuid,
@@ -193,73 +138,6 @@ impl Module {
 
   pub fn export_named(&self, name: &str) -> Option<&Export> {
     self.exports.get(self.export_id(name)?)
-  }
-}
-
-#[derive(Debug, GraphQLObject, Serialize, Deserialize, JsonSchema)]
-#[graphql(name = "FrozenIdExport")]
-pub struct IdExport {
-  pub id: Uuid,
-  pub export: Export,
-}
-
-#[graphql_object(name = "FrozenModule")]
-impl Module {
-  #[graphql(name = "exportId")]
-  pub fn gql_export_id(&self, name: String) -> Option<Uuid> {
-    self.export_id(&name).cloned()
-  }
-
-  #[graphql(name = "hasExport")]
-  pub fn gql_has_export(&self, id: Uuid) -> bool {
-    self.has_export(&id)
-  }
-
-  #[graphql(name = "hasExportNamed")]
-  pub fn gql_has_export_named(&self, name: String) -> bool {
-    self.has_export_named(&name)
-  }
-
-  #[graphql(name = "export")]
-  pub fn gql_export(&self, id: Uuid) -> Option<Export> {
-    self.export(&id).cloned()
-  }
-
-  #[graphql(name = "exportNamed")]
-  pub fn gql_export_named(&self, name: String) -> Option<Export> {
-    self.export_named(&name).cloned()
-  }
-
-  #[graphql(name = "parent")]
-  pub fn gql_parent(&self) -> Option<Uuid> {
-    Some(self.parent)
-  }
-
-  #[graphql(name = "name")]
-  pub fn gql_name(&self) -> String {
-    self.name.clone()
-  }
-
-  #[graphql(name = "exports")]
-  pub fn gql_exports(&self) -> Vec<IdExport> {
-    self
-      .exports
-      .iter()
-      .map(|(id, export)| IdExport {
-        id: id.clone(),
-        export: export.clone(),
-      })
-      .collect()
-  }
-
-  #[graphql(name = "executable")]
-  pub fn gql_executable(&self) -> Option<Uuid> {
-    self.executable.clone()
-  }
-
-  #[graphql(name = "dependencies")]
-  pub fn gql_dependencies(&self) -> &Vec<FrozenReference> {
-    &self.dependencies
   }
 }
 

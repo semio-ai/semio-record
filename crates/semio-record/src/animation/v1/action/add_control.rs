@@ -4,18 +4,18 @@ use uuid::Uuid;
 
 use crate::record::Apply;
 
-use schemars::JsonSchema;
-
 use super::super::unfrozen::{Animation, Control};
 
-#[derive(Debug, Serialize, Deserialize, From, Clone, JsonSchema)]
+#[derive(Debug, Serialize, Deserialize, From, Clone)]
+#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[serde(rename = "animation_v1_Action_AddControl", rename_all = "camelCase")]
 pub struct AddControl {
   pub control_id: Uuid,
   pub control: Control,
 }
 
-#[derive(Display, Debug, Serialize, Deserialize, Error, Clone, JsonSchema)]
+#[derive(Display, Debug, Serialize, Deserialize, Error, Clone)]
+#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[serde(rename = "animation_v1_Action_AddControlError", tag = "type", rename_all = "camelCase")]
 pub enum AddControlError {
   #[display(fmt = "Control already exists")]

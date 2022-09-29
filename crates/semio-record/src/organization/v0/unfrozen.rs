@@ -7,9 +7,8 @@ use crate::{record::{Unfrozen, UnfrozenReference, View, Freeze, Freezer}, blob::
 
 use super::action::Action;
 
-use schemars::JsonSchema;
-
-#[derive(Debug, Serialize, Deserialize, GraphQLObject, Clone, JsonSchema)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
+#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[serde(rename = "organization_v0_Private")]
 pub struct Organization {
   pub name: String,

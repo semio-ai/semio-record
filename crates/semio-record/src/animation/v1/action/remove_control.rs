@@ -6,17 +6,17 @@ use uuid::Uuid;
 
 use crate::record::Apply;
 
-use schemars::JsonSchema;
-
 use super::super::unfrozen::{Animation, NodeKind};
 
-#[derive(Debug, Serialize, Deserialize, From, Clone, JsonSchema)]
+#[derive(Debug, Serialize, Deserialize, From, Clone)]
+#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[serde(rename = "animation_v1_Action_RemoveControl", rename_all = "camelCase")]
 pub struct RemoveControl {
   pub control_id: Uuid,
 }
 
-#[derive(Display, Debug, Serialize, Deserialize, Error, Clone, JsonSchema)]
+#[derive(Display, Debug, Serialize, Deserialize, Error, Clone)]
+#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[serde(rename = "animation_v1_Action_RemoveControlError", tag = "type", rename_all = "camelCase")]
 pub enum RemoveControlError {
   #[display(fmt = "Control does not exist")]

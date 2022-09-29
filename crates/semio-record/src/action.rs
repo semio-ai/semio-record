@@ -2,7 +2,7 @@ use serde::{Deserialize, Serialize};
 
 use derive_more::{Display, Error};
 use uuid::Uuid;
-use schemars::JsonSchema;
+
 
 use crate::record::Apply;
 
@@ -11,7 +11,8 @@ pub trait Name {
   fn set_name(&mut self, name: String);
 }
 
-#[derive(Debug, Serialize, Deserialize, GraphQLObject, Display, Clone, JsonSchema)]
+#[derive(Debug, Serialize, Deserialize, Display, Clone)]
+#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[serde(rename = "SetName")]
 pub struct SetName {
   pub name: String,
@@ -23,7 +24,8 @@ impl SetName {
   }
 }
 
-#[derive(Debug, Display, Error, GraphQLEnum, Serialize, Deserialize, Clone, JsonSchema)]
+#[derive(Debug, Display, Error, Serialize, Deserialize, Clone)]
+#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[serde(rename = "SetNameError", tag = "type", rename_all = "camelCase")]
 pub enum SetNameError {
   #[display(fmt = "Name too short")]
@@ -81,7 +83,8 @@ pub trait Parent {
   fn set_parent(&mut self, parent: Uuid);
 }
 
-#[derive(Debug, Serialize, Deserialize, GraphQLObject, Clone, JsonSchema)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
+#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[serde(rename = "SetParent")]
 pub struct SetParent {
   pub id: Uuid,
@@ -93,7 +96,8 @@ impl SetParent {
   }
 }
 
-#[derive(Debug, Display, Error, GraphQLEnum, Serialize, Deserialize, Clone, JsonSchema)]
+#[derive(Debug, Display, Error, Serialize, Deserialize, Clone)]
+#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[serde(rename = "SetParentError", tag = "type", rename_all = "camelCase")]
 pub enum SetParentError {
   #[display(fmt = "Parent is not a valid UUID")]

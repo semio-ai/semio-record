@@ -8,14 +8,12 @@ use crate::{ty::UnfrozenTy, record::{View, Freezer, Freeze, Unfrozen, UnfrozenRe
 
 use super::{frozen, action::Action};
 
-use schemars::JsonSchema;
-
-#[derive(Clone, Debug, Serialize, Deserialize, GraphQLObject, JsonSchema)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
+#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[serde(rename = "structure_v0_Field")]
 pub struct StructureField {
   pub name: String,
   #[serde(rename = "type")]
-  #[graphql(name = "type")]
   pub ty: UnfrozenTy,
 }
 
@@ -31,7 +29,8 @@ impl<F: Freezer> Freeze<F> for StructureField {
   }
 }
 
-#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
+#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[serde(rename = "structure_v0_Private")]
 pub struct Structure {
   pub parent: Uuid,
@@ -53,13 +52,6 @@ impl Default for Structure {
 
 impl_unfrozen!(Structure, Action);
 
-
-#[derive(Debug, Serialize, Deserialize, GraphQLObject, JsonSchema)]
-pub struct IdStructureField {
-  pub id: Uuid,
-  pub field: StructureField
-}
-
 impl Structure {
   pub fn field_named(&self, name: &str) -> Option<&StructureField> {
     for (_, field) in &self.fields {
@@ -68,33 +60,6 @@ impl Structure {
       }
     }
     None
-  }
-}
-
-#[graphql_object]
-impl Structure {
-  pub fn name(&self) -> &str {
-    &self.name
-  }
-
-  pub fn parent(&self) -> &Uuid {
-    &self.parent
-  }
-
-  pub fn acl(&self) -> &Acl {
-    &self.acl
-  }
-
-  pub fn fields(&self) -> Vec<IdStructureField> {
-    self.fields.iter().map(|(id, field)| IdStructureField {
-      id: id.clone(),
-      field: field.clone(),
-    }).collect()
-  }
-
-  #[graphql(name = "fieldNamed")]
-  pub fn gql_field_named(&self, name: String) -> Option<&StructureField> {
-    self.field_named(&name)
   }
 }
 

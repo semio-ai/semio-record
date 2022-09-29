@@ -1,6 +1,7 @@
 use std::collections::{HashSet, HashMap};
 
 use async_trait::async_trait;
+
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
@@ -12,45 +13,51 @@ use crate::{
   action::name,
   unit_math::{Vector3, Vector2, ReferenceFrame},
   unit::{Distance, DistanceKind, Mass},
-  math::{Vector3 as RawVector3, Vector2 as RawVector2},
+  math::{Vector3 as RawVector3, Vector2 as RawVector2}, migrate::Migrate,
 };
 
 use super::action::Action;
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
-#[serde(rename_all = "camelCase")]
-pub struct Box {
+#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
+#[serde(rename = "scene_v0_Geometry_Box", rename_all = "camelCase")]
+pub struct BoxGeometry {
   size: Vector3,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
-#[serde(rename_all = "camelCase")]
+#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
+#[serde(rename = "scene_v0_Geometry_Sphere", rename_all = "camelCase")]
 pub struct Sphere {
   radius: Distance,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
-#[serde(rename_all = "camelCase")]
+#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
+#[serde(rename = "scene_v0_Geometry_Cylinder", rename_all = "camelCase")]
 pub struct Cylinder {
   radius: Distance,
   height: Distance,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
-#[serde(rename_all = "camelCase")]
+#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
+#[serde(rename = "scene_v0_Geometry_Cone", rename_all = "camelCase")]
 pub struct Cone {
   radius: Distance,
   height: Distance,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
-#[serde(rename_all = "camelCase")]
+#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
+#[serde(rename = "scene_v0_Geometry_Plane", rename_all = "camelCase")]
 pub struct Plane {
   size: Vector2,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
-#[serde(rename_all = "camelCase")]
+#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
+#[serde(rename = "scene_v0_Geometry_LocalMesh", rename_all = "camelCase")]
 pub struct LocalMesh {
   distance_type: Option<DistanceKind>,
   vertices: Vec<RawVector3>,
@@ -59,14 +66,17 @@ pub struct LocalMesh {
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
+#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
+#[serde(rename = "scene_v0_Geometry_RemoteMesh", rename_all = "camelCase")]
 pub struct RemoteMesh {
-  uri: String,
+  blob_id: Uuid,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
-#[serde(tag = "type", rename_all = "camelCase")]
+#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
+#[serde(rename = "scene_v0_Geometry", tag = "type", rename_all = "camelCase", content = "value")]
 pub enum Geometry {
-  Box(Box),
+  Box(BoxGeometry),
   Sphere(Sphere),
   Cylinder(Cylinder),
   Cone(Cone),
@@ -76,7 +86,8 @@ pub enum Geometry {
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
-#[serde(rename_all = "camelCase")]
+#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
+#[serde(rename = "scene_v0_ColliderKind", rename_all = "camelCase")]
 pub enum ColliderKind {
   Box,
   Sphere,
@@ -86,7 +97,8 @@ pub enum ColliderKind {
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
-#[serde(rename_all = "camelCase")]
+#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
+#[serde(rename = "scene_v0_Physics", rename_all = "camelCase")]
 pub struct Physics {
   collider_id: Option<Uuid>,
   collider_kind: ColliderKind,
@@ -96,10 +108,16 @@ pub struct Physics {
   restitution: Option<f64>,
 }
 
-pub struct Obj {
+#[derive(Debug, Serialize, Deserialize, Clone)]
+#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
+#[serde(rename = "scene_v0_Node_Kind_Object", rename_all = "camelCase")]
+pub struct Object {
   pub geometry_id: Option<Uuid>,
 }
 
+#[derive(Debug, Serialize, Deserialize, Clone)]
+#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
+#[serde(rename = "scene_v0_Node_Kind_DirectionalLight", rename_all = "camelCase")]
 pub struct DirectionalLight {
   radius: Option<Distance>,
   range: Option<Distance>,
@@ -108,10 +126,13 @@ pub struct DirectionalLight {
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
-#[serde(tag = "type", rename_all = "camelCase")]
+#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
+#[serde(rename = "scene_v0_Node_Kind", tag = "type", rename_all = "camelCase", content = "value")]
 pub enum NodeKind {
   Empty,
-  Obj(Obj),
+  // `object` is a reserved keyword in JS/TS.
+  #[serde(rename = "obj")]
+  Object(Object),
   PointLight,
   SpotLight,
   DirectionalLight(DirectionalLight),
@@ -119,6 +140,8 @@ pub enum NodeKind {
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
+#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
+#[serde(rename = "scene_v0_Node", rename_all = "camelCase")]
 pub struct Node {
   pub name: String,
   pub parent_id: Option<Uuid>,
@@ -128,7 +151,9 @@ pub struct Node {
   pub kind: NodeKind,
 }
 
-#[derive(Debug, Serialize, Deserialize, GraphQLObject, Clone)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
+#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
+#[serde(rename = "scene_v0_Private", rename_all = "camelCase")]
 pub struct Scene {
   pub name: String,
   pub description: String,
@@ -144,7 +169,16 @@ impl Unfrozen<Action> for Scene {
 }
 
 impl BlobDependencies for Scene {
-  fn blob_dependencies<'a>(&'a self, _set: &mut HashSet<&'a uuid::Uuid>) {}
+  fn blob_dependencies<'a>(&'a self, set: &mut HashSet<&'a uuid::Uuid>) {
+    for geometry in self.geometry.values() {
+      match geometry {
+        Geometry::RemoteMesh(mesh) => {
+          set.insert(&mesh.blob_id);
+        },
+        _ => {}
+      }
+    }
+  }
 }
 
 with_acl!(Scene);
@@ -171,5 +205,11 @@ impl<F: Freezer> Freeze<F> for Scene {
 
   async fn freeze(&self, _: &F) -> Result<Self::Frozen, F::Error> {
     Ok(())
+  }
+}
+
+impl Migrate for Scene {
+  fn migrate(from_version: i16, _from: &[u8]) -> anyhow::Result<Self> {
+    anyhow::bail!("Migration not implemented for version {}", from_version)
   }
 }

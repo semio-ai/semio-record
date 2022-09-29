@@ -4,7 +4,7 @@ use async_trait::async_trait;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
-use schemars::JsonSchema;
+
 
 use crate::{
   record::{Unfrozen, UnfrozenReference, View, Freeze, Freezer},
@@ -17,7 +17,8 @@ use crate::{
 
 use super::action::Action;
 
-#[derive(Debug, Serialize, Deserialize, GraphQLObject, Clone, JsonSchema)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
+#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[serde(rename = "folder_v0_Private")]
 pub struct Folder {
   pub name: String,

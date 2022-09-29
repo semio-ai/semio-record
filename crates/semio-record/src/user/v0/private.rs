@@ -1,12 +1,9 @@
-use juniper::GraphQLObject;
 use serde::{Serialize, Deserialize};
 
 use super::unfrozen::User;
 
-use schemars::JsonSchema;
-
-#[derive(Debug, Clone, GraphQLObject, Serialize, Deserialize, JsonSchema)]
-#[graphql(name = "UserPrivate")]
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[serde(rename = "user_v0_Private", rename_all = "camelCase")]
 pub struct Private {
   pub user_name: String,

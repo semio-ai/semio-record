@@ -3,11 +3,10 @@ use std::collections::HashMap;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
-use super::unfrozen::{Enumeration, EnumerationVariant, IdEnumerationVariant};
+use super::unfrozen::{Enumeration, EnumerationVariant};
 
-use schemars::JsonSchema;
-
-#[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq, JsonSchema)]
+#[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq)]
+#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[serde(rename = "enumeration_v0_Public")]
 pub struct Public {
   pub name: String,
@@ -23,33 +22,6 @@ impl Public {
       }
     }
     None
-  }
-}
-
-#[graphql_object(name = "EnumerationPublic")]
-impl Public {
-  fn name(&self) -> &str {
-    &self.name
-  }
-
-  fn parent(&self) -> &Uuid {
-    &self.parent
-  }
-
-  fn variants(&self) -> Vec<IdEnumerationVariant> {
-    self
-      .variants
-      .iter()
-      .map(|(id, variant)| IdEnumerationVariant {
-        id: id.clone(),
-        variant: variant.clone(),
-      })
-      .collect()
-  }
-
-  #[graphql(name = "variantNamed")]
-  fn gql_variant_named(&self, name: String) -> Option<&EnumerationVariant> {
-    self.variant_named(&name)
   }
 }
 

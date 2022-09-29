@@ -3,25 +3,23 @@ use std::collections::{HashMap, HashSet};
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
-use schemars::JsonSchema;
-
 use crate::{
   blob::BlobDependencies,
   record::{Frozen, FrozenReference, View},
   ty::FrozenTy,
 };
 
-#[derive(Debug, Clone, Serialize, Deserialize, GraphQLObject, JsonSchema)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[serde(rename = "enumeration_v0_Frozen_Field")]
-#[graphql(name = "FrozenStructureField")]
 pub struct StructureField {
   pub name: String,
   #[serde(rename = "type")]
-  #[graphql(name = "type")]
   pub ty: FrozenTy,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, JsonSchema)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[serde(rename = "structure_v0_Frozen")]
 pub struct Structure {
   pub parent: Uuid,
@@ -37,40 +35,6 @@ impl Structure {
       }
     }
     None
-  }
-}
-
-#[derive(Debug, Serialize, Deserialize, GraphQLObject, JsonSchema)]
-#[graphql(name = "FrozenIdStructureField")]
-pub struct IdStructureField {
-  pub id: Uuid,
-  pub field: StructureField,
-}
-
-#[graphql_object(name = "FrozenStructure")]
-impl Structure {
-  pub fn name(&self) -> &str {
-    &self.name
-  }
-
-  pub fn parent(&self) -> &Uuid {
-    &self.parent
-  }
-
-  pub fn fields(&self) -> Vec<IdStructureField> {
-    self
-      .fields
-      .iter()
-      .map(|(id, field)| IdStructureField {
-        id: id.clone(),
-        field: field.clone(),
-      })
-      .collect()
-  }
-
-  #[graphql(name = "fieldNamed")]
-  pub fn gql_field_named(&self, name: String) -> Option<&StructureField> {
-    self.field_named(&name)
   }
 }
 

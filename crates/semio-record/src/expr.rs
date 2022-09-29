@@ -4,13 +4,15 @@ use derive_more::From;
 
 use serde::{Serialize, Deserialize};
 
-#[derive(Debug, Clone, Serialize, Deserialize, GraphQLObject)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[serde(rename = "Expr_Number")]
 pub struct Number {
   pub value: f64,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, GraphQLObject)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[serde(rename = "Expr_Variable")]
 pub struct Variable {
   pub identifier: String,
@@ -18,7 +20,8 @@ pub struct Variable {
 
 macro_rules! binary_op {
   ($id:ident, $name:literal) => {
-    #[derive(Debug, Clone, Serialize, Deserialize, GraphQLObject)]
+    #[derive(Debug, Clone, Serialize, Deserialize)]
+    #[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
     #[serde(rename = $name)]
     pub struct $id {
       pub left: Box<Expr>,
@@ -29,7 +32,8 @@ macro_rules! binary_op {
 
 macro_rules! unary_op {
   ($id:ident, $name:literal) => {
-    #[derive(Debug, Clone, Serialize, Deserialize, GraphQLObject)]
+    #[derive(Debug, Clone, Serialize, Deserialize)]
+    #[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
     #[serde(rename = $name)]
     pub struct $id {
       pub value: Box<Expr>,
@@ -39,7 +43,8 @@ macro_rules! unary_op {
 
 macro_rules! constant {
   ($id:ident, $name:literal) => {
-    #[derive(Debug, Copy, Clone, Serialize, Deserialize, GraphQLObject)]
+    #[derive(Debug, Copy, Clone, Serialize, Deserialize)]
+    #[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
     #[serde(rename = $name)]
     pub struct $id {
       pub _dummy: i32
@@ -64,7 +69,8 @@ unary_op!(Floor, "Expr_Floor");
 unary_op!(Ceil, "Expr_Ceil");
 unary_op!(Round, "Expr_Round");
 
-#[derive(Debug, Clone, Serialize, Deserialize, GraphQLUnion, From)]
+#[derive(Debug, Clone, Serialize, Deserialize, From)]
+#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[serde(rename = "Expr", tag = "type")]
 pub enum Expr {
   Number(Number),

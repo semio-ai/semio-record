@@ -1,8 +1,9 @@
 use serde::{Serialize, Deserialize};
 
-use schemars::JsonSchema;
 
-#[derive(Debug, Serialize, Deserialize, Clone, JsonSchema)]
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
+#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[serde(rename = "math_Euler_Order", rename_all = "lowercase")]
 pub enum EulerOrder {
   XYZ,
@@ -13,7 +14,8 @@ pub enum EulerOrder {
   ZYX,
 }
 
-#[derive(Debug, Serialize, Deserialize, Clone, JsonSchema)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
+#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[serde(rename = "math_Euler")]
 pub struct Euler {
   pub x: f64,

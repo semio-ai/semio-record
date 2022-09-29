@@ -4,16 +4,16 @@ use super::unfrozen::Organization;
 use derive_more::{Display, Error, From};
 use serde::{Deserialize, Serialize};
 
-use schemars::JsonSchema;
-
-#[derive(Debug, Serialize, Deserialize, From, Clone, JsonSchema)]
+#[derive(Debug, Serialize, Deserialize, From, Clone)]
+#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[serde(rename = "organization_v0_Action", tag = "type", rename_all = "camelCase", content = "value")]
 pub enum Action {
   SetName(SetName),
   Acl(AclAction),
 }
 
-#[derive(Display, Debug, Error, From, Clone, Serialize, Deserialize, JsonSchema)]
+#[derive(Display, Debug, Error, From, Clone, Serialize, Deserialize)]
+#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[serde(rename = "organization_v0_ActionError", tag = "type", rename_all = "camelCase", content = "value")]
 pub enum ActionError {
   SetName(SetNameError),

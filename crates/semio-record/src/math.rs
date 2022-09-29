@@ -1,5 +1,4 @@
 use serde::{Serialize, Deserialize};
-use juniper::GraphQLObject;
 
 mod vector2;
 mod vector3;
@@ -15,9 +14,10 @@ pub use axis_angle::*;
 pub use reference_frame::*;
 pub use quaternion::*;
 
-use schemars::JsonSchema;
 
-#[derive(Debug, Serialize, Deserialize, GraphQLObject, Clone, JsonSchema)]
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
+#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[serde(rename = "math_MultiBezier2_Chunk")]
 pub struct MultiBezier2Chunk {
   p0: Vector2,
@@ -25,7 +25,8 @@ pub struct MultiBezier2Chunk {
   p2: Vector2,
 }
 
-#[derive(Debug, Serialize, Deserialize, GraphQLObject, Clone, JsonSchema)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
+#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[serde(rename = "math_MultiBezier2")]
 pub struct MultiBezier2 {
   chunks: Vec<MultiBezier2Chunk>,

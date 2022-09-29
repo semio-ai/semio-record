@@ -16,39 +16,45 @@ use crate::{
 
 use super::action::Action;
 
-use schemars::JsonSchema;
 
-#[derive(Debug, Serialize, Deserialize, GraphQLObject, Clone, JsonSchema)]
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
+#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[serde(rename = "animation_v0_Value_F64", rename_all = "camelCase")]
 pub struct F64 {
   pub value: f64,
 }
 
-#[derive(Debug, Serialize, Deserialize, GraphQLUnion, Clone, JsonSchema)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
+#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[serde(rename = "animation_v0_Value", tag = "type", rename_all = "camelCase", content = "value")]
 pub enum Value {
   F64(F64),
 }
 
-#[derive(Debug, Serialize, Deserialize, GraphQLObject, Clone, JsonSchema)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
+#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[serde(rename = "animation_v0_Transition_None")]
 pub struct None {
   pub _dummy: i32,
 }
 
-#[derive(Debug, Serialize, Deserialize, GraphQLObject, Clone, JsonSchema)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
+#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[serde(rename = "animation_v0_Transition_Linear")]
 pub struct Linear {
   pub _dummy: i32,
 }
 
-#[derive(Debug, Serialize, Deserialize, GraphQLObject, Clone, JsonSchema)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
+#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[serde(rename = "animation_v0_Transition_MultiBezier")]
 pub struct MultiBezier {
   pub multi_bezier: MultiBezier2,
 }
 
-#[derive(Debug, Serialize, Deserialize, GraphQLUnion, Clone, JsonSchema)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
+#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[serde(rename = "animation_v0_Transition", tag = "type", rename_all = "camelCase", content = "value")]
 pub enum Transition {
   None(None),
@@ -56,7 +62,8 @@ pub enum Transition {
   MultiBezier(MultiBezier),
 }
 
-#[derive(Debug, Serialize, Deserialize, GraphQLObject, Clone, JsonSchema)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
+#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[serde(rename = "animation_v0_Key")]
 pub struct Key {
   pub at: f64,
@@ -64,7 +71,8 @@ pub struct Key {
   pub transition: Transition,
 }
 
-#[derive(Debug, Serialize, Deserialize, Clone, JsonSchema)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
+#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[serde(rename = "animation_v0_Group")]
 pub struct Group {
   pub name: String,
@@ -75,30 +83,8 @@ pub struct Group {
   pub children_ids: HashSet<Uuid>,
 }
 
-#[graphql_object]
-impl Group {
-  fn name(&self) -> &str {
-    &self.name
-  }
-
-  fn locked(&self) -> bool {
-    self.locked
-  }
-
-  fn collapsed(&self) -> bool {
-    self.collapsed
-  }
-
-  fn color(&self) -> &Color {
-    &self.color
-  }
-
-  fn children_ids(&self) -> Vec<Uuid> {
-    self.children_ids.iter().cloned().collect()
-  }
-}
-
-#[derive(Debug, Serialize, Deserialize, Clone, JsonSchema)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
+#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[serde(rename = "animation_v0_Track")]
 pub struct Track {
   pub name: String,
@@ -110,53 +96,23 @@ pub struct Track {
   pub key_ordering: Vec<Uuid>,
 }
 
-#[derive(Debug, Serialize, Deserialize, Clone, GraphQLObject, JsonSchema)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
+#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 pub struct IdKey {
   pub id: Uuid,
   pub key: Key,
 }
 
-#[graphql_object]
-impl Track {
-  pub fn name(&self) -> &String {
-    &self.name
-  }
-
-  pub fn locked(&self) -> bool {
-    self.locked
-  }
-
-  pub fn collapsed(&self) -> bool {
-    self.collapsed
-  }
-
-  pub fn color(&self) -> &Color {
-    &self.color
-  }
-
-  pub fn keys(&self) -> Vec<IdKey> {
-    self.key_ordering
-      .iter()
-      .map(|id| IdKey {
-        id: *id,
-        key: self.keys.get(id).unwrap().clone(),
-      })
-      .collect()
-  }
-
-  pub fn key_ordering(&self) -> &Vec<Uuid> {
-    &self.key_ordering
-  }
-}
-
-#[derive(Debug, Serialize, Deserialize, GraphQLUnion, Clone, JsonSchema)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
+#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[serde(rename = "animation_v0_Node", tag = "type", rename_all = "camelCase", content = "value")]
 pub enum Node {
   Group(Group),
   Track(Track),
 }
 
-#[derive(Debug, Serialize, Deserialize, Clone, JsonSchema)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
+#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[serde(rename = "animation_v0_Private")]
 pub struct Animation {
   pub name: String,
@@ -191,41 +147,6 @@ impl Default for Animation {
       nodes,
       acl: Default::default(),
     }
-  }
-}
-
-#[derive(Debug, Serialize, Deserialize, Clone, GraphQLObject, JsonSchema)]
-pub struct IdNode {
-  pub id: Uuid,
-  pub node: Node,
-}
-
-#[graphql_object]
-impl Animation {
-  pub fn name(&self) -> &str {
-    &self.name
-  }
-
-  pub fn parent(&self) -> &Uuid {
-    &self.parent
-  }
-
-  pub fn root_id(&self) -> &Uuid {
-    &self.root_id
-  }
-
-  pub fn nodes(&self) -> Vec<IdNode> {
-    self.nodes
-      .iter()
-      .map(|(id, node)| IdNode {
-        id: *id,
-        node: node.clone(),
-      })
-      .collect()
-  }
-
-  pub fn acl(&self) -> &Acl {
-    &self.acl
   }
 }
 

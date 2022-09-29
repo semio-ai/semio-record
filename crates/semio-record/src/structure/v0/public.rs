@@ -3,11 +3,10 @@ use std::collections::HashMap;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
-use schemars::JsonSchema;
+use super::unfrozen::{Structure, StructureField};
 
-use super::unfrozen::{IdStructureField, Structure, StructureField};
-
-#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
+#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[serde(rename = "structure_v0_Public")]
 pub struct Public {
   pub name: String,
@@ -23,33 +22,6 @@ impl Public {
       }
     }
     None
-  }
-}
-
-#[graphql_object(name = "StructurePublic")]
-impl Public {
-  fn name(&self) -> &str {
-    &self.name
-  }
-
-  fn parent(&self) -> &Uuid {
-    &self.parent
-  }
-
-  fn fields(&self) -> Vec<IdStructureField> {
-    self
-      .fields
-      .iter()
-      .map(|(id, field)| IdStructureField {
-        id: id.clone(),
-        field: field.clone(),
-      })
-      .collect()
-  }
-
-  #[graphql(name = "fieldNamed")]
-  fn gql_field_named(&self, name: String) -> Option<&StructureField> {
-    self.field_named(&name)
   }
 }
 

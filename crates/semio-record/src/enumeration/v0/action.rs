@@ -7,16 +7,16 @@ use derive_more::{Display, From, Error};
 
 use super::unfrozen::{EnumerationVariant, Enumeration};
 
-use schemars::JsonSchema;
-
-#[derive(Debug, Serialize, Deserialize, GraphQLObject, Clone, JsonSchema)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
+#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[serde(rename = "enumeration_v0_Action_AddVariant", rename_all = "camelCase")]
 pub struct AddVariant  {
   pub id: Uuid,
   pub variant: EnumerationVariant
 }
 
-#[derive(Debug, Serialize, Deserialize, Display, Error, GraphQLEnum, Clone, JsonSchema)]
+#[derive(Debug, Serialize, Deserialize, Display, Error, Clone)]
+#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[serde(rename = "enumeration_v0_Action_AddVariantError", tag = "type", rename_all = "camelCase")]
 pub enum AddVariantError {
   #[display(fmt = "ID already exists")]
@@ -53,13 +53,15 @@ impl Apply<AddVariant> for Enumeration {
   }
 }
 
-#[derive(Debug, Serialize, Deserialize, GraphQLObject, Clone, JsonSchema)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
+#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[serde(rename = "enumeration_v0_Action_RemoveVariant", rename_all = "camelCase")]
 pub struct RemoveVariant  {
   pub id: Uuid,
 }
 
-#[derive(Debug, Serialize, Deserialize, Display, Error, GraphQLEnum, Clone, JsonSchema)]
+#[derive(Debug, Serialize, Deserialize, Display, Error, Clone)]
+#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[serde(rename = "enumeration_v0_Action_RemoveVariantError", tag = "type", rename_all = "camelCase")]
 pub enum RemoveVariantError {
   #[display(fmt = "Variant does not exist")]
@@ -78,14 +80,16 @@ impl Apply<RemoveVariant> for Enumeration {
   }
 }
 
-#[derive(Debug, Serialize, Deserialize, GraphQLObject, Clone, JsonSchema)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
+#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[serde(rename = "enumeration_v0_Action_SetVariantName")]
 pub struct SetVariantName  {
   pub id: Uuid,
   pub name: String,
 }
 
-#[derive(Debug, Serialize, Deserialize, Display, Error, GraphQLEnum, Clone, JsonSchema)]
+#[derive(Debug, Serialize, Deserialize, Display, Error, Clone)]
+#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[serde(rename = "enumeration_v0_Action_SetVariantNameError", tag = "type", rename_all = "camelCase")]
 pub enum SetVariantNameError {
   #[display(fmt = "Variant does not exist")]
@@ -117,7 +121,8 @@ impl Apply<SetVariantName> for Enumeration {
   }
 }
 
-#[derive(Debug, Serialize, Deserialize, GraphQLObject, Clone, JsonSchema)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
+#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[serde(rename = "enumeration_v0_Action_SetVariantType", rename_all = "camelCase")]
 pub struct SetVariantType {
   pub id: Uuid,
@@ -125,7 +130,8 @@ pub struct SetVariantType {
   pub ty: UnfrozenTy,
 }
 
-#[derive(Debug, Serialize, Deserialize, Display, Error, GraphQLEnum, Clone, JsonSchema)]
+#[derive(Debug, Serialize, Deserialize, Display, Error, Clone)]
+#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[serde(rename = "enumeration_v0_Action_SetVariantTypeError", tag = "type", rename_all = "camelCase")]
 pub enum SetVariantTypeError {
   #[display(fmt = "Variant does not exist")]
@@ -145,7 +151,8 @@ impl Apply<SetVariantType> for Enumeration {
   }
 }
 
-#[derive(Debug, Serialize, Deserialize, From, Clone, JsonSchema)]
+#[derive(Debug, Serialize, Deserialize, From, Clone)]
+#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[serde(rename = "enumeration_v0_Action", tag = "type", rename_all = "camelCase", content = "value")]
 pub enum Action {
   SetName(SetName),
@@ -157,7 +164,8 @@ pub enum Action {
   Acl(AclAction),
 }
 
-#[derive(Display, Debug, Error, From, Clone, Serialize, Deserialize, JsonSchema)]
+#[derive(Display, Debug, Error, From, Clone, Serialize, Deserialize)]
+#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[serde(rename = "enumeration_v0_ActionError", tag = "type", rename_all = "camelCase", content = "value")]
 pub enum ActionError {
   SetName(SetNameError),

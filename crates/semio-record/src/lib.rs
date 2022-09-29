@@ -1,7 +1,5 @@
 #![feature(associated_type_defaults)]
 
-#[macro_use] extern crate juniper;
-
 pub mod blob;
 pub mod expr;
 pub mod record;
@@ -24,10 +22,14 @@ pub mod animation;
 pub mod color;
 pub mod math;
 pub mod migrate;
-pub mod reference;
+pub mod container;
 pub mod i18n;
 pub mod unit;
 pub mod unit_math;
+
+#[cfg(feature = "js")]
+mod js;
+
 
 macro_rules! impl_lib {
   ($($ty:tt => $module:tt),+) => {
@@ -97,6 +99,7 @@ macro_rules! impl_lib {
       }
     }
 
+    #[cfg(feature = "schemars")]
     pub fn schema(ty: i16, schema_version: i16) -> Result<crate::schema_version::Schema, Box<dyn std::error::Error>> {
       match ty {
         $(
@@ -115,10 +118,12 @@ impl_lib!(
   TYPE_STRUCTURE => structure,
   TYPE_ENUMERATION => enumeration,
   TYPE_FOLDER => folder,
-  TYPE_ANIMATION => animation
+  TYPE_ANIMATION => animation,
+  TYPE_SCENE => scene
 );
 
-#[derive(Debug, Serialize, Deserialize, GraphQLUnion)]
+#[derive(Debug, Serialize, Deserialize)]
+#[serde(rename = "frozen_Record", rename_all = "camelCase")]
 pub enum FrozenRecord {
   Module(module::latest::frozen::Module),
 

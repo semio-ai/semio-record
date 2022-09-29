@@ -1,17 +1,11 @@
 use std::collections::HashSet;
 use std::str::FromStr;
 
+use async_trait::async_trait;
 use derive_more::From;
-use juniper::marker::IsInputType;
-use juniper::FromInputValue;
-use juniper::InputValue;
-use juniper::ScalarValue;
-use juniper::{GraphQLEnum, GraphQLObject, GraphQLUnion};
 use serde::Deserialize;
 use serde::Serialize;
 use uuid::Uuid;
-
-use schemars::JsonSchema;
 
 use crate::record::Freeze;
 use crate::record::Freezer;
@@ -19,7 +13,8 @@ use crate::record::FrozenReference;
 use crate::record::UnfrozenReference;
 use crate::record::VersionReq;
 
-#[derive(Debug, GraphQLEnum, Serialize, Deserialize, Clone, PartialEq, Eq, Hash, JsonSchema)]
+#[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq, Hash)]
+#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[serde(rename = "Primitive_Kind", rename_all = "camelCase")]
 pub enum PrimitiveKind {
   Unit,
@@ -155,7 +150,8 @@ impl FromStr for PrimitiveKind {
   }
 }
 
-#[derive(Debug, GraphQLObject, Serialize, Deserialize, Clone, PartialEq, Eq, JsonSchema)]
+#[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq)]
+#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 pub struct Primitive {
   pub kind: PrimitiveKind,
 }
@@ -258,18 +254,23 @@ impl Primitive {
   }
 }
 
-#[derive(Debug, GraphQLObject, Serialize, Deserialize, Clone, PartialEq, Eq, JsonSchema)]
+#[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq)]
+#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
+#[serde(rename = "frozen_Array")]
 pub struct FrozenArray {
   pub reference: FrozenReference,
 }
 
-#[derive(Debug, GraphQLObject, Serialize, Deserialize, Clone, PartialEq, Eq, JsonSchema)]
+#[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq)]
+#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
+#[serde(rename = "frozen_Scalar")]
 pub struct FrozenScalar {
   pub reference: FrozenReference,
 }
 
-#[derive(Debug, Serialize, Deserialize, GraphQLUnion, From, Clone, PartialEq, Eq, JsonSchema)]
-#[serde(rename = "FrozenType", rename_all = "camelCase", tag = "type", content = "value")]
+#[derive(Debug, Serialize, Deserialize, From, Clone, PartialEq, Eq)]
+#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
+#[serde(rename = "frozen_Type", rename_all = "camelCase", tag = "type", content = "value")]
 pub enum FrozenTy {
   Primitive(Primitive),
   FrozenScalar(FrozenScalar),
@@ -359,7 +360,9 @@ impl FrozenTy {
   }
 }
 
-#[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq, GraphQLObject, JsonSchema)]
+#[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq)]
+#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
+#[serde(rename = "unfrozen_Scalar")]
 pub struct UnfrozenScalar {
   pub reference: UnfrozenReference,
 }
@@ -381,7 +384,9 @@ impl<F: Freezer> Freeze<F> for UnfrozenScalar {
   }
 }
 
-#[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq, GraphQLObject, JsonSchema)]
+#[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq)]
+#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
+#[serde(rename = "unfrozen_Array")]
 pub struct UnfrozenArray {
   pub reference: UnfrozenReference,
 }
@@ -403,8 +408,9 @@ impl<F: Freezer> Freeze<F> for UnfrozenArray {
   }
 }
 
-#[derive(Debug, Serialize, Deserialize, GraphQLUnion, From, Clone, PartialEq, Eq, JsonSchema)]
-#[serde(rename = "UnfrozenType", rename_all = "camelCase", tag = "type", content = "value")]
+#[derive(Debug, Serialize, Deserialize, From, Clone, PartialEq, Eq)]
+#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
+#[serde(rename = "Unfrozen_Type", rename_all = "camelCase", tag = "type", content = "value")]
 pub enum UnfrozenTy {
   Primitive(Primitive),
   UnfrozenScalar(UnfrozenScalar),
@@ -506,15 +512,6 @@ impl<F: Freezer> Freeze<F> for UnfrozenTy {
     }
   }
 }
-
-impl<S: ScalarValue> FromInputValue<S> for UnfrozenTy {
-  fn from_input_value(value: &InputValue<S>) -> Option<Self> {
-    let str = value.as_string_value()?;
-    Self::from_str(&str).ok()
-  }
-}
-
-impl<S: ScalarValue> IsInputType<S> for UnfrozenTy {}
 
 impl FromStr for UnfrozenTy {
   type Err = ();

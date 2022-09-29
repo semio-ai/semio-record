@@ -6,7 +6,7 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-semio-record = { path = "../semio-record" }
+semio-record = { path = "../semio-record", features = [ "schemars" ] }
 anyhow = "1.0.55"
 async-trait = "0.1.52"
 chrono = "0.4.19"

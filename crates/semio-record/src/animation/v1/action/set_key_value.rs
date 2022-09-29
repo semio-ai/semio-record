@@ -6,9 +6,8 @@ use crate::record::Apply;
 
 use super::super::unfrozen::{Animation, Value};
 
-use schemars::JsonSchema;
-
-#[derive(Debug, Serialize, Deserialize, From, Clone, JsonSchema)]
+#[derive(Debug, Serialize, Deserialize, From, Clone)]
+#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[serde(rename = "animation_v1_Action_SetKeyValue", rename_all = "camelCase")]
 pub struct SetKeyValue {
   pub control_id: Uuid,
@@ -16,7 +15,8 @@ pub struct SetKeyValue {
   pub value: Value,
 }
 
-#[derive(Display, Debug, Serialize, Deserialize, Error, Clone, JsonSchema)]
+#[derive(Display, Debug, Serialize, Deserialize, Error, Clone)]
+#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[serde(rename = "animation_v1_Action_SetKeyValueError", tag = "type", rename_all = "camelCase")]
 pub enum SetKeyValueError {
   #[display(fmt = "Control does not exist")]

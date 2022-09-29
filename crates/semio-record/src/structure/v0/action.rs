@@ -7,16 +7,16 @@ use derive_more::{Display, From, Error};
 
 use super::unfrozen::{StructureField, Structure};
 
-use schemars::JsonSchema;
-
-#[derive(Debug, Serialize, Deserialize, GraphQLObject, Clone, JsonSchema)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
+#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[serde(rename = "structure_v0_Action_AddField", rename_all = "camelCase")]
 pub struct AddField {
   pub id: Uuid,
   pub field: StructureField
 }
 
-#[derive(Debug, Serialize, Deserialize, Display, Error, GraphQLEnum, Clone, JsonSchema)]
+#[derive(Debug, Serialize, Deserialize, Display, Error, Clone)]
+#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[serde(rename = "structure_v0_Action_AddFieldError", tag = "type", rename_all = "camelCase")]
 pub enum AddFieldError {
   #[display(fmt = "ID already exists")]
@@ -53,13 +53,15 @@ impl Apply<AddField> for Structure {
   }
 }
 
-#[derive(Debug, Serialize, Deserialize, GraphQLObject, Clone, JsonSchema)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
+#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[serde(rename = "structure_v0_Action_RemoveField", rename_all = "camelCase")]
 pub struct RemoveField  {
   pub id: Uuid,
 }
 
-#[derive(Debug, Serialize, Deserialize, Display, Error, GraphQLEnum, Clone, JsonSchema)]
+#[derive(Debug, Serialize, Deserialize, Display, Error, Clone)]
+#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[serde(rename = "structure_v0_Action_RemoveFieldError", tag = "type", rename_all = "camelCase")]
 pub enum RemoveFieldError {
   #[display(fmt = "Field does not exist")]
@@ -78,14 +80,16 @@ impl Apply<RemoveField> for Structure {
   }
 }
 
-#[derive(Debug, Serialize, Deserialize, GraphQLObject, Clone, JsonSchema)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
+#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[serde(rename = "structure_v0_Action_SetFieldName", rename_all = "camelCase")]
 pub struct SetFieldName  {
   pub id: Uuid,
   pub name: String,
 }
 
-#[derive(Debug, Serialize, Deserialize, Display, Error, GraphQLEnum, Clone, JsonSchema)]
+#[derive(Debug, Serialize, Deserialize, Display, Error, Clone)]
+#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[serde(rename = "structure_v0_Action_SetFieldNameError", tag = "type", rename_all = "camelCase")]
 pub enum SetFieldNameError {
   #[display(fmt = "Field does not exist")]
@@ -117,7 +121,8 @@ impl Apply<SetFieldName> for Structure {
   }
 }
 
-#[derive(Debug, Serialize, Deserialize, GraphQLObject, Clone, JsonSchema)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
+#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[serde(rename = "structure_v0_Action_SetFieldType", rename_all = "camelCase")]
 pub struct SetFieldType  {
   pub id: Uuid,
@@ -125,7 +130,8 @@ pub struct SetFieldType  {
   pub ty: UnfrozenTy,
 }
 
-#[derive(Debug, Serialize, Deserialize, Display, Error, GraphQLEnum, Clone, JsonSchema)]
+#[derive(Debug, Serialize, Deserialize, Display, Error, Clone)]
+#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[serde(rename = "structure_v0_Action_SetFieldTypeError", tag = "type", rename_all = "camelCase")]
 pub enum SetFieldTypeError {
   #[display(fmt = "Field does not exist")]
@@ -145,7 +151,8 @@ impl Apply<SetFieldType> for Structure {
   }
 }
 
-#[derive(Debug, Serialize, Deserialize, From, Clone, JsonSchema)]
+#[derive(Debug, Serialize, Deserialize, From, Clone)]
+#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[serde(rename = "structure_v0_Action", tag = "type", rename_all = "camelCase", content = "value")]
 pub enum Action {
   SetName(SetName),
@@ -157,7 +164,8 @@ pub enum Action {
   Acl(AclAction),
 }
 
-#[derive(Display, Debug, Error, From, Serialize, Deserialize, Clone, JsonSchema)]
+#[derive(Display, Debug, Error, From, Serialize, Deserialize, Clone)]
+#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[serde(rename = "structure_v0_ActionError", tag = "type", rename_all = "camelCase", content = "value")]
 pub enum ActionError {
   SetName(SetNameError),

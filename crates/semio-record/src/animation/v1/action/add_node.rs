@@ -6,9 +6,8 @@ use crate::{record::Apply, animation::v1::unfrozen::NodeKind};
 
 use super::super::unfrozen::{Animation, Node};
 
-use schemars::JsonSchema;
-
-#[derive(Debug, Serialize, Deserialize, From, Clone, JsonSchema)]
+#[derive(Debug, Serialize, Deserialize, From, Clone)]
+#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[serde(rename = "animation_v1_Action_AddNode", rename_all = "camelCase")]
 pub struct AddNode {
   pub parent_id: Option<Uuid>,
@@ -16,7 +15,8 @@ pub struct AddNode {
   pub node: Node,
 }
 
-#[derive(Display, Debug, Serialize, Deserialize, Error, Clone, JsonSchema)]
+#[derive(Display, Debug, Serialize, Deserialize, Error, Clone)]
+#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[serde(rename = "animation_v1_Action_AddNodeError", tag = "type", rename_all = "camelCase")]
 pub enum AddNodeError {
   #[display(fmt = "Node already exists")]

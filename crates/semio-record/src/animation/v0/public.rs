@@ -3,42 +3,17 @@ use std::collections::HashMap;
 
 use serde::{Serialize, Deserialize};
 use uuid::Uuid;
-use schemars::JsonSchema;
 
-use super::unfrozen::{Animation, Node, IdNode};
+use super::unfrozen::{Animation, Node};
 
-#[derive(Debug, Serialize, Deserialize, Clone, JsonSchema)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
+#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[serde(rename = "animation_v0_Public")]
 pub struct Public {
   pub name: String,
   pub parent: Uuid,
   pub root_id: Uuid,
   pub nodes: HashMap<Uuid, Node>,
-}
-
-#[graphql_object(name = "AnimationPublic")]
-impl Public {
-  fn name(&self) -> &str {
-    &self.name
-  }
-
-  fn parent(&self) -> &Uuid {
-    &self.parent
-  }
-
-  fn root_id(&self) -> &Uuid {
-    &self.root_id
-  }
-
-  fn nodes(&self) -> Vec<IdNode> {
-    self.nodes
-      .iter()
-      .map(|(id, node)| IdNode {
-        id: *id,
-        node: node.clone(),
-      })
-      .collect()
-  }
 }
 
 impl From<Animation> for Public {

@@ -5,11 +5,10 @@ use serde::{Deserialize, Serialize};
 
 use crate::{record::{Unfrozen, UnfrozenReference, View, Freeze, Freezer}, blob::BlobDependencies, unfrozen::impl_unfrozen, action::Name, migrate::Migrate};
 
-use schemars::JsonSchema;
-
 use super::action::Action;
 
-#[derive(Debug, Serialize, Deserialize, Clone, JsonSchema)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
+#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[serde(rename = "user_v0_Unfrozen", rename_all = "camelCase")]
 pub struct User {
   pub user_name: String,

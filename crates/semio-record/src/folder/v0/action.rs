@@ -1,6 +1,5 @@
 use derive_more::{Display, Error, From};
 use serde::{Deserialize, Serialize};
-use schemars::JsonSchema;
 
 use crate::{
   acl::action::{Action as AclAction, ActionError as AclActionError},
@@ -10,7 +9,8 @@ use crate::{
 
 use super::unfrozen::Folder;
 
-#[derive(Debug, Serialize, Deserialize, From, Clone, JsonSchema)]
+#[derive(Debug, Serialize, Deserialize, From, Clone)]
+#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[serde(rename = "folder_v0_Action", tag = "type", rename_all = "camelCase", content = "value")]
 pub enum Action {
   SetName(SetName),
@@ -18,7 +18,8 @@ pub enum Action {
   Acl(AclAction),
 }
 
-#[derive(Display, Debug, Error, From, Serialize, Deserialize, Clone, JsonSchema)]
+#[derive(Display, Debug, Error, From, Serialize, Deserialize, Clone)]
+#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[serde(rename = "folder_v0_ActionError", tag = "type", rename_all = "camelCase", content = "value")]
 pub enum ActionError {
   SetName(SetNameError),

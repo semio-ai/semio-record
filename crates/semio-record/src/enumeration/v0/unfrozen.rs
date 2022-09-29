@@ -4,18 +4,16 @@ use serde::{Serialize, Deserialize};
 use uuid::Uuid;
 use async_trait::async_trait;
 
-use schemars::JsonSchema;
-
 use crate::{ty::UnfrozenTy, record::{View, Freezer, Freeze, Unfrozen, UnfrozenReference}, action::{name, parent}, acl::Acl, acl::action::with_acl, blob::BlobDependencies, unfrozen::impl_unfrozen, migrate::Migrate};
 
 use super::{frozen, action::Action};
 
-#[derive(Clone, Debug, Serialize, Deserialize, GraphQLObject, PartialEq, Eq, JsonSchema)]
+#[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq)]
+#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[serde(rename = "enumeration_v0_Variant")]
 pub struct EnumerationVariant {
   pub name: String,
   #[serde(rename = "type")]
-  #[graphql(name = "type")]
   pub ty: UnfrozenTy,
 }
 
@@ -31,7 +29,8 @@ impl<F: Freezer> Freeze<F> for EnumerationVariant {
   }
 }
 
-#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
+#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[serde(rename = "enumeration_v0_Private")]
 pub struct Enumeration {
   pub parent: Uuid,
@@ -55,12 +54,6 @@ impl Default for Enumeration {
 
 impl_unfrozen!(Enumeration, Action);
 
-#[derive(Debug, Serialize, Deserialize, GraphQLObject)]
-pub struct IdEnumerationVariant {
-  pub id: Uuid,
-  pub variant: EnumerationVariant
-}
-
 impl Enumeration {
   pub fn variant_named(&self, name: &str) -> Option<&EnumerationVariant> {
     for (_, variant) in &self.variants {
@@ -69,33 +62,6 @@ impl Enumeration {
       }
     }
     None
-  }
-}
-
-#[graphql_object]
-impl Enumeration {
-  pub fn name(&self) -> &str {
-    &self.name
-  }
-
-  pub fn parent(&self) -> &Uuid {
-    &self.parent
-  }
-
-  pub fn acl(&self) -> &Acl {
-    &self.acl
-  }
-
-  pub fn variants(&self) -> Vec<IdEnumerationVariant> {
-    self.variants.iter().map(|(id, variant)| IdEnumerationVariant {
-      id: id.clone(),
-      variant: variant.clone(),
-    }).collect()
-  }
-  
-  #[graphql(name = "variantNamed")]
-  pub fn gql_variant_named(&self, name: String) -> Option<&EnumerationVariant> {
-    self.variant_named(&name)
   }
 }
 

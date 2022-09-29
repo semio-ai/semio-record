@@ -4,8 +4,6 @@ use uuid::Uuid;
 
 use derive_more::{Display, Error, From};
 
-use schemars::JsonSchema;
-
 use crate::{
   record::{Apply, UnfrozenReference}, action::{SetName, SetNameError, SetParentError, SetParent}, ty::UnfrozenTy,
   acl::action::{Action as AclAction, ActionError as AclActionError},
@@ -14,13 +12,15 @@ use crate::{
 use super::unfrozen::{Export, Module, Parameter};
 
 
-#[derive(Debug, Clone, Serialize, Deserialize, GraphQLObject, JsonSchema)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[serde(rename = "module_v0_Action_SetExecutable")]
 pub struct SetExecutable {
   pub blob_id: Uuid,
 }
 
-#[derive(Display, Clone, Debug, Error, GraphQLEnum, Serialize, Deserialize, JsonSchema)]
+#[derive(Display, Clone, Debug, Error, Serialize, Deserialize)]
+#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[serde(rename = "module_v0_Action_SetExecutableError", tag = "type", rename_all = "camelCase")]
 pub enum SetExecutableError {
   _Dummy
@@ -36,14 +36,16 @@ impl Apply<SetExecutable> for Module
   }
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, GraphQLObject, JsonSchema)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[serde(rename = "module_v0_Action_AddExport")]
 pub struct AddExport {
   pub id: Uuid,
   pub export: Export
 }
 
-#[derive(Display, Clone,Debug, Error, GraphQLEnum, Serialize, Deserialize, JsonSchema)]
+#[derive(Display, Clone,Debug, Error, Serialize, Deserialize)]
+#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[serde(rename = "module_v0_Action_AddExportError", tag = "type", rename_all = "camelCase")]
 pub enum AddExportError
 {
@@ -66,13 +68,15 @@ impl Apply<AddExport> for Module
   }
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, GraphQLObject, JsonSchema)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[serde(rename = "module_v0_Action_RemoveExport")]
 pub struct RemoveExport {
   pub id: Uuid,
 }
 
-#[derive(Display, Clone, Debug, Error, GraphQLEnum, Serialize, Deserialize, JsonSchema)]
+#[derive(Display, Clone, Debug, Error, Serialize, Deserialize)]
+#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[serde(rename = "module_v0_Action_RemoveExportError", tag = "type", rename_all = "camelCase")]
 pub enum RemoveExportError {
   #[display(fmt = "Export not found in module")]
@@ -94,14 +98,16 @@ impl Apply<RemoveExport> for Module
   }
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, GraphQLObject, JsonSchema)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[serde(rename = "module_v0_Action_RenameExport")]
 pub struct RenameExport {
   pub id: Uuid,
   pub name: String,
 }
 
-#[derive(Display, Clone, Debug, Error, GraphQLEnum, Serialize, Deserialize, JsonSchema)]
+#[derive(Display, Clone, Debug, Error, Serialize, Deserialize)]
+#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[serde(rename = "module_v0_Action_RenameExportError", tag = "type", rename_all = "camelCase")]
 pub enum RenameExportError {
   #[display(fmt = "Export not found in module")]
@@ -132,7 +138,8 @@ impl Apply<RenameExport> for Module
   }
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, GraphQLObject, JsonSchema)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[serde(rename = "module_v0_Action_AppendFunctionParameter")]
 pub struct AppendFunctionParameter {
   pub export: Uuid,
@@ -140,7 +147,8 @@ pub struct AppendFunctionParameter {
   pub parameter: Parameter,
 }
 
-#[derive(Display, Clone, Debug, Error, GraphQLEnum, Serialize, Deserialize, JsonSchema)]
+#[derive(Display, Clone, Debug, Error, Serialize, Deserialize)]
+#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[serde(rename = "module_v0_Action_AppendFunctionParameterError", tag = "type", rename_all = "camelCase")]
 pub enum AppendFunctionParameterError
 {
@@ -177,14 +185,16 @@ impl Apply<AppendFunctionParameter> for Module
   }
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, GraphQLObject, JsonSchema)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[serde(rename = "module_v0_Action_RemoveFunctionParameter")]
 pub struct RemoveFunctionParameter {
   pub export: Uuid,
   pub parameter: Uuid,
 }
 
-#[derive(Display, Clone, Debug, Error, GraphQLEnum, Serialize, Deserialize, JsonSchema)]
+#[derive(Display, Clone, Debug, Error, Serialize, Deserialize)]
+#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[serde(rename = "module_v0_Action_RemoveFunctionParameterError", tag = "type", rename_all = "camelCase")]
 pub enum RemoveFunctionParameterError {
   #[display(fmt = "Export not found in module")]
@@ -217,7 +227,8 @@ impl Apply<RemoveFunctionParameter> for Module
   }
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, GraphQLObject, JsonSchema)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[serde(rename = "module_v0_Action_SetFunctionParameterName", rename_all = "camelCase")]
 pub struct SetFunctionParameterName {
   pub export: Uuid,
@@ -225,7 +236,8 @@ pub struct SetFunctionParameterName {
   pub name: String,
 }
 
-#[derive(Display, Clone, Debug, Error, GraphQLEnum, Serialize, Deserialize, JsonSchema)]
+#[derive(Display, Clone, Debug, Error, Serialize, Deserialize)]
+#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[serde(rename = "module_v0_Action_SetFunctionParameterNameError", tag = "type", rename_all = "camelCase")]
 pub enum SetFunctionParameterNameError {
   #[display(fmt = "Export not found in module")]
@@ -266,7 +278,8 @@ impl Apply<SetFunctionParameterName> for Module
   }
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, GraphQLObject, JsonSchema)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[serde(rename = "module_v0_Action_SetFunctionParameterType")]
 pub struct SetFunctionParameterType {
   pub export: Uuid,
@@ -274,7 +287,8 @@ pub struct SetFunctionParameterType {
   pub ty: UnfrozenTy,
 }
 
-#[derive(Display, Clone, Debug, Error, GraphQLEnum, Serialize, Deserialize, JsonSchema)]
+#[derive(Display, Clone, Debug, Error, Serialize, Deserialize)]
+#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[serde(rename = "module_v0_Action_SetFunctionParameterTypeError", tag = "type", rename_all = "camelCase")]
 pub enum SetFunctionParameterTypeError
 {
@@ -310,7 +324,8 @@ impl Apply<SetFunctionParameterType> for Module
   }
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, GraphQLObject, JsonSchema)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[serde(rename = "module_v0_Action_SetFunctionParameterMutability")]
 pub struct SetFunctionParameterMutability {
   pub export: Uuid,
@@ -318,7 +333,8 @@ pub struct SetFunctionParameterMutability {
   pub mutable: bool,
 }
 
-#[derive(Display, Clone, Debug, Error, GraphQLEnum, Serialize, Deserialize, JsonSchema)]
+#[derive(Display, Clone, Debug, Error, Serialize, Deserialize)]
+#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[serde(rename = "module_v0_Action_SetFunctionParameterMutabilityError", tag = "type", rename_all = "camelCase")]
 pub enum SetFunctionParameterMutabilityError {
   #[display(fmt = "Export not found in module")]
@@ -353,14 +369,16 @@ impl Apply<SetFunctionParameterMutability> for Module
   }
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, GraphQLObject, JsonSchema)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[serde(rename = "module_v0_Action_SetFunctionReturnType")]
 pub struct SetFunctionReturnType {
   pub export: Uuid,
   pub ty: UnfrozenTy,
 }
 
-#[derive(Display, Clone, Debug, Error, GraphQLEnum, Serialize, Deserialize, JsonSchema)]
+#[derive(Display, Clone, Debug, Error, Serialize, Deserialize)]
+#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[serde(rename = "module_v0_Action_SetFunctionReturnTypeError", tag = "type", rename_all = "camelCase")]
 pub enum SetFunctionReturnTypeError
 {
@@ -388,13 +406,15 @@ impl Apply<SetFunctionReturnType> for Module
   }
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, GraphQLObject, JsonSchema)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[serde(rename = "module_v0_Action_AddDependency")]
 pub struct AddDependency {
   pub dependency: UnfrozenReference,
 }
 
-#[derive(Display, Clone, Debug, Error, GraphQLEnum, Serialize, Deserialize, JsonSchema)]
+#[derive(Display, Clone, Debug, Error, Serialize, Deserialize)]
+#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[serde(rename = "module_v0_Action_AddDependencyError", tag = "type", rename_all = "camelCase")]
 pub enum AddDependencyError
 {
@@ -423,13 +443,15 @@ impl Apply<AddDependency> for Module
   }
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, GraphQLObject, JsonSchema)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[serde(rename = "module_v0_Action_RemoveDependency")]
 pub struct RemoveDependency {
   pub id: Uuid,
 }
 
-#[derive(Display, Clone, Debug, Error, GraphQLEnum, Serialize, Deserialize, JsonSchema)]
+#[derive(Display, Clone, Debug, Error, Serialize, Deserialize)]
+#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[serde(rename = "module_v0_Action_RemoveDependencyError", tag = "type", rename_all = "camelCase")]
 pub enum RemoveDependencyError {
   #[display(fmt = "Dependency not found")]
@@ -454,7 +476,8 @@ impl Apply<RemoveDependency> for Module
 }
 
 
-#[derive(Debug, Clone, Serialize, Deserialize, From, JsonSchema)]
+#[derive(Debug, Clone, Serialize, Deserialize, From)]
+#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[serde(rename = "module_v0_Action", tag = "type", rename_all = "camelCase", content = "value")]
 pub enum Action {
   SetParent(SetParent),
@@ -473,7 +496,8 @@ pub enum Action {
   Acl(AclAction),
 }
 
-#[derive(Display, Clone, Debug, Error, Serialize, Deserialize, From, JsonSchema)]
+#[derive(Display, Clone, Debug, Error, Serialize, Deserialize, From)]
+#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[serde(rename = "module_v0_ActionError", tag = "type", rename_all = "camelCase")]
 pub enum ActionError
 {

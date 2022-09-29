@@ -1,9 +1,7 @@
 use serde::{Serialize, Deserialize};
-use juniper::{GraphQLObject, GraphQLUnion};
 
-use schemars::JsonSchema;
-
-#[derive(Debug, Serialize, Deserialize, Clone, GraphQLObject, JsonSchema)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
+#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[serde(rename = "Color_Rgb")]
 pub struct Rgb {
   pub r: f64,
@@ -11,7 +9,8 @@ pub struct Rgb {
   pub b: f64,
 }
 
-#[derive(Debug, Serialize, Deserialize, Clone, GraphQLObject, JsonSchema)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
+#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[serde(rename = "Color_Rgba")]
 pub struct Rgba {
   pub r: f64,
@@ -20,7 +19,8 @@ pub struct Rgba {
   pub a: f64,
 }
 
-#[derive(Debug, Serialize, Deserialize, Clone, GraphQLObject, JsonSchema)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
+#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[serde(rename = "Color_Hsl")]
 pub struct Hsl {
   pub h: f64,
@@ -28,7 +28,8 @@ pub struct Hsl {
   pub l: f64,
 }
 
-#[derive(Debug, Serialize, Deserialize, Clone, GraphQLObject, JsonSchema)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
+#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[serde(rename = "Color_Hsla")]
 pub struct Hsla {
   pub h: f64,
@@ -37,7 +38,8 @@ pub struct Hsla {
   pub a: f64,
 }
 
-#[derive(Debug, Serialize, Deserialize, Clone, GraphQLUnion, JsonSchema)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
+#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[serde(rename = "Color", tag = "type", rename_all = "lowercase", content = "value")]
 pub enum Color {
   Rgb(Rgb),

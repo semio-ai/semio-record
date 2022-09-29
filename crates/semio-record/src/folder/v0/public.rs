@@ -2,26 +2,14 @@
 use serde::{Serialize, Deserialize};
 use uuid::Uuid;
 
-use schemars::JsonSchema;
-
 use super::unfrozen::Folder;
 
-#[derive(Debug, Serialize, Deserialize, Clone, JsonSchema)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
+#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[serde(rename = "folder_v0_Public")]
 pub struct Public {
   pub name: String,
   pub parent: Uuid,
-}
-
-#[graphql_object(name = "FolderPublic")]
-impl Public {
-  fn name(&self) -> &str {
-    &self.name
-  }
-
-  fn parent(&self) -> &Uuid {
-    &self.parent
-  }
 }
 
 impl From<Folder> for Public {

@@ -23,6 +23,8 @@ mod merge;
 mod schema;
 mod ast;
 
+const TS_CONFIG: &'static str = include_str!("tsconfig.json");
+
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Scope {
   definitions: BTreeMap<String, Schema>,
@@ -287,6 +289,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
   merge::version(schema(TYPE_MODULE, 0)?, &mut definitions);
   merge::version(schema(TYPE_ANIMATION, 0)?, &mut definitions);
   merge::version(schema(TYPE_ANIMATION, 1)?, &mut definitions);
+  merge::version(schema(TYPE_SCENE, 0)?, &mut definitions);
 
   let root = rescope(definitions);
 
@@ -304,9 +307,18 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
   let mut logical_root_path = Utf8PathBuf::new();
   logical_root_path.push("/");
-  write_scope(args.outdir, logical_root_path, &root).await?;
+
+  let mut tsconfig_path = args.outdir.clone();
+  tsconfig_path.push("tsconfig.json");
+
+  write_scope(args.outdir.join("src"), logical_root_path, &root).await?;
   // Write out blank marker file
   tokio::fs::File::create(marker_path).await?;
+
+  // Write tsconfig.json
+  
+  let mut tsconfig_file = tokio::fs::File::create(tsconfig_path).await?;
+  tsconfig_file.write_all(TS_CONFIG.as_bytes()).await?;
 
   Ok(())
 }

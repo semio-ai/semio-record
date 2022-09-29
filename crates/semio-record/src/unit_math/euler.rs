@@ -2,9 +2,10 @@ use serde::{Serialize, Deserialize};
 
 use crate::{unit::Angle, math::EulerOrder};
 
-use schemars::JsonSchema;
 
-#[derive(Debug, Serialize, Deserialize, Clone, JsonSchema)]
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
+#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[serde(rename = "unit_math_Euler")]
 pub struct Euler {
   pub x: Angle,

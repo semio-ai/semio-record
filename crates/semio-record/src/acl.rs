@@ -4,12 +4,10 @@ use std::collections::HashMap;
 
 use async_trait::async_trait;
 use derive_more::Display;
-use juniper::{marker::IsInputType, FieldError, FromInputValue, InputValue, ScalarValue};
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
-use schemars::JsonSchema;
 
-#[derive(Debug, Serialize, Deserialize, GraphQLObject, Clone)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct IdWithPermissions {
   pub id: Uuid,
   pub with_permissions: WithPermissions,
@@ -17,7 +15,8 @@ pub struct IdWithPermissions {
 
 /// An Access Control List (ACL) is a list of rules that specify which agents
 /// can perform which actions, if any.
-#[derive(Debug, Serialize, Deserialize, Clone, JsonSchema)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
+#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[serde(rename = "Acl")]
 pub struct Acl {
   /// A map of agent IDs to their permissions.
@@ -54,24 +53,6 @@ impl Acl {
   }
 }
 
-#[graphql_object]
-impl Acl {
-  pub fn default(&self) -> &WithPermissions {
-    &self.default
-  }
-
-  pub fn permissions(&self) -> Vec<IdWithPermissions> {
-    self
-      .permissions
-      .iter()
-      .map(|(id, with_permissions)| IdWithPermissions {
-        id: id.clone(),
-        with_permissions: with_permissions.clone(),
-      })
-      .collect()
-  }
-}
-
 impl Default for Acl {
   fn default() -> Self {
     Self {
@@ -91,7 +72,7 @@ impl Acl {
     resolver: &P,
     parent: Option<&Uuid>,
     agent: &Uuid,
-  ) -> Result<Permissions, FieldError> {
+  ) -> Result<Permissions, Box<dyn std::error::Error>> {
     Ok(
       self
         .with_permissions(agent)
@@ -102,8 +83,9 @@ impl Acl {
 }
 
 #[derive(
-  Debug, Display, Serialize, Deserialize, Clone, Eq, PartialEq, PartialOrd, Ord, GraphQLEnum, JsonSchema
+  Debug, Display, Serialize, Deserialize, Clone, Eq, PartialEq, PartialOrd, Ord
 )]
+#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[serde(rename = "Acl_PermissionLevel", rename_all = "camelCase")]
 pub enum PermissionLevel {
   None,
@@ -117,7 +99,8 @@ impl Default for PermissionLevel {
   }
 }
 
-#[derive(Debug, Serialize, Deserialize, Clone, Eq, PartialEq, GraphQLObject, JsonSchema)]
+#[derive(Debug, Serialize, Deserialize, Clone, Eq, PartialEq)]
+#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[serde(rename = "Acl_WithPermissions_None")]
 pub struct None {
   pub _dummy: i32,
@@ -125,7 +108,8 @@ pub struct None {
 
 const NONE: None = None { _dummy: 0 };
 
-#[derive(Debug, Serialize, Deserialize, Clone, Eq, PartialEq, GraphQLObject, JsonSchema)]
+#[derive(Debug, Serialize, Deserialize, Clone, Eq, PartialEq)]
+#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[serde(rename = "Acl_WithPermissions_Inherit")]
 pub struct Inherit {
   /// Inherit permissions from the following record with a ACL.
@@ -136,7 +120,8 @@ pub struct Inherit {
   pub from: Option<Uuid>,
 }
 
-#[derive(Debug, Serialize, Deserialize, Clone, Eq, PartialEq, GraphQLObject, JsonSchema)]
+#[derive(Debug, Serialize, Deserialize, Clone, Eq, PartialEq)]
+#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[serde(rename = "Acl_Permissions")]
 pub struct Permissions {
   pub read: PermissionLevel,
@@ -153,19 +138,17 @@ impl Default for Permissions {
 }
 
 impl Permissions {
-  pub fn validate(&self, required: &Permissions) -> Result<(), FieldError> {
+  pub fn validate(&self, required: &Permissions) -> Result<(), Box<dyn std::error::Error>> {
     if self.read < required.read {
-      return Err(FieldError::new(
+      return Err(anyhow::anyhow!(
         "Read permission for agent is too low",
-        graphql_value!({ "error": "UNAUTHORIZED" }),
-      ));
+      ).into());
     }
 
     if self.write < required.write {
-      return Err(FieldError::new(
+      return Err(anyhow::anyhow!(
         "Write permission for agent is too low",
-        graphql_value!({ "error": "UNAUTHORIZED" }),
-      ));
+      ).into());
     }
 
     Ok(())
@@ -207,7 +190,8 @@ pub const PRIVATE_READ_WRITE: Permissions = Permissions {
   write: PermissionLevel::Private,
 };
 
-#[derive(Debug, Serialize, Deserialize, Clone, Eq, PartialEq, GraphQLUnion, JsonSchema)]
+#[derive(Debug, Serialize, Deserialize, Clone, Eq, PartialEq)]
+#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[serde(rename = "Acl_WithPermissions", tag = "type", rename_all = "camelCase", content = "value")]
 pub enum WithPermissions {
   /// No permissions
@@ -222,25 +206,6 @@ pub enum WithPermissions {
   Custom(Permissions),
 }
 
-impl<S: ScalarValue> FromInputValue<S> for WithPermissions {
-  fn from_input_value(v: &InputValue<S>) -> Option<Self> {
-    let s = v.as_string_value()?;
-    let mut iter = s.split(':');
-    match iter.next()? {
-      "none" => Some(WithPermissions::None(None { _dummy: 0 })),
-      "inherit" => Some(WithPermissions::Inherit(Inherit {
-        from: iter.next().map(|s| Uuid::parse_str(s).unwrap()),
-      })),
-      "custom" => Some(WithPermissions::Custom(Permissions {
-        read: PermissionLevel::from_input_value(&InputValue::<S>::Enum(iter.next()?.to_string()))?,
-        write: PermissionLevel::from_input_value(&InputValue::<S>::Enum(iter.next()?.to_string()))?,
-      })),
-      _ => None,
-    }
-  }
-}
-
-impl<S: ScalarValue> IsInputType<S> for WithPermissions {}
 
 impl Default for WithPermissions {
   fn default() -> Self {
@@ -254,7 +219,7 @@ impl WithPermissions {
     resolver: &P,
     parent: Option<&Uuid>,
     agent: &Uuid,
-  ) -> Result<Permissions, FieldError> {
+  ) -> Result<Permissions, Box<dyn std::error::Error>> {
     match self {
       WithPermissions::None(_) => Ok(NO_PERMISSIONS),
       WithPermissions::Inherit(inherit) => Ok(
@@ -274,7 +239,7 @@ pub trait PermissionResolver {
     parent: Option<&Uuid>,
     inherit: &Inherit,
     agent: &Uuid,
-  ) -> Result<Permissions, FieldError>;
+  ) -> Result<Permissions, Box<dyn std::error::Error>>;
 }
 
 pub struct DummyPermissionResolver;
@@ -286,10 +251,9 @@ impl PermissionResolver for DummyPermissionResolver {
     _parent: Option<&Uuid>,
     _inherit: &Inherit,
     _agent: &Uuid,
-  ) -> Result<Permissions, FieldError> {
-    Err(FieldError::new(
+  ) -> Result<Permissions, Box<dyn std::error::Error>> {
+    Err(anyhow::anyhow!(
       "Inheriting permissions is not possible",
-      graphql_value!({ "error": "UNAUTHORIZED" }),
-    ))
+    ).into())
   }
 }

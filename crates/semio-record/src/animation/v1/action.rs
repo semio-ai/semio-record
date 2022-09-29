@@ -2,16 +2,16 @@ use derive_more::{Display, Error, From};
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
-use schemars::JsonSchema;
-
-#[derive(Debug, Serialize, Deserialize, From, Clone, Hash, PartialEq, Eq, JsonSchema)]
+#[derive(Debug, Serialize, Deserialize, From, Clone, Hash, PartialEq, Eq)]
+#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[serde(rename = "animation_v1_KeySelector")]
 pub struct KeySelector {
   pub control_id: Uuid,
   pub key_id: Uuid,
 }
 
-#[derive(Debug, Serialize, Deserialize, From, Clone, JsonSchema)]
+#[derive(Debug, Serialize, Deserialize, From, Clone)]
+#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[serde(rename = "animation_v1_KeySelectorAt")]
 pub struct KeySelectorAt {
   pub selector: KeySelector,
@@ -44,7 +44,8 @@ use crate::{
 use super::unfrozen::Animation;
 
 
-#[derive(Debug, Serialize, Deserialize, From, Clone, JsonSchema)]
+#[derive(Debug, Serialize, Deserialize, From, Clone)]
+#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[serde(rename = "animation_v1_Action", tag = "type", rename_all = "camelCase", content = "value")]
 pub enum Action {
   SetName(SetName),
@@ -68,7 +69,8 @@ pub enum Action {
   Acl(AclAction),
 }
 
-#[derive(Display, Debug, Error, From, Clone, Serialize, Deserialize, JsonSchema)]
+#[derive(Display, Debug, Error, From, Clone, Serialize, Deserialize)]
+#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[serde(rename = "animation_v1_ActionError", tag = "type", rename_all = "camelCase", content = "value")]
 pub enum ActionError {
   SetName(SetNameError),

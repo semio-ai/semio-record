@@ -3,18 +3,18 @@ use serde::{Deserialize, Serialize};
 
 use crate::record::Apply;
 
-use schemars::JsonSchema;
-
 use super::KeySelector;
 use super::super::unfrozen::Animation;
 
-#[derive(Debug, Serialize, Deserialize, From, Clone, JsonSchema)]
+#[derive(Debug, Serialize, Deserialize, From, Clone)]
+#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[serde(rename = "animation_v1_Action_RemoveKeys", rename_all = "camelCase")]
 pub struct RemoveKeys {
   pub selectors: Vec<KeySelector>,
 }
 
-#[derive(Display, Debug, Serialize, Deserialize, Error, Clone, JsonSchema)]
+#[derive(Display, Debug, Serialize, Deserialize, Error, Clone)]
+#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[serde(rename = "animation_v1_Action_RemoveKeysError", tag = "type", rename_all = "camelCase")]
 pub enum RemoveKeysError {
   #[display(fmt = "Control does not exist")]

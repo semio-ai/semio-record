@@ -1,12 +1,12 @@
-use schemars::{schema::RootSchema};
 use serde::{Serialize, Deserialize};
 
+#[cfg(feature = "schemars")]
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Schema {
-  pub private: RootSchema,
-  pub public: RootSchema,
-  pub frozen: RootSchema,
-  pub action: RootSchema,
+  pub private: schemars::schema::RootSchema,
+  pub public: schemars::schema::RootSchema,
+  pub frozen: schemars::schema::RootSchema,
+  pub action: schemars::schema::RootSchema,
 }
 
 macro_rules! impl_schema_version {
@@ -54,6 +54,7 @@ macro_rules! impl_schema_version {
       unfrozen.acl().map(|v| v.clone())
     }
 
+    #[cfg(feature = "schemars")]
     pub fn schema() -> crate::schema_version::Schema {
       crate::schema_version::Schema {
         private: schemars::schema_for!(<$t as crate::record::RecordDefn>::Private),

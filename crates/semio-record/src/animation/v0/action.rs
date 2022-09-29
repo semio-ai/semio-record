@@ -4,8 +4,6 @@ use derive_more::{Display, Error, From};
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
-use schemars::JsonSchema;
-
 use crate::{
   acl::action::{Action as AclAction, ActionError as AclActionError},
   action::{SetName, SetNameError, SetParent, SetParentError},
@@ -14,7 +12,8 @@ use crate::{
 
 use super::unfrozen::{Animation, Node, Key, Value, Transition};
 
-#[derive(Debug, Serialize, Deserialize, From, Clone, JsonSchema)]
+#[derive(Debug, Serialize, Deserialize, From, Clone)]
+#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[serde(rename = "animation_v0_Action_AddNode")]
 pub struct AddNode {
   pub parent_id: Uuid,
@@ -22,7 +21,8 @@ pub struct AddNode {
   pub node: Node,
 }
 
-#[derive(Display, Debug, Serialize, Deserialize, Error, Clone, JsonSchema)]
+#[derive(Display, Debug, Serialize, Deserialize, Error, Clone)]
+#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[serde(rename = "animation_v0_Action_AddNodeError", tag = "type", rename_all = "camelCase")]
 pub enum AddNodeError {
   #[display(fmt = "Node already exists")]
@@ -59,13 +59,15 @@ impl Apply<AddNode> for Animation {
   }
 }
 
-#[derive(Debug, Serialize, Deserialize, From, Clone, JsonSchema)]
+#[derive(Debug, Serialize, Deserialize, From, Clone)]
+#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[serde(rename = "animation_v0_Action_RemoveNode")]
 pub struct RemoveNode {
   pub id: Uuid,
 }
 
-#[derive(Display, Debug, Serialize, Deserialize, Error, Clone, JsonSchema)]
+#[derive(Display, Debug, Serialize, Deserialize, Error, Clone)]
+#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[serde(rename = "animation_v0_Action_RemoveNodeError", tag = "type", rename_all = "camelCase")]
 pub enum RemoveNodeError {
   #[display(fmt = "Node does not exist")]
@@ -90,7 +92,8 @@ impl Apply<RemoveNode> for Animation {
   }
 }
 
-#[derive(Debug, Serialize, Deserialize, From, Clone, JsonSchema)]
+#[derive(Debug, Serialize, Deserialize, From, Clone)]
+#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[serde(rename = "animation_v0_Action_AddKey")]
 pub struct AddKey {
   pub node_id: Uuid,
@@ -98,7 +101,8 @@ pub struct AddKey {
   pub key: Key,
 }
 
-#[derive(Display, Debug, Serialize, Deserialize, Error, Clone, JsonSchema)]
+#[derive(Display, Debug, Serialize, Deserialize, Error, Clone)]
+#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[serde(rename = "animation_v0_Action_AddKeyError", tag = "type", rename_all = "camelCase")]
 pub enum AddKeyError {
   #[display(fmt = "Node does not exist")]
@@ -140,14 +144,16 @@ impl Apply<AddKey> for Animation {
   }
 }
 
-#[derive(Debug, Serialize, Deserialize, From, Clone, JsonSchema)]
+#[derive(Debug, Serialize, Deserialize, From, Clone)]
+#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[serde(rename = "animation_v0_Action_RemoveKey")]
 pub struct RemoveKey {
   pub node_id: Uuid,
   pub key_id: Uuid,
 }
 
-#[derive(Display, Debug, Serialize, Deserialize, Error, Clone, JsonSchema)]
+#[derive(Display, Debug, Serialize, Deserialize, Error, Clone)]
+#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[serde(rename = "animation_v0_Action_RemoveKeyError", tag = "type", rename_all = "camelCase")]
 pub enum RemoveKeyError {
   #[display(fmt = "Node does not exist")]
@@ -182,13 +188,15 @@ impl Apply<RemoveKey> for Animation {
   }
 }
 
-#[derive(Debug, Serialize, Deserialize, From, Clone, JsonSchema)]
+#[derive(Debug, Serialize, Deserialize, From, Clone)]
+#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[serde(rename = "animation_v0_Action_RemoveKeys")]
 pub struct RemoveKeys {
   pub selectors: Vec<KeySelector>,
 }
 
-#[derive(Display, Debug, Serialize, Deserialize, Error, Clone, JsonSchema)]
+#[derive(Display, Debug, Serialize, Deserialize, Error, Clone)]
+#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[serde(rename = "animation_v0_Action_RemoveKeysError", tag = "type", rename_all = "camelCase")]
 pub enum RemoveKeysError {
   #[display(fmt = "Node does not exist")]
@@ -237,14 +245,16 @@ impl Apply<RemoveKeys> for Animation {
   }
 }
 
-#[derive(Debug, Serialize, Deserialize, From, Clone, JsonSchema)]
+#[derive(Debug, Serialize, Deserialize, From, Clone)]
+#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[serde(rename = "animation_v0_Action_SetNodeName")]
 pub struct SetNodeName {
   pub id: Uuid,
   pub name: String,
 }
 
-#[derive(Display, Debug, Serialize, Deserialize, Error, Clone, JsonSchema)]
+#[derive(Display, Debug, Serialize, Deserialize, Error, Clone)]
+#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[serde(rename = "animation_v0_Action_SetNodeNameError", tag = "type", rename_all = "camelCase")]
 pub enum SetNodeNameError {
   #[display(fmt = "Node does not exist")]
@@ -268,14 +278,16 @@ impl Apply<SetNodeName> for Animation {
   }
 }
 
-#[derive(Debug, Serialize, Deserialize, From, Clone, JsonSchema)]
+#[derive(Debug, Serialize, Deserialize, From, Clone)]
+#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[serde(rename = "animation_v0_Action_SetNodeParent")]
 pub struct SetNodeParent {
   pub id: Uuid,
   pub parent_id: Uuid,
 }
 
-#[derive(Display, Debug, Serialize, Deserialize, Error, Clone, JsonSchema)]
+#[derive(Display, Debug, Serialize, Deserialize, Error, Clone)]
+#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[serde(rename = "animation_v0_Action_SetNodeParentError", tag = "type", rename_all = "camelCase")]
 pub enum SetNodeParentError {
   #[display(fmt = "Node does not exist")]
@@ -319,14 +331,16 @@ impl Apply<SetNodeParent> for Animation {
   }
 }
 
-#[derive(Debug, Serialize, Deserialize, From, Clone, JsonSchema)]
+#[derive(Debug, Serialize, Deserialize, From, Clone)]
+#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[serde(rename = "animation_v0_Action_SetNodeColor")]
 pub struct SetNodeColor {
   pub id: Uuid,
   pub color: Color,
 }
 
-#[derive(Display, Debug, Serialize, Deserialize, Error, Clone, JsonSchema)]
+#[derive(Display, Debug, Serialize, Deserialize, Error, Clone)]
+#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[serde(rename = "animation_v0_Action_SetNodeColorError", tag = "type", rename_all = "camelCase")]
 pub enum SetNodeColorError {
   #[display(fmt = "Node does not exist")]
@@ -350,14 +364,16 @@ impl Apply<SetNodeColor> for Animation {
   }
 }
 
-#[derive(Debug, Serialize, Deserialize, From, Clone, JsonSchema)]
+#[derive(Debug, Serialize, Deserialize, From, Clone)]
+#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[serde(rename = "animation_v0_Action_SetNodeLocked")]
 pub struct SetNodeLocked {
   pub id: Uuid,
   pub locked: bool,
 }
 
-#[derive(Display, Debug, Serialize, Deserialize, Error, Clone, JsonSchema)]
+#[derive(Display, Debug, Serialize, Deserialize, Error, Clone)]
+#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[serde(rename = "animation_v0_Action_SetNodeLockedError", tag = "type", rename_all = "camelCase")]
 pub enum SetNodeLockedError {
   #[display(fmt = "Node does not exist")]
@@ -381,14 +397,16 @@ impl Apply<SetNodeLocked> for Animation {
   }
 }
 
-#[derive(Debug, Serialize, Deserialize, From, Clone, JsonSchema)]
+#[derive(Debug, Serialize, Deserialize, From, Clone)]
+#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[serde(rename = "animation_v0_Action_SetNodeCollapsed")]
 pub struct SetNodeCollapsed {
   pub id: Uuid,
   pub collapsed: bool,
 }
 
-#[derive(Display, Debug, Serialize, Deserialize, Error, Clone, JsonSchema)]
+#[derive(Display, Debug, Serialize, Deserialize, Error, Clone)]
+#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[serde(rename = "animation_v0_Action_SetNodeCollapsedError", tag = "type", rename_all = "camelCase")]
 pub enum SetNodeCollapsedError {
   #[display(fmt = "Node does not exist")]
@@ -412,7 +430,8 @@ impl Apply<SetNodeCollapsed> for Animation {
   }
 }
 
-#[derive(Debug, Serialize, Deserialize, From, Clone, JsonSchema)]
+#[derive(Debug, Serialize, Deserialize, From, Clone)]
+#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[serde(rename = "animation_v0_Action_SetKeyAt")]
 pub struct SetKeyAt {
   pub id: Uuid,
@@ -420,7 +439,8 @@ pub struct SetKeyAt {
   pub at: f64,
 }
 
-#[derive(Display, Debug, Serialize, Deserialize, Error, Clone, JsonSchema)]
+#[derive(Display, Debug, Serialize, Deserialize, Error, Clone)]
+#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[serde(rename = "animation_v0_Action_SetKeyAtError", tag = "type", rename_all = "camelCase")]
 pub enum SetKeyAtError {
   #[display(fmt = "Node does not exist")]
@@ -463,27 +483,31 @@ impl Apply<SetKeyAt> for Animation {
   }
 }
 
-#[derive(Debug, Serialize, Deserialize, From, Clone, Hash, PartialEq, Eq, JsonSchema)]
+#[derive(Debug, Serialize, Deserialize, From, Clone, Hash, PartialEq, Eq)]
+#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[serde(rename = "animation_v0_KeySelector", rename_all = "camelCase")]
 pub struct KeySelector {
   pub node_id: Uuid,
   pub key_id: Uuid,
 }
 
-#[derive(Debug, Serialize, Deserialize, From, Clone, JsonSchema)]
+#[derive(Debug, Serialize, Deserialize, From, Clone)]
+#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[serde(rename = "animation_v0_KeySelectorAt")]
 pub struct KeySelectorAt {
   pub selector: KeySelector,
   pub at: f64,
 }
 
-#[derive(Debug, Serialize, Deserialize, From, Clone, JsonSchema)]
+#[derive(Debug, Serialize, Deserialize, From, Clone)]
+#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[serde(rename = "animation_v0_Action_SetKeysAt")]
 pub struct SetKeysAt {
   pub ats: Vec<KeySelectorAt>,
 }
 
-#[derive(Display, Debug, Serialize, Deserialize, Error, Clone, JsonSchema)]
+#[derive(Display, Debug, Serialize, Deserialize, Error, Clone)]
+#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[serde(rename = "animation_v0_Action_SetKeysAtError", tag = "type", rename_all = "camelCase")]
 pub enum SetKeysAtError {
   #[display(fmt = "Node does not exist")]
@@ -544,7 +568,8 @@ impl Apply<SetKeysAt> for Animation {
 
 
 
-#[derive(Debug, Serialize, Deserialize, From, Clone, JsonSchema)]
+#[derive(Debug, Serialize, Deserialize, From, Clone)]
+#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[serde(rename = "animation_v0_Action_SetKeyValue", rename_all = "camelCase")]
 pub struct SetKeyValue {
   pub id: Uuid,
@@ -552,7 +577,8 @@ pub struct SetKeyValue {
   pub value: Value,
 }
 
-#[derive(Display, Debug, Serialize, Deserialize, Error, Clone, JsonSchema)]
+#[derive(Display, Debug, Serialize, Deserialize, Error, Clone)]
+#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[serde(rename = "animation_v0_Action_SetKeyValueError", tag = "type", rename_all = "camelCase")]
 pub enum SetKeyValueError {
   #[display(fmt = "Node does not exist")]
@@ -588,7 +614,8 @@ impl Apply<SetKeyValue> for Animation {
   }
 }
 
-#[derive(Debug, Serialize, Deserialize, From, Clone, JsonSchema)]
+#[derive(Debug, Serialize, Deserialize, From, Clone)]
+#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[serde(rename = "animation_v0_Action_SetKeyTransition", rename_all = "camelCase")]
 pub struct SetKeyTransition {
   pub id: Uuid,
@@ -596,7 +623,8 @@ pub struct SetKeyTransition {
   pub transition: Transition,
 }
 
-#[derive(Display, Debug, Serialize, Deserialize, Error, Clone, JsonSchema)]
+#[derive(Display, Debug, Serialize, Deserialize, Error, Clone)]
+#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[serde(rename = "animation_v0_Action_SetKeyTransitionError", tag = "type", rename_all = "camelCase")]
 pub enum SetKeyTransitionError {
   #[display(fmt = "Node does not exist")]
@@ -632,7 +660,8 @@ impl Apply<SetKeyTransition> for Animation {
   }
 }
 
-#[derive(Debug, Serialize, Deserialize, From, Clone, JsonSchema)]
+#[derive(Debug, Serialize, Deserialize, From, Clone)]
+#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[serde(rename = "animation_v0_Action", tag = "type", rename_all = "camelCase", content = "value")]
 pub enum Action {
   SetName(SetName),
@@ -654,7 +683,8 @@ pub enum Action {
   Acl(AclAction),
 }
 
-#[derive(Display, Debug, Error, From, Clone, Serialize, Deserialize, JsonSchema)]
+#[derive(Display, Debug, Error, From, Clone, Serialize, Deserialize)]
+#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[serde(rename = "animation_v0_ActionError", tag = "type", rename_all = "camelCase", content = "value")]
 pub enum ActionError {
   SetName(SetNameError),

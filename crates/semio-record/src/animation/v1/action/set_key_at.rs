@@ -6,11 +6,10 @@ use uuid::Uuid;
 
 use crate::record::Apply;
 
-use schemars::JsonSchema;
-
 use super::super::unfrozen::Animation;
 
-#[derive(Debug, Serialize, Deserialize, From, Clone, JsonSchema)]
+#[derive(Debug, Serialize, Deserialize, From, Clone)]
+#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[serde(rename = "animation_v1_Action_SetKeyAt", rename_all = "camelCase")]
 pub struct SetKeyAt {
   pub control_id: Uuid,
@@ -18,7 +17,8 @@ pub struct SetKeyAt {
   pub at: f64,
 }
 
-#[derive(Display, Debug, Serialize, Deserialize, Error, Clone, JsonSchema)]
+#[derive(Display, Debug, Serialize, Deserialize, Error, Clone)]
+#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[serde(rename = "animation_v1_Action_SetKeyAtError", tag = "type", rename_all = "camelCase")]
 pub enum SetKeyAtError {
   #[display(fmt = "Control does not exist")]

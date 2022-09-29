@@ -3,9 +3,8 @@ use crate::math::Vector3 as RawVector3;
 
 use serde::{Serialize, Deserialize};
 
-use schemars::JsonSchema;
-
-#[derive(Debug, Serialize, Deserialize, Clone, JsonSchema)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
+#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[serde(rename = "unit_math_ReferenceFrame")]
 pub struct ReferenceFrame {
   pub position: Vector3,

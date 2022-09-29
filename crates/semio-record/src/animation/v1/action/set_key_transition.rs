@@ -4,11 +4,10 @@ use uuid::Uuid;
 
 use crate::record::Apply;
 
-use schemars::JsonSchema;
-
 use super::super::unfrozen::{Animation, Transition};
 
-#[derive(Debug, Serialize, Deserialize, From, Clone, JsonSchema)]
+#[derive(Debug, Serialize, Deserialize, From, Clone)]
+#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[serde(rename = "animation_v1_Action_SetKeyTransition", rename_all = "camelCase")]
 pub struct SetKeyTransition {
   pub control_id: Uuid,
@@ -16,7 +15,8 @@ pub struct SetKeyTransition {
   pub transition: Transition,
 }
 
-#[derive(Display, Debug, Serialize, Deserialize, Error, Clone, JsonSchema)]
+#[derive(Display, Debug, Serialize, Deserialize, Error, Clone)]
+#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[serde(rename = "animation_v1_Action_SetKeyTransitionError", tag = "type", rename_all = "camelCase")]
 pub enum SetKeyTransitionError {
   #[display(fmt = "Control does not exist")]

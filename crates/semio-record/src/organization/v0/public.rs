@@ -3,19 +3,11 @@ use serde::{Serialize, Deserialize};
 
 use super::unfrozen::Organization;
 
-use schemars::JsonSchema;
-
-#[derive(Debug, Clone, Serialize, Deserialize, JsonSchema)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[serde(rename = "organization_v0_Public")]
 pub struct Public {
   pub name: String,
-}
-
-#[graphql_object(name = "OrganizationPublic")]
-impl Public {
-  fn name(&self) -> &str {
-    &self.name
-  }
 }
 
 impl From<Organization> for Public {

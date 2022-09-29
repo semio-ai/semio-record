@@ -1,8 +1,7 @@
 use serde::{Serialize, Deserialize};
 
-use schemars::JsonSchema;
-
-#[derive(Debug, Serialize, Deserialize, Clone, JsonSchema)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
+#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[serde(rename = "math_Quaternion")]
 pub struct Quaternion {
   pub x: f64,

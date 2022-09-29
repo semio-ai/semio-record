@@ -2,13 +2,8 @@ use std::{collections::HashSet, fmt::Display};
 
 use async_trait::async_trait;
 use derive_more::From;
-use juniper::{
-  FromInputValue, GraphQLObject,
-  InputValue, ScalarValue,
-};
 use serde::{de::DeserializeOwned, Deserialize, Serialize};
 use uuid::Uuid;
-use schemars::JsonSchema;
 
 use crate::{acl::Acl, blob::BlobDependencies, migrate::Migrate};
 
@@ -27,8 +22,9 @@ pub const TYPE_SCENE: i16 = 0x0100;
 pub const TYPE_PLATFORM: i16 = 0x0200;
 pub const TYPE_WORKSPACE: i16 = 0x0300;
 
-#[derive(Debug, From, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize, JsonSchema)]
-pub struct Version(#[schemars(with = "String")] pub semver::Version);
+#[derive(Debug, From, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize)]
+#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
+pub struct Version(#[cfg_attr(feature = "schemars", schemars(with = "String"))] pub semver::Version);
 
 impl std::fmt::Display for Version {
   fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
@@ -42,30 +38,9 @@ impl Version {
   }
 }
 
-#[juniper::graphql_scalar]
-impl<S> GraphQLScalar for Version
-where
-  S: juniper::ScalarValue,
-{
-  fn resolve(&self) -> juniper::Value {
-    juniper::Value::scalar(self.0.to_string())
-  }
-
-  // NOTE: The error type should implement `IntoFieldError<S>`.
-  fn from_input_value(value: &juniper::InputValue) -> Option<Version> {
-    match value.as_string_value() {
-      Some(s) => Some(Version(s.parse().ok()?)),
-      None => None,
-    }
-  }
-
-  fn from_str<'a>(value: juniper::ScalarToken<'a>) -> juniper::ParseScalarResult<'a, S> {
-    <String as juniper::ParseScalarValue<S>>::from_str(value)
-  }
-}
-
-#[derive(Debug, From, Clone, PartialEq, Eq, Hash, Serialize, Deserialize, JsonSchema)]
-pub struct VersionReq(#[schemars(with = "Option::<String>")] pub Option<semver::VersionReq>);
+#[derive(Debug, From, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
+pub struct VersionReq(#[cfg_attr(feature = "schemars", schemars(with = "Option::<String>"))] pub Option<semver::VersionReq>);
 
 impl VersionReq {
   pub fn parse(s: &str) -> Result<Self, semver::Error> {
@@ -88,50 +63,25 @@ impl Into<semver::VersionReq> for VersionReq {
   }
 }
 
-#[juniper::graphql_scalar]
-impl<S> GraphQLScalar for VersionReq
-where
-  S: juniper::ScalarValue,
-{
-  fn resolve(&self) -> juniper::Value {
-    match &self.0 {
-      None => juniper::Value::scalar("*".to_string()),
-      Some(s) => juniper::Value::scalar(s.to_string()),
-    }
-  }
-
-  fn from_input_value(value: &juniper::InputValue) -> Option<VersionReq> {
-    if value.is_null() {
-      return Some(VersionReq(None));
-    }
-
-    match value.as_string_value() {
-      Some(s) => Some(VersionReq(Some(s.parse().ok()?))),
-      None => None,
-    }
-  }
-
-  fn from_str<'a>(value: juniper::ScalarToken<'a>) -> juniper::ParseScalarResult<'a, S> {
-    <String as juniper::ParseScalarValue<S>>::from_str(value)
-  }
-}
-
-#[derive(Debug, Serialize, Deserialize, JsonSchema)]
+#[derive(Debug, Serialize, Deserialize)]
+#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 pub struct Path {
   pub components: Vec<String>,
 }
 
 #[derive(
-  Debug, Serialize, Deserialize, Hash, PartialEq, Eq, Clone, PartialOrd, Ord, GraphQLObject, JsonSchema
+  Debug, Serialize, Deserialize, Hash, PartialEq, Eq, Clone, PartialOrd, Ord
 )]
-#[serde(rename_all = "camelCase")]
+#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
+#[serde(rename = "frozen_Reference", rename_all = "camelCase")]
 pub struct FrozenReference {
   pub id: Uuid,
   pub version: Version,
 }
 
-#[derive(Debug, Serialize, Deserialize, Hash, PartialEq, Eq, Clone, GraphQLObject, JsonSchema)]
-#[serde(rename_all = "camelCase")]
+#[derive(Debug, Serialize, Deserialize, Hash, PartialEq, Eq, Clone)]
+#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
+#[serde(rename = "unfrozen_Reference", rename_all = "camelCase")]
 pub struct UnfrozenReference {
   pub id: Uuid,
   pub version_req: VersionReq,
@@ -143,35 +93,6 @@ impl ToString for UnfrozenReference {
       format!("{}@{}", self.id, version_req)
     } else {
       self.id.to_string()
-    }
-  }
-}
-
-impl<S: ScalarValue> FromInputValue<S> for UnfrozenReference {
-  fn from_input_value(v: &InputValue<S>) -> Option<Self> {
-    match v {
-      InputValue::Object(object) => {
-        let mut id = None;
-        let mut version_req = None;
-
-        for (key, value) in object {
-          match key.item.as_str() {
-            "id" => id = Some(Uuid::parse_str(value.item.as_string_value()?).ok()?),
-            "versionReq" => version_req = VersionReq::from_input_value(&value.item),
-            _ => return None,
-          }
-        }
-
-        if id.is_none() {
-          return None;
-        }
-
-        Some(UnfrozenReference {
-          id: id.unwrap(),
-          version_req: version_req.unwrap_or(VersionReq(None)),
-        })
-      }
-      _ => None,
     }
   }
 }
@@ -313,6 +234,7 @@ macro_rules! impl_record {
       }
     }
 
+    #[cfg(feature = "schemars")]
     pub fn schema(schema_version: i16) -> Result<crate::schema_version::Schema, Box<dyn std::error::Error>> {
       match schema_version {
         $(
