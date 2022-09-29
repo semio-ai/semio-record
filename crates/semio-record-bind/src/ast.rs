@@ -158,8 +158,10 @@ impl ToTypescript for InterfaceDecl {
 pub enum TypeExpr {
   Identifier(String),
   Union(Vec<TypeExpr>),
+  Dictionary(Box<TypeExpr>),
   StringLiteral(String),
   NumberLiteral(i64),
+  Array(Box<TypeExpr>),
 }
 
 impl TypeExpr {
@@ -178,6 +180,14 @@ impl TypeExpr {
   pub fn number_literal(number: i64) -> Self {
     Self::NumberLiteral(number)
   }
+
+  pub fn dictionary<T: Into<TypeExpr>>(ty: T) -> Self {
+    Self::Dictionary(Box::new(ty.into()))
+  }
+
+  pub fn array<T: Into<TypeExpr>>(ty: T) -> Self {
+    Self::Array(Box::new(ty.into()))
+  }
 }
 
 impl ToTypescript for TypeExpr {
@@ -194,6 +204,19 @@ impl ToTypescript for TypeExpr {
       },
       TypeExpr::StringLiteral(value) => ret.add_line(format!("\"{}\"", value)),
       TypeExpr::NumberLiteral(value) => ret.add_line(format!("{}", value)),
+      TypeExpr::Dictionary(ty) => {
+        let mut line = String::new();
+        line.push_str("{ [key: string]: ");
+        line.push_str(&ty.to_typescript().into_single_line().unwrap());
+        line.push_str(" }");
+        ret.add_line(line)
+      },
+      TypeExpr::Array(ty) => {
+        let mut line = String::new();
+        line.push_str(&ty.to_typescript().into_single_line().unwrap());
+        line.push_str("[]");
+        ret.add_line(line)
+      }
     }
     ret
   }

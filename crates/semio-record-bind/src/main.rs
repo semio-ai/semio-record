@@ -95,6 +95,26 @@ fn schema_object_to_type(schema_object: &SchemaObject, imports: &mut Imports) ->
     let name = path.file_name().unwrap().to_string();
     let import_name = imports.add(name, path);
     TypeExpr::Identifier(import_name)
+  } else if let Some(array) = &schema_object.array {
+    if let Some(SingleOrVec::Single(array_single)) = &array.items {
+      if let Schema::Object(array_schema_object) = array_single.as_ref() {
+        TypeExpr::array(schema_object_to_type(array_schema_object, imports))
+      } else {
+        TypeExpr::array(TypeExpr::identifier("any"))
+      }
+    } else {
+      TypeExpr::array(TypeExpr::identifier("any"))
+    }
+  } else if let Some(object) = &schema_object.object {
+    if let Some(additional_properties) = &object.additional_properties {
+      if let Schema::Object(additional_properties_object) = additional_properties.as_ref() {
+        TypeExpr::dictionary(schema_object_to_type(additional_properties_object, imports))
+      } else {
+        TypeExpr::dictionary(TypeExpr::identifier("any"))
+      }
+    } else {
+      TypeExpr::identifier("any")
+    }
   } else if let Some(instance_type) = &schema_object.instance_type {
     match instance_type {
       SingleOrVec::Single(single) => {
