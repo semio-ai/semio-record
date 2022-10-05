@@ -4,7 +4,7 @@ use super::unfrozen::User;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
-#[serde(rename = "user_v0_Private", rename_all = "camelCase")]
+#[serde(rename = "user_V0_Private", rename_all = "camelCase")]
 pub struct Private {
   pub user_name: String,
   pub first_name: String,

@@ -11,7 +11,7 @@ use crate::{
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
-#[serde(rename = "enumeration_v0_Frozen_Field")]
+#[serde(rename = "enumeration_V0_Frozen_Field")]
 pub struct StructureField {
   pub name: String,
   #[serde(rename = "type")]
@@ -20,7 +20,7 @@ pub struct StructureField {
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
-#[serde(rename = "structure_v0_Frozen")]
+#[serde(rename = "structure_V0_Frozen")]
 pub struct Structure {
   pub parent: Uuid,
   pub name: String,

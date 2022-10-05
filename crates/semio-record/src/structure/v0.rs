@@ -20,4 +20,4 @@ impl RecordDefn for Structure {
   type Private = unfrozen::Structure;
 }
 
-impl_schema_version!(Structure);
+impl_schema_version!(Structure, "structure_V0");

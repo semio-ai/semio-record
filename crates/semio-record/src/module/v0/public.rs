@@ -9,7 +9,7 @@ use super::unfrozen::{Export, Module};
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 #[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
-#[serde(rename = "module_v0_Public", rename_all = "camelCase")]
+#[serde(rename = "module_V0_Public", rename_all = "camelCase")]
 pub struct Public {
   pub parent: Uuid,
   pub name: String,

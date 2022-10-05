@@ -10,14 +10,14 @@ use super::KeySelectorAt;
 
 #[derive(Debug, Serialize, Deserialize, From, Clone)]
 #[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
-#[serde(rename = "animation_v1_Action_SetKeysAt", rename_all = "camelCase")]
+#[serde(rename = "animation_V1_Action_SetKeysAt", rename_all = "camelCase")]
 pub struct SetKeysAt {
   pub ats: Vec<KeySelectorAt>,
 }
 
 #[derive(Display, Debug, Serialize, Deserialize, Error, Clone)]
 #[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
-#[serde(rename = "animation_v1_Action_SetKeysAtError", tag = "type", rename_all = "camelCase")]
+#[serde(rename = "animation_V1_Action_SetKeysAtError", tag = "type", rename_all = "camelCase")]
 pub enum SetKeysAtError {
   #[display(fmt = "Control does not exist")]
   ControlDoesNotExist,

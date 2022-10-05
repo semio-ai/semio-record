@@ -10,7 +10,7 @@ use crate::{
   blob::BlobDependencies,
   unfrozen::impl_unfrozen,
   acl::{Acl, action::with_acl},
-  action::name,
+  action::{name, parent},
   unit_math::{Vector3, Vector2, ReferenceFrame},
   unit::{Distance, DistanceKind, Mass},
   math::{Vector3 as RawVector3, Vector2 as RawVector2}, migrate::Migrate,
@@ -20,21 +20,21 @@ use super::action::Action;
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 #[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
-#[serde(rename = "scene_v0_Geometry_Box", rename_all = "camelCase")]
+#[serde(rename = "scene_V0_Geometry_Box", rename_all = "camelCase")]
 pub struct BoxGeometry {
   size: Vector3,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 #[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
-#[serde(rename = "scene_v0_Geometry_Sphere", rename_all = "camelCase")]
+#[serde(rename = "scene_V0_Geometry_Sphere", rename_all = "camelCase")]
 pub struct Sphere {
   radius: Distance,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 #[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
-#[serde(rename = "scene_v0_Geometry_Cylinder", rename_all = "camelCase")]
+#[serde(rename = "scene_V0_Geometry_Cylinder", rename_all = "camelCase")]
 pub struct Cylinder {
   radius: Distance,
   height: Distance,
@@ -42,7 +42,7 @@ pub struct Cylinder {
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 #[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
-#[serde(rename = "scene_v0_Geometry_Cone", rename_all = "camelCase")]
+#[serde(rename = "scene_V0_Geometry_Cone", rename_all = "camelCase")]
 pub struct Cone {
   radius: Distance,
   height: Distance,
@@ -50,14 +50,14 @@ pub struct Cone {
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 #[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
-#[serde(rename = "scene_v0_Geometry_Plane", rename_all = "camelCase")]
+#[serde(rename = "scene_V0_Geometry_Plane", rename_all = "camelCase")]
 pub struct Plane {
   size: Vector2,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 #[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
-#[serde(rename = "scene_v0_Geometry_LocalMesh", rename_all = "camelCase")]
+#[serde(rename = "scene_V0_Geometry_LocalMesh", rename_all = "camelCase")]
 pub struct LocalMesh {
   distance_type: Option<DistanceKind>,
   vertices: Vec<RawVector3>,
@@ -67,14 +67,14 @@ pub struct LocalMesh {
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 #[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
-#[serde(rename = "scene_v0_Geometry_RemoteMesh", rename_all = "camelCase")]
+#[serde(rename = "scene_V0_Geometry_RemoteMesh", rename_all = "camelCase")]
 pub struct RemoteMesh {
   blob_id: Uuid,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 #[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
-#[serde(rename = "scene_v0_Geometry", tag = "type", rename_all = "camelCase", content = "value")]
+#[serde(rename = "scene_V0_Geometry", tag = "type", rename_all = "camelCase", content = "value")]
 pub enum Geometry {
   Box(BoxGeometry),
   Sphere(Sphere),
@@ -87,7 +87,7 @@ pub enum Geometry {
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 #[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
-#[serde(rename = "scene_v0_ColliderKind", rename_all = "camelCase")]
+#[serde(rename = "scene_V0_ColliderKind", rename_all = "camelCase")]
 pub enum ColliderKind {
   Box,
   Sphere,
@@ -98,7 +98,7 @@ pub enum ColliderKind {
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 #[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
-#[serde(rename = "scene_v0_Physics", rename_all = "camelCase")]
+#[serde(rename = "scene_V0_Physics", rename_all = "camelCase")]
 pub struct Physics {
   collider_id: Option<Uuid>,
   collider_kind: ColliderKind,
@@ -110,14 +110,14 @@ pub struct Physics {
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 #[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
-#[serde(rename = "scene_v0_Node_Kind_Object", rename_all = "camelCase")]
+#[serde(rename = "scene_V0_Node_Kind_Object", rename_all = "camelCase")]
 pub struct Object {
   pub geometry_id: Option<Uuid>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 #[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
-#[serde(rename = "scene_v0_Node_Kind_DirectionalLight", rename_all = "camelCase")]
+#[serde(rename = "scene_V0_Node_Kind_DirectionalLight", rename_all = "camelCase")]
 pub struct DirectionalLight {
   radius: Option<Distance>,
   range: Option<Distance>,
@@ -127,7 +127,7 @@ pub struct DirectionalLight {
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 #[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
-#[serde(rename = "scene_v0_Node_Kind", tag = "type", rename_all = "camelCase", content = "value")]
+#[serde(rename = "scene_V0_Node_Kind", tag = "type", rename_all = "camelCase", content = "value")]
 pub enum NodeKind {
   Empty,
   // `object` is a reserved keyword in JS/TS.
@@ -141,7 +141,7 @@ pub enum NodeKind {
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 #[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
-#[serde(rename = "scene_v0_Node", rename_all = "camelCase")]
+#[serde(rename = "scene_V0_Node", rename_all = "camelCase")]
 pub struct Node {
   pub name: String,
   pub parent_id: Option<Uuid>,
@@ -153,8 +153,9 @@ pub struct Node {
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 #[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
-#[serde(rename = "scene_v0_Private", rename_all = "camelCase")]
+#[serde(rename = "scene_V0_Private", rename_all = "camelCase")]
 pub struct Scene {
+  pub parent: Uuid,
   pub name: String,
   pub description: String,
   pub acl: Acl,
@@ -165,6 +166,7 @@ pub struct Scene {
 impl Default for Scene {
   fn default() -> Self {
     Self {
+      parent: Uuid::nil(),
       name: String::new(),
       description: String::new(),
       acl: Default::default(),
@@ -201,7 +203,7 @@ impl View for Scene {
   }
 
   fn parent<'a>(&'a self) -> Option<&'a uuid::Uuid> {
-    None
+    Some(&self.parent)
   }
 
   fn acl<'a>(&'a self) -> Option<&'a Acl> {
@@ -209,6 +211,7 @@ impl View for Scene {
   }
 }
 
+parent!(Scene);
 name!(Scene);
 
 #[async_trait]

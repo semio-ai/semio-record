@@ -410,7 +410,7 @@ impl<F: Freezer> Freeze<F> for UnfrozenArray {
 
 #[derive(Debug, Serialize, Deserialize, From, Clone, PartialEq, Eq)]
 #[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
-#[serde(rename = "Unfrozen_Type", rename_all = "camelCase", tag = "type", content = "value")]
+#[serde(rename = "unfrozen_Type", rename_all = "camelCase", tag = "type", content = "value")]
 pub enum UnfrozenTy {
   Primitive(Primitive),
   UnfrozenScalar(UnfrozenScalar),

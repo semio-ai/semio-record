@@ -5,7 +5,7 @@ use super::unfrozen::Organization;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
-#[serde(rename = "organization_v0_Public")]
+#[serde(rename = "organization_V0_Public")]
 pub struct Public {
   pub name: String,
 }

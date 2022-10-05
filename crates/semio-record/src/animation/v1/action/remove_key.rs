@@ -8,7 +8,7 @@ use super::super::unfrozen::Animation;
 
 #[derive(Debug, Serialize, Deserialize, From, Clone)]
 #[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
-#[serde(rename = "animation_v1_Action_RemoveKey", rename_all = "camelCase")]
+#[serde(rename = "animation_V1_Action_RemoveKey", rename_all = "camelCase")]
 pub struct RemoveKey {
   pub control_id: Uuid,
   pub key_id: Uuid,
@@ -16,7 +16,7 @@ pub struct RemoveKey {
 
 #[derive(Display, Debug, Serialize, Deserialize, Error, Clone)]
 #[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
-#[serde(rename = "animation_v1_Action_RemoveKeyError", tag = "type", rename_all = "camelCase")]
+#[serde(rename = "animation_V1_Action_RemoveKeyError", tag = "type", rename_all = "camelCase")]
 pub enum RemoveKeyError {
   #[display(fmt = "Control does not exist")]
   ControlDoesNotExist,

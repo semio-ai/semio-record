@@ -10,7 +10,7 @@ use super::{frozen, action::Action};
 
 #[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq)]
 #[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
-#[serde(rename = "enumeration_v0_Variant")]
+#[serde(rename = "enumeration_V0_Variant")]
 pub struct EnumerationVariant {
   pub name: String,
   #[serde(rename = "type")]
@@ -31,7 +31,7 @@ impl<F: Freezer> Freeze<F> for EnumerationVariant {
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 #[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
-#[serde(rename = "enumeration_v0_Private")]
+#[serde(rename = "enumeration_V0_Private")]
 pub struct Enumeration {
   pub parent: Uuid,
   pub name: String,

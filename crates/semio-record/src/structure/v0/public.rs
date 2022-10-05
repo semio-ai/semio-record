@@ -7,7 +7,7 @@ use super::unfrozen::{Structure, StructureField};
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 #[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
-#[serde(rename = "structure_v0_Public")]
+#[serde(rename = "structure_V0_Public")]
 pub struct Public {
   pub name: String,
   pub parent: Uuid,

@@ -8,7 +8,7 @@ use super::super::unfrozen::{Animation, Value};
 
 #[derive(Debug, Serialize, Deserialize, From, Clone)]
 #[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
-#[serde(rename = "animation_v1_Action_SetKeyValue", rename_all = "camelCase")]
+#[serde(rename = "animation_V1_Action_SetKeyValue", rename_all = "camelCase")]
 pub struct SetKeyValue {
   pub control_id: Uuid,
   pub key_id: Uuid,
@@ -17,7 +17,7 @@ pub struct SetKeyValue {
 
 #[derive(Display, Debug, Serialize, Deserialize, Error, Clone)]
 #[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
-#[serde(rename = "animation_v1_Action_SetKeyValueError", tag = "type", rename_all = "camelCase")]
+#[serde(rename = "animation_V1_Action_SetKeyValueError", tag = "type", rename_all = "camelCase")]
 pub enum SetKeyValueError {
   #[display(fmt = "Control does not exist")]
   ControlDoesNotExist,

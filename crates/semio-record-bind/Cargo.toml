@@ -25,3 +25,4 @@ clap = { version = "3.2.22", features = ["derive"] }
 camino = "1.1.1"
 pathdiff = { version = "0.2.1", features = ["camino"] }
 bimap = "0.6.2"
+rand = "0.8.5"

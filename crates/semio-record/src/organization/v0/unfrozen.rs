@@ -9,7 +9,7 @@ use super::action::Action;
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 #[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
-#[serde(rename = "organization_v0_Private")]
+#[serde(rename = "organization_V0_Private")]
 pub struct Organization {
   pub name: String,
   pub acl: Acl,

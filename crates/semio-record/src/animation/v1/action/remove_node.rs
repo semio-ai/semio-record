@@ -8,14 +8,14 @@ use super::super::unfrozen::{Animation, NodeKind};
 
 #[derive(Debug, Serialize, Deserialize, From, Clone)]
 #[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
-#[serde(rename = "animation_v1_Action_RemoveNode", rename_all = "camelCase")]
+#[serde(rename = "animation_V1_Action_RemoveNode", rename_all = "camelCase")]
 pub struct RemoveNode {
   pub node_id: Uuid,
 }
 
 #[derive(Display, Debug, Serialize, Deserialize, Error, Clone)]
 #[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
-#[serde(rename = "animation_v1_Action_RemoveNodeError", tag = "type", rename_all = "camelCase")]
+#[serde(rename = "animation_V1_Action_RemoveNodeError", tag = "type", rename_all = "camelCase")]
 pub enum RemoveNodeError {
   #[display(fmt = "Node does not exist")]
   NodeDoesNotExist,

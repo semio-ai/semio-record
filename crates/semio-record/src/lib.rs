@@ -26,6 +26,7 @@ pub mod container;
 pub mod i18n;
 pub mod unit;
 pub mod unit_math;
+pub mod api;
 
 #[cfg(feature = "js")]
 mod js;
@@ -137,7 +138,8 @@ impl_lib!(
   TYPE_ENUMERATION => enumeration,
   TYPE_FOLDER => folder,
   TYPE_ANIMATION => animation,
-  TYPE_SCENE => scene
+  TYPE_SCENE => scene,
+  TYPE_WORKSPACE => workspace
 );
 
 #[derive(Debug, Serialize, Deserialize)]

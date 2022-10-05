@@ -6,7 +6,7 @@ use super::unfrozen::Folder;
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 #[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
-#[serde(rename = "folder_v0_Public")]
+#[serde(rename = "folder_V0_Public")]
 pub struct Public {
   pub name: String,
   pub parent: Uuid,

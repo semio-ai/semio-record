@@ -19,4 +19,4 @@ impl RecordDefn for Enumeration {
   type Private = unfrozen::Enumeration;
 }
 
-impl_schema_version!(Enumeration);
+impl_schema_version!(Enumeration, "enumeration_V0");

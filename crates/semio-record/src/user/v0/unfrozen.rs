@@ -9,7 +9,7 @@ use super::action::Action;
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 #[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
-#[serde(rename = "user_v0_Unfrozen", rename_all = "camelCase")]
+#[serde(rename = "user_V0_Unfrozen", rename_all = "camelCase")]
 pub struct User {
   pub user_name: String,
   pub first_name: String,

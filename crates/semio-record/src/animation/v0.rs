@@ -17,4 +17,4 @@ impl RecordDefn for Animation {
   type Private = unfrozen::Animation;
 }
 
-impl_schema_version!(Animation);
+impl_schema_version!(Animation, "animation_V0");

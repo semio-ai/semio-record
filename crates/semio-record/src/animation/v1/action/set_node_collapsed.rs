@@ -8,7 +8,7 @@ use super::super::unfrozen::Animation;
 
 #[derive(Debug, Serialize, Deserialize, From, Clone)]
 #[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
-#[serde(rename = "animation_v1_Action_SetNodeCollapsed", rename_all = "camelCase")]
+#[serde(rename = "animation_V1_Action_SetNodeCollapsed", rename_all = "camelCase")]
 pub struct SetNodeCollapsed {
   pub node_id: Uuid,
   pub collapsed: bool,
@@ -16,7 +16,7 @@ pub struct SetNodeCollapsed {
 
 #[derive(Display, Debug, Serialize, Deserialize, Error, Clone)]
 #[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
-#[serde(rename = "animation_v1_Action_SetNodeCollapsedError", tag = "type", rename_all = "camelCase")]
+#[serde(rename = "animation_V1_Action_SetNodeCollapsedError", tag = "type", rename_all = "camelCase")]
 pub enum SetNodeCollapsedError {
   #[display(fmt = "Node does not exist")]
   NodeDoesNotExist,

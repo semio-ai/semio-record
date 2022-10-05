@@ -19,4 +19,4 @@ impl RecordDefn for User {
   type Private = private::Private;
 }
 
-impl_schema_version!(User);
+impl_schema_version!(User, "user_V0");

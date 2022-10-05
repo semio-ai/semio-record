@@ -3,7 +3,7 @@ use std::{
   path::PathBuf,
 };
 
-use schemars::{schema::{RootSchema, Schema, SchemaObject, SingleOrVec, InstanceType}, _serde_json::Value};
+use schemars::{schema::{RootSchema, Schema, SchemaObject, SingleOrVec, InstanceType}, _serde_json::Value, schema_for};
 use semio_record::{record::*, schema, schema_version::Schema as VersionSchema};
 use serde::{Deserialize, Serialize};
 
@@ -290,6 +290,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
   merge::version(schema(TYPE_ANIMATION, 0)?, &mut definitions);
   merge::version(schema(TYPE_ANIMATION, 1)?, &mut definitions);
   merge::version(schema(TYPE_SCENE, 0)?, &mut definitions);
+  merge::version(schema(TYPE_WORKSPACE, 0)?, &mut definitions);
+  merge::root_schema(schema_for!(semio_record::api::Msg), &mut definitions);
 
   let root = rescope(definitions);
 

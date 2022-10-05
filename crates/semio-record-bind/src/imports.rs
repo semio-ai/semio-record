@@ -5,6 +5,7 @@ use camino::{Utf8Path, Utf8PathBuf, Utf8Component};
 use bimap::BiMap;
 
 use crate::ast::{ToTypescript, Decl, ImportDecl};
+use rand::Rng;
 
 pub struct Imports {
   name: String,
@@ -34,16 +35,32 @@ impl Imports {
     if self.imports.contains_left(name) || name == self.name {
       let mut i = 1;
       loop {
-        let new_name = path
+        let components = path
           .components()
-          .collect::<Vec<_>>()
-          .iter()
-          .rev()
-          .take(i)
-          .rev()
-          .map(Utf8Component::as_str)
-          .collect::<Vec<_>>()
-          .join("");
+          .collect::<Vec<_>>();
+        if i > components.len() {
+          panic!("Could not find a unique name for import");
+        }
+
+        let new_name = if i > components.len() - 1 {
+          // Generate random name
+          let mut rng = rand::thread_rng();
+          let mut entropy = String::new();
+          for _ in 0..8 {
+            entropy.push(rng.sample(rand::distributions::Alphanumeric) as char);
+          }
+          format!("{name}{entropy}", name = name, entropy = entropy)
+        } else {
+          components
+            .iter()
+            .rev()
+            .take(i)
+            .rev()
+            .map(Utf8Component::as_str)
+            .collect::<Vec<_>>()
+            .join("")
+        };
+
         if self.imports.get_by_left(&new_name).is_none() && new_name != self.name {
           self.imports.insert(new_name.clone(), path.to_path_buf());
           return new_name;
@@ -103,4 +120,5 @@ mod test {
     assert_eq!(imports.add("MyFile", "/Foo/MyFile"), "FooMyFile");
     assert_eq!(imports.iter().count(), 1);
   }
+  
 }

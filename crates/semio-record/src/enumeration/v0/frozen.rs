@@ -7,7 +7,7 @@ use crate::{ty::FrozenTy, record::{View, Frozen, FrozenReference}, blob::BlobDep
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
 #[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
-#[serde(rename = "enumeration_v0_Frozen_Variant", rename_all = "camelCase")]
+#[serde(rename = "enumeration_V0_Frozen_Variant", rename_all = "camelCase")]
 pub struct EnumerationVariant {
   pub name: String,
   #[serde(rename = "type")]
@@ -16,7 +16,7 @@ pub struct EnumerationVariant {
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
 #[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
-#[serde(rename = "enumeration_v0_Frozen", rename_all = "camelCase")]
+#[serde(rename = "enumeration_V0_Frozen", rename_all = "camelCase")]
 pub struct Enumeration {
   pub parent: Uuid,
   pub name: String,

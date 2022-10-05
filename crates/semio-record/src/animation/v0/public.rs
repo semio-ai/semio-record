@@ -8,7 +8,7 @@ use super::unfrozen::{Animation, Node};
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 #[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
-#[serde(rename = "animation_v0_Public")]
+#[serde(rename = "animation_V0_Public")]
 pub struct Public {
   pub name: String,
   pub parent: Uuid,

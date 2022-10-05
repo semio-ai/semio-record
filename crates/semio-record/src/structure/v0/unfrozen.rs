@@ -10,7 +10,7 @@ use super::{frozen, action::Action};
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 #[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
-#[serde(rename = "structure_v0_Field")]
+#[serde(rename = "structure_V0_Field")]
 pub struct StructureField {
   pub name: String,
   #[serde(rename = "type")]
@@ -31,7 +31,7 @@ impl<F: Freezer> Freeze<F> for StructureField {
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 #[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
-#[serde(rename = "structure_v0_Private")]
+#[serde(rename = "structure_V0_Private")]
 pub struct Structure {
   pub parent: Uuid,
   pub name: String,

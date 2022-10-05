@@ -10,7 +10,7 @@ use super::super::unfrozen::Animation;
 
 #[derive(Debug, Serialize, Deserialize, From, Clone)]
 #[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
-#[serde(rename = "animation_v1_Action_SetNodeName", rename_all = "camelCase")]
+#[serde(rename = "animation_V1_Action_SetNodeName", rename_all = "camelCase")]
 pub struct SetNodeName {
   pub node_id: Uuid,
   pub name: Option<String>,
@@ -18,7 +18,7 @@ pub struct SetNodeName {
 
 #[derive(Display, Debug, Serialize, Deserialize, Error, Clone)]
 #[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
-#[serde(rename = "animation_v1_Action_SetNodeNameError", tag = "type", rename_all = "camelCase")]
+#[serde(rename = "animation_V1_Action_SetNodeNameError", tag = "type", rename_all = "camelCase")]
 pub enum SetNodeNameError {
   #[display(fmt = "Node does not exist")]
   NodeDoesNotExist,

@@ -11,7 +11,7 @@ use super::unfrozen::Folder;
 
 #[derive(Debug, Serialize, Deserialize, From, Clone)]
 #[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
-#[serde(rename = "folder_v0_Action", tag = "type", rename_all = "camelCase", content = "value")]
+#[serde(rename = "folder_V0_Action", tag = "type", rename_all = "camelCase", content = "value")]
 pub enum Action {
   SetName(SetName),
   SetParent(SetParent),
@@ -20,7 +20,7 @@ pub enum Action {
 
 #[derive(Display, Debug, Error, From, Serialize, Deserialize, Clone)]
 #[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
-#[serde(rename = "folder_v0_ActionError", tag = "type", rename_all = "camelCase", content = "value")]
+#[serde(rename = "folder_V0_ActionError", tag = "type", rename_all = "camelCase", content = "value")]
 pub enum ActionError {
   SetName(SetNameError),
   SetParent(SetParentError),

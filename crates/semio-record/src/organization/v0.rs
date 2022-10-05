@@ -18,4 +18,4 @@ impl RecordDefn for Organization {
   type Private = unfrozen::Organization;
 }
 
-impl_schema_version!(Organization);
+impl_schema_version!(Organization, "organization_V0");

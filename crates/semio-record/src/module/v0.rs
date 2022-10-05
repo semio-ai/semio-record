@@ -29,4 +29,4 @@ impl ValidatedSemanticVersion for Module {
   }
 }
 
-impl_schema_version!(Module);
+impl_schema_version!(Module, "module_V0");

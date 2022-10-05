@@ -8,7 +8,7 @@ use super::super::unfrozen::{Animation, Node};
 
 #[derive(Debug, Serialize, Deserialize, From, Clone)]
 #[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
-#[serde(rename = "animation_v1_Action_AddNode", rename_all = "camelCase")]
+#[serde(rename = "animation_V1_Action_AddNode", rename_all = "camelCase")]
 pub struct AddNode {
   pub parent_id: Option<Uuid>,
   pub node_id: Uuid,
@@ -17,7 +17,7 @@ pub struct AddNode {
 
 #[derive(Display, Debug, Serialize, Deserialize, Error, Clone)]
 #[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
-#[serde(rename = "animation_v1_Action_AddNodeError", tag = "type", rename_all = "camelCase")]
+#[serde(rename = "animation_V1_Action_AddNodeError", tag = "type", rename_all = "camelCase")]
 pub enum AddNodeError {
   #[display(fmt = "Node already exists")]
   NodeExists,

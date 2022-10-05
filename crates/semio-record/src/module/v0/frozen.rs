@@ -11,7 +11,7 @@ use crate::{
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
-#[serde(rename = "module_v0_Frozen_Parameter", rename_all = "camelCase")]
+#[serde(rename = "module_V0_Frozen_Parameter", rename_all = "camelCase")]
 pub struct Parameter {
   pub name: String,
   #[serde(rename = "type")]
@@ -27,7 +27,7 @@ impl Parameter {
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
-#[serde(rename = "module_v0_Frozen_Function", rename_all = "camelCase")]
+#[serde(rename = "module_V0_Frozen_Function", rename_all = "camelCase")]
 pub struct Function {
   pub parameters: HashMap<Uuid, Parameter>,
   pub parameter_ordering: Vec<Uuid>,
@@ -69,7 +69,7 @@ impl Function {
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
-#[serde(rename = "module_v0_Frozen_Export_Kind", tag = "type", rename_all = "camelCase", content = "value")]
+#[serde(rename = "module_V0_Frozen_Export_Kind", tag = "type", rename_all = "camelCase", content = "value")]
 pub enum ExportKind {
   // `function` is a reserved keyword in JS/TS.
   #[serde(rename = "func")]
@@ -92,7 +92,7 @@ impl ExportKind {
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
-#[serde(rename = "module_v0_Frozen_Export", rename_all = "camelCase")]
+#[serde(rename = "module_V0_Frozen_Export", rename_all = "camelCase")]
 pub struct Export {
   pub name: String,
   pub kind: ExportKind,
@@ -106,7 +106,7 @@ impl Export {
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
-#[serde(rename = "module_v0_Frozen", rename_all = "camelCase")]
+#[serde(rename = "module_V0_Frozen", rename_all = "camelCase")]
 pub struct Module {
   pub parent: Uuid,
   pub name: String,

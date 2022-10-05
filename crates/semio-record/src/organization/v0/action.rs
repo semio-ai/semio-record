@@ -6,7 +6,7 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize, From, Clone)]
 #[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
-#[serde(rename = "organization_v0_Action", tag = "type", rename_all = "camelCase", content = "value")]
+#[serde(rename = "organization_V0_Action", tag = "type", rename_all = "camelCase", content = "value")]
 pub enum Action {
   SetName(SetName),
   Acl(AclAction),
@@ -14,7 +14,7 @@ pub enum Action {
 
 #[derive(Display, Debug, Error, From, Clone, Serialize, Deserialize)]
 #[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
-#[serde(rename = "organization_v0_ActionError", tag = "type", rename_all = "camelCase", content = "value")]
+#[serde(rename = "organization_V0_ActionError", tag = "type", rename_all = "camelCase", content = "value")]
 pub enum ActionError {
   SetName(SetNameError),
   Acl(AclActionError),

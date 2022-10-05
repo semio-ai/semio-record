@@ -19,7 +19,7 @@ use super::action::Action;
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 #[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
-#[serde(rename = "animation_v1_Value_F64", rename_all = "camelCase")]
+#[serde(rename = "animation_V1_Value_F64", rename_all = "camelCase")]
 pub struct F64 {
   pub value: f64,
 }
@@ -34,14 +34,14 @@ impl From<crate::animation::v0::unfrozen::F64> for F64 {
 
 #[derive(Debug, Serialize, Deserialize, Copy, Clone)]
 #[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
-#[serde(rename = "animation_v1_Value_Kind", rename_all = "camelCase")]
+#[serde(rename = "animation_V1_Value_Kind", rename_all = "camelCase")]
 pub enum ValueKind {
   F64,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 #[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
-#[serde(rename = "animation_v1_Value", tag = "type", rename_all = "camelCase", content = "value")]
+#[serde(rename = "animation_V1_Value", tag = "type", rename_all = "camelCase", content = "value")]
 pub enum Value {
   F64(F64),
 }
@@ -56,7 +56,7 @@ impl From<crate::animation::v0::unfrozen::Value> for Value {
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 #[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
-#[serde(rename = "animation_v1_Transition_MultiBezier", rename_all = "camelCase")]
+#[serde(rename = "animation_V1_Transition_MultiBezier", rename_all = "camelCase")]
 pub struct MultiBezier {
   pub multi_bezier: MultiBezier2,
 }
@@ -71,7 +71,7 @@ impl From<crate::animation::v0::unfrozen::MultiBezier> for MultiBezier {
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 #[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
-#[serde(rename = "animation_v1_Transition", tag = "type", rename_all = "camelCase", content = "value")]
+#[serde(rename = "animation_V1_Transition", tag = "type", rename_all = "camelCase", content = "value")]
 pub enum Transition {
   None,
   Linear,
@@ -90,7 +90,7 @@ impl From<crate::animation::v0::unfrozen::Transition> for Transition {
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 #[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
-#[serde(rename = "animation_v1_Key", rename_all = "camelCase")]
+#[serde(rename = "animation_V1_Key", rename_all = "camelCase")]
 pub struct Key {
   pub at: f64,
   pub value: Value,
@@ -109,7 +109,7 @@ impl From<crate::animation::v0::unfrozen::Key> for Key {
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 #[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
-#[serde(rename = "animation_v1_Control", rename_all = "camelCase")]
+#[serde(rename = "animation_V1_Control", rename_all = "camelCase")]
 pub struct Control {
   pub value_kind: ValueKind,
   pub name: String,
@@ -120,7 +120,7 @@ pub struct Control {
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 #[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
-#[serde(rename = "animation_v1_Node_Kind_Group", rename_all = "camelCase")]
+#[serde(rename = "animation_V1_Node_Kind_Group", rename_all = "camelCase")]
 pub struct GroupNode {
   // Children nodes (of any type)
   pub children_ids: HashSet<Uuid>,
@@ -128,14 +128,14 @@ pub struct GroupNode {
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 #[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
-#[serde(rename = "animation_v1_Node_Kind_Control", rename_all = "camelCase")]
+#[serde(rename = "animation_V1_Node_Kind_Control", rename_all = "camelCase")]
 pub struct ControlNode {
   pub id: Uuid,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone, From)]
 #[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
-#[serde(rename = "animation_v1_Node_Kind", tag = "type", rename_all = "camelCase", content = "value")]
+#[serde(rename = "animation_V1_Node_Kind", tag = "type", rename_all = "camelCase", content = "value")]
 pub enum NodeKind {
   Group(GroupNode),
   Control(ControlNode),
@@ -143,7 +143,7 @@ pub enum NodeKind {
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 #[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
-#[serde(rename = "animation_v1_Node", rename_all = "camelCase")]
+#[serde(rename = "animation_V1_Node", rename_all = "camelCase")]
 pub struct Node {
   pub name: Option<String>,
   pub collapsed: bool,
@@ -152,7 +152,7 @@ pub struct Node {
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 #[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
-#[serde(rename = "animation_v1_Private", rename_all = "camelCase")]
+#[serde(rename = "animation_V1_Private", rename_all = "camelCase")]
 pub struct Animation {
   /// Human-readable name of the animation
   pub name: String,

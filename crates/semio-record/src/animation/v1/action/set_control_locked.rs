@@ -8,7 +8,7 @@ use super::super::unfrozen::Animation;
 
 #[derive(Debug, Serialize, Deserialize, From, Clone)]
 #[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
-#[serde(rename = "animation_v1_Action_SetControlLocked", rename_all = "camelCase")]
+#[serde(rename = "animation_V1_Action_SetControlLocked", rename_all = "camelCase")]
 pub struct SetControlLocked {
   pub control_id: Uuid,
   pub locked: bool,
@@ -16,7 +16,7 @@ pub struct SetControlLocked {
 
 #[derive(Display, Debug, Serialize, Deserialize, Error, Clone)]
 #[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
-#[serde(rename = "animation_v1_Action_SetControlLockedError", tag = "type", rename_all = "camelCase")]
+#[serde(rename = "animation_V1_Action_SetControlLockedError", tag = "type", rename_all = "camelCase")]
 pub enum SetControlLockedError {
   #[display(fmt = "Control does not exist")]
   ControlDoesNotExist,

@@ -19,7 +19,7 @@ use super::action::Action;
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 #[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
-#[serde(rename = "folder_v0_Private")]
+#[serde(rename = "folder_V0_Private")]
 pub struct Folder {
   pub name: String,
   pub parent: Uuid,

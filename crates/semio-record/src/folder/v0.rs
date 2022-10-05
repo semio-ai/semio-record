@@ -18,4 +18,4 @@ impl RecordDefn for Folder {
   type Private = unfrozen::Folder;
 }
 
-impl_schema_version!(Folder);
+impl_schema_version!(Folder, "folder_V0");

@@ -12,7 +12,7 @@ use derive_more::From;
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 #[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
-#[serde(rename = "module_v0_Parameter", rename_all = "camelCase")]
+#[serde(rename = "module_V0_Parameter", rename_all = "camelCase")]
 pub struct Parameter {
   pub name: String,
   #[serde(rename = "type")]
@@ -41,7 +41,7 @@ impl<F: Freezer> Freeze<F> for Parameter {
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 #[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
-#[serde(rename = "module_v0_Function", rename_all = "camelCase")]
+#[serde(rename = "module_V0_Function", rename_all = "camelCase")]
 pub struct Function {
   pub parameters: HashMap<Uuid, Parameter>,
   pub parameter_ordering: Vec<Uuid>,
@@ -132,7 +132,7 @@ impl<F: Freezer> Freeze<F> for Function {
 
 #[derive(Debug, Serialize, Deserialize, Clone, From)]
 #[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
-#[serde(rename = "module_v0_Export_Kind", tag = "type", rename_all = "camelCase", content = "value")]
+#[serde(rename = "module_V0_Export_Kind", tag = "type", rename_all = "camelCase", content = "value")]
 pub enum ExportKind {
   // `function` is a reserved keyword in JS/TS.
   #[serde(rename = "func")]
@@ -178,7 +178,7 @@ impl<F: Freezer> Freeze<F> for ExportKind {
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 #[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
-#[serde(rename = "module_v0_Export", rename_all = "camelCase")]
+#[serde(rename = "module_V0_Export", rename_all = "camelCase")]
 pub struct Export {
   pub name: String,
   pub kind: ExportKind,
@@ -205,7 +205,7 @@ impl<F: Freezer> Freeze<F> for Export {
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 #[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
-#[serde(rename = "module_v0_Private", rename_all = "camelCase")]
+#[serde(rename = "module_V0_Private", rename_all = "camelCase")]
 pub struct Module {
   pub acl: Acl,
   pub parent: Uuid,

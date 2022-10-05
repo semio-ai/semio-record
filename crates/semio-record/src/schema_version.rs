@@ -10,7 +10,24 @@ pub struct Schema {
 }
 
 macro_rules! impl_schema_version {
-  ($t: ty) => {
+  ($t: ty, $name: literal) => {
+    #[cfg(feature = "schemars")]
+    impl schemars::JsonSchema for $t {
+      fn schema_name() -> String {
+        $name.to_string()
+      }
+
+      fn json_schema(_: &mut schemars::gen::SchemaGenerator) -> schemars::schema::Schema {
+        let mut schema_object = schemars::schema::SchemaObject::default();
+        schema_object.metadata = Some(Box::new(schemars::schema::Metadata {
+          title: Some($name.to_string()),
+          description: Some("This is a schema for a Semio record schema version. It is not intended to be used directly, but rather to be used as a reference for other schemas.".to_string()),
+          ..Default::default()
+        }));
+        schema_object.into()
+      }
+    }
+
     pub async fn freeze<F: 'static + crate::record::Freezer>(freezer: &F, data: &[u8]) -> Result<Vec<u8>, Box<dyn std::error::Error>> {
       use crate::record::Freeze;
       let unfrozen: <$t as crate::record::RecordDefn>::Unfrozen = crate::deserialize(data)?;

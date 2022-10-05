@@ -10,7 +10,7 @@ use super::super::unfrozen::Animation;
 
 #[derive(Debug, Serialize, Deserialize, From, Clone)]
 #[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
-#[serde(rename = "animation_v1_Action_SetKeyAt", rename_all = "camelCase")]
+#[serde(rename = "animation_V1_Action_SetKeyAt", rename_all = "camelCase")]
 pub struct SetKeyAt {
   pub control_id: Uuid,
   pub key_id: Uuid,
@@ -19,7 +19,7 @@ pub struct SetKeyAt {
 
 #[derive(Display, Debug, Serialize, Deserialize, Error, Clone)]
 #[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
-#[serde(rename = "animation_v1_Action_SetKeyAtError", tag = "type", rename_all = "camelCase")]
+#[serde(rename = "animation_V1_Action_SetKeyAtError", tag = "type", rename_all = "camelCase")]
 pub enum SetKeyAtError {
   #[display(fmt = "Control does not exist")]
   ControlDoesNotExist,

@@ -20,42 +20,42 @@ use super::action::Action;
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 #[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
-#[serde(rename = "animation_v0_Value_F64", rename_all = "camelCase")]
+#[serde(rename = "animation_V0_Value_F64", rename_all = "camelCase")]
 pub struct F64 {
   pub value: f64,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 #[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
-#[serde(rename = "animation_v0_Value", tag = "type", rename_all = "camelCase", content = "value")]
+#[serde(rename = "animation_V0_Value", tag = "type", rename_all = "camelCase", content = "value")]
 pub enum Value {
   F64(F64),
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 #[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
-#[serde(rename = "animation_v0_Transition_None")]
+#[serde(rename = "animation_V0_Transition_None")]
 pub struct None {
   pub _dummy: i32,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 #[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
-#[serde(rename = "animation_v0_Transition_Linear")]
+#[serde(rename = "animation_V0_Transition_Linear")]
 pub struct Linear {
   pub _dummy: i32,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 #[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
-#[serde(rename = "animation_v0_Transition_MultiBezier")]
+#[serde(rename = "animation_V0_Transition_MultiBezier")]
 pub struct MultiBezier {
   pub multi_bezier: MultiBezier2,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 #[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
-#[serde(rename = "animation_v0_Transition", tag = "type", rename_all = "camelCase", content = "value")]
+#[serde(rename = "animation_V0_Transition", tag = "type", rename_all = "camelCase", content = "value")]
 pub enum Transition {
   None(None),
   Linear(Linear),
@@ -64,7 +64,7 @@ pub enum Transition {
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 #[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
-#[serde(rename = "animation_v0_Key")]
+#[serde(rename = "animation_V0_Key")]
 pub struct Key {
   pub at: f64,
   pub value: Value,
@@ -73,7 +73,7 @@ pub struct Key {
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 #[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
-#[serde(rename = "animation_v0_Group")]
+#[serde(rename = "animation_V0_Group")]
 pub struct Group {
   pub name: String,
   pub locked: bool,
@@ -85,7 +85,7 @@ pub struct Group {
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 #[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
-#[serde(rename = "animation_v0_Track")]
+#[serde(rename = "animation_V0_Track")]
 pub struct Track {
   pub name: String,
   pub locked: bool,
@@ -105,7 +105,7 @@ pub struct IdKey {
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 #[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
-#[serde(rename = "animation_v0_Node", tag = "type", rename_all = "camelCase", content = "value")]
+#[serde(rename = "animation_V0_Node", tag = "type", rename_all = "camelCase", content = "value")]
 pub enum Node {
   Group(Group),
   Track(Track),
@@ -113,7 +113,7 @@ pub enum Node {
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 #[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
-#[serde(rename = "animation_v0_Private")]
+#[serde(rename = "animation_V0_Private")]
 pub struct Animation {
   pub name: String,
   pub parent: Uuid,

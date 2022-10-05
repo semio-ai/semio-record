@@ -160,7 +160,14 @@ pub trait RecordDefn {
   type Action;
   type Unfrozen: Unfrozen<Self::Action>;
   type Frozen: Frozen = ();
+  #[cfg(feature = "schemars")]
+  type Public: From<Self::Unfrozen> + schemars::JsonSchema;
+  #[cfg(not(feature = "schemars"))]
   type Public: From<Self::Unfrozen>;
+  
+  #[cfg(feature = "schemars")]
+  type Private: From<Self::Unfrozen> + schemars::JsonSchema;
+  #[cfg(not(feature = "schemars"))]
   type Private: From<Self::Unfrozen>;
 }
 

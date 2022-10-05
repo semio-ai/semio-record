@@ -18,4 +18,4 @@ impl RecordDefn for Scene {
   type Private = unfrozen::Scene;
 }
 
-impl_schema_version!(Scene);
+impl_schema_version!(Scene, "scene_V0");

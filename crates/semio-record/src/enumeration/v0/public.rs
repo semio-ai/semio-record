@@ -7,7 +7,7 @@ use super::unfrozen::{Enumeration, EnumerationVariant};
 
 #[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq)]
 #[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
-#[serde(rename = "enumeration_v0_Public")]
+#[serde(rename = "enumeration_V0_Public")]
 pub struct Public {
   pub name: String,
   pub parent: Uuid,
