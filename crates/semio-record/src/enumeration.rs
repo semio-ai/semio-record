@@ -16,13 +16,16 @@ mod tests {
 
   use crate::{
     acl::Acl,
-    ty::{Primitive, PrimitiveKind, UnfrozenTy},
+    ty::{FrozenTy, Primitive, PrimitiveKind, UnfrozenTy},
   };
 
-  use super::v0::unfrozen::{Enumeration, EnumerationVariant};
+  use super::v0::{
+    frozen::{Enumeration as EnumerationFrozen, EnumerationVariant as EnumerationVariantFrozen},
+    unfrozen::{Enumeration, EnumerationVariant},
+  };
 
   #[test]
-  fn test_serde_yaml() {
+  fn test_serde_yaml_unfrozen() {
     let enumeration_meta = Enumeration {
       name: "Status".to_string(),
       parent: Uuid::new_v4(),
@@ -61,6 +64,48 @@ mod tests {
     let yaml = serde_yaml::to_string(&enumeration_meta).unwrap();
     println!("YAML: {}", yaml);
     let deserialized: Enumeration = serde_yaml::from_str(&yaml).unwrap();
+    assert_eq!(enumeration_meta, deserialized);
+  }
+
+  #[test]
+  fn test_serde_yaml_frozen() {
+    let enumeration_meta = EnumerationFrozen {
+      name: "Status".to_string(),
+      parent: Uuid::new_v4(),
+      variants: HashMap::from([
+        (
+          Uuid::new_v4(),
+          EnumerationVariantFrozen {
+            name: "Success".to_string(),
+            ty: FrozenTy::Primitive(Primitive {
+              kind: PrimitiveKind::Unit,
+            }),
+          },
+        ),
+        (
+          Uuid::new_v4(),
+          EnumerationVariantFrozen {
+            name: "Failure".to_string(),
+            ty: FrozenTy::Primitive(Primitive {
+              kind: PrimitiveKind::Unit,
+            }),
+          },
+        ),
+        (
+          Uuid::new_v4(),
+          EnumerationVariantFrozen {
+            name: "Running".to_string(),
+            ty: FrozenTy::Primitive(Primitive {
+              kind: PrimitiveKind::Unit,
+            }),
+          },
+        ),
+      ]),
+    };
+
+    let yaml = serde_yaml::to_string(&enumeration_meta).unwrap();
+    println!("YAML: {}", yaml);
+    let deserialized: EnumerationFrozen = serde_yaml::from_str(&yaml).unwrap();
     assert_eq!(enumeration_meta, deserialized);
   }
 }
