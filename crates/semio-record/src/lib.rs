@@ -1,36 +1,35 @@
 #![feature(associated_type_defaults)]
 
-pub mod blob;
-pub mod expr;
-pub mod record;
-pub mod module;
-pub mod workspace;
-pub mod ty;
-pub mod structure;
-pub mod enumeration;
-pub mod organization;
-pub mod folder;
-pub mod version;
-pub mod serial;
-pub mod scene;
-pub mod user;
-pub mod schema_version;
-pub mod unfrozen;
 pub mod acl;
 pub mod action;
 pub mod animation;
+pub mod api;
+pub mod blob;
 pub mod color;
+pub mod container;
+pub mod enumeration;
+pub mod expr;
+pub mod folder;
+pub mod i18n;
 pub mod math;
 pub mod migrate;
-pub mod container;
-pub mod i18n;
+pub mod module;
+pub mod organization;
+pub mod record;
+pub mod scene;
+pub mod schema_version;
+pub mod serial;
+pub mod structure;
+pub mod ty;
+pub mod unfrozen;
 pub mod unit;
 pub mod unit_math;
-pub mod api;
+pub mod user;
+pub mod version;
+pub mod workspace;
 
 #[cfg(feature = "js")]
 mod js;
-
 
 macro_rules! impl_lib {
   ($($ty:tt => $module:tt),+) => {
@@ -146,11 +145,9 @@ impl_lib!(
 #[serde(rename = "frozen_Record", rename_all = "camelCase")]
 pub enum FrozenRecord {
   Module(module::latest::frozen::Module),
-
 }
 
-
-pub use serde_json::to_vec as serialize;
-pub use serde_json::from_slice as deserialize;
 use serde::Deserialize;
 use serde::Serialize;
+pub use serde_json::from_slice as deserialize;
+pub use serde_json::to_vec as serialize;

@@ -15,7 +15,7 @@ pub struct IdWithPermissions {
 
 /// An Access Control List (ACL) is a list of rules that specify which agents
 /// can perform which actions, if any.
-#[derive(Debug, Serialize, Deserialize, Clone)]
+#[derive(Debug, Serialize, Deserialize, Clone, Eq, PartialEq)]
 #[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[serde(rename = "Acl")]
 pub struct Acl {
@@ -82,9 +82,7 @@ impl Acl {
   }
 }
 
-#[derive(
-  Debug, Display, Serialize, Deserialize, Clone, Eq, PartialEq, PartialOrd, Ord
-)]
+#[derive(Debug, Display, Serialize, Deserialize, Clone, Eq, PartialEq, PartialOrd, Ord)]
 #[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[serde(rename = "Acl_PermissionLevel", rename_all = "camelCase")]
 pub enum PermissionLevel {
@@ -140,15 +138,11 @@ impl Default for Permissions {
 impl Permissions {
   pub fn validate(&self, required: &Permissions) -> Result<(), Box<dyn std::error::Error>> {
     if self.read < required.read {
-      return Err(anyhow::anyhow!(
-        "Read permission for agent is too low",
-      ).into());
+      return Err(anyhow::anyhow!("Read permission for agent is too low",).into());
     }
 
     if self.write < required.write {
-      return Err(anyhow::anyhow!(
-        "Write permission for agent is too low",
-      ).into());
+      return Err(anyhow::anyhow!("Write permission for agent is too low",).into());
     }
 
     Ok(())
@@ -192,7 +186,12 @@ pub const PRIVATE_READ_WRITE: Permissions = Permissions {
 
 #[derive(Debug, Serialize, Deserialize, Clone, Eq, PartialEq)]
 #[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
-#[serde(rename = "Acl_WithPermissions", tag = "type", rename_all = "camelCase", content = "value")]
+#[serde(
+  rename = "Acl_WithPermissions",
+  tag = "type",
+  rename_all = "camelCase",
+  content = "value"
+)]
 pub enum WithPermissions {
   /// No permissions
   None(None),
@@ -205,7 +204,6 @@ pub enum WithPermissions {
   /// Custom permissions
   Custom(Permissions),
 }
-
 
 impl Default for WithPermissions {
   fn default() -> Self {
@@ -252,8 +250,6 @@ impl PermissionResolver for DummyPermissionResolver {
     _inherit: &Inherit,
     _agent: &Uuid,
   ) -> Result<Permissions, Box<dyn std::error::Error>> {
-    Err(anyhow::anyhow!(
-      "Inheriting permissions is not possible",
-    ).into())
+    Err(anyhow::anyhow!("Inheriting permissions is not possible",).into())
   }
 }

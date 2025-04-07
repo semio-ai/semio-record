@@ -270,7 +270,12 @@ pub struct FrozenScalar {
 
 #[derive(Debug, Serialize, Deserialize, From, Clone, PartialEq, Eq)]
 #[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
-#[serde(rename = "frozen_Type", rename_all = "camelCase", tag = "type", content = "value")]
+#[serde(
+  rename = "frozen_Type",
+  rename_all = "camelCase",
+  tag = "type",
+  content = "value"
+)]
 pub enum FrozenTy {
   Primitive(Primitive),
   FrozenScalar(FrozenScalar),
@@ -410,7 +415,12 @@ impl<F: Freezer> Freeze<F> for UnfrozenArray {
 
 #[derive(Debug, Serialize, Deserialize, From, Clone, PartialEq, Eq)]
 #[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
-#[serde(rename = "unfrozen_Type", rename_all = "camelCase", tag = "type", content = "value")]
+#[serde(
+  rename = "unfrozen_Type",
+  rename_all = "camelCase",
+  tag = "type",
+  content = "value"
+)]
 pub enum UnfrozenTy {
   Primitive(Primitive),
   UnfrozenScalar(UnfrozenScalar),

@@ -1,12 +1,21 @@
 use std::collections::{HashMap, HashSet};
 
-use serde::{Serialize, Deserialize};
-use uuid::Uuid;
 use async_trait::async_trait;
+use serde::{Deserialize, Serialize};
+use uuid::Uuid;
 
-use crate::{ty::UnfrozenTy, record::{View, Freezer, Freeze, Unfrozen, UnfrozenReference}, action::{name, parent}, acl::Acl, acl::action::with_acl, blob::BlobDependencies, unfrozen::impl_unfrozen, migrate::Migrate};
+use crate::{
+  acl::action::with_acl,
+  acl::Acl,
+  action::{name, parent},
+  blob::BlobDependencies,
+  migrate::Migrate,
+  record::{Freeze, Freezer, Unfrozen, UnfrozenReference, View},
+  ty::UnfrozenTy,
+  unfrozen::impl_unfrozen,
+};
 
-use super::{frozen, action::Action};
+use super::{action::Action, frozen};
 
 #[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq)]
 #[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
@@ -29,7 +38,7 @@ impl<F: Freezer> Freeze<F> for EnumerationVariant {
   }
 }
 
-#[derive(Clone, Debug, Serialize, Deserialize)]
+#[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq)]
 #[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[serde(rename = "enumeration_V0_Private")]
 pub struct Enumeration {
