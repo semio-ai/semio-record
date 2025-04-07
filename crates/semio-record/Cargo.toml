@@ -24,3 +24,6 @@ wasm-bindgen = { version = "0.2.83", optional = true }
 
 [features]
 js = ["dep:wasm-bindgen", "uuid/wasm-bindgen"]
+
+[dev-dependencies]
+serde_yaml = "0.9.34"
