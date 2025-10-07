@@ -1,6 +1,3 @@
 [workspace]
-
-members = [
-  "crates/semio-record",
-  "crates/semio-record-bind",
-]
+resolver = "2"
+members = ["crates/semio-record", "crates/semio-record-bind"]
