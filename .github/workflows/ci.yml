@@ -7,14 +7,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Install Rust
-      run:
-        curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
-        rustup default nightly
-    - name: Checkout Simulator
-      uses: actions/checkout@v2
-      with:
-        path: semio-record
+    - uses: actions/checkout@v4
+    - uses: dtolnay/rust-toolchain@nightly
     - name: Run tests
       run: cargo test
-      working-directory: semio-record
