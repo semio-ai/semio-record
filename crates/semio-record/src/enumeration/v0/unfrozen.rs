@@ -1,4 +1,6 @@
-use std::collections::{HashMap, HashSet};
+use std::collections::HashSet;
+
+use indexmap::IndexMap;
 
 use async_trait::async_trait;
 use serde::{Deserialize, Serialize};
@@ -45,7 +47,11 @@ pub struct Enumeration {
   pub parent: Uuid,
   pub name: String,
   pub acl: Acl,
-  pub variants: HashMap<Uuid, EnumerationVariant>,
+  /// `IndexMap` rather than `HashMap` so that the insertion order of variants
+  /// is preserved during serialization. This keeps generated YAML record files
+  /// stable across runs — a plain `HashMap` produces a non-deterministic key
+  /// order that causes spurious diffs every time a module is rebuilt.
+  pub variants: IndexMap<Uuid, EnumerationVariant>,
 }
 
 with_acl!(Enumeration);
@@ -56,7 +62,7 @@ impl Default for Enumeration {
       parent: Uuid::default(),
       name: "".to_string(),
       acl: Default::default(),
-      variants: HashMap::new(),
+      variants: IndexMap::new(),
     }
   }
 }
@@ -108,7 +114,7 @@ impl<F: Freezer> Freeze<F> for Enumeration {
   type Frozen = frozen::Enumeration;
 
   async fn freeze(&self, freezer: &F) -> Result<Self::Frozen, F::Error> {
-    let mut variants = HashMap::new();
+    let mut variants = IndexMap::new();
     for (id, variant) in &self.variants {
       variants.insert(id.clone(), variant.freeze(freezer).await?);
     }

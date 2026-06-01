@@ -68,11 +68,22 @@ in order to organize them conveniently.
 with `EnumerationVariant`s capable of holding values of any other type.
 Each variant has an associated UUID.
 
+Variants are stored as an [`IndexMap<Uuid, EnumerationVariant>`][indexmap] rather
+than a plain `HashMap`. This preserves the insertion order of variants across
+serialization/deserialization, which keeps generated YAML record files stable —
+a `HashMap` produces non-deterministic key ordering and causes spurious diffs every
+time a module is rebuilt.
+
 ### Structure
 
 [`Structure`](src/structure.rs) represents a structure type,
 with `StructureField`s capable of associating values of any other type
 to named and UUID-identified attributes.
+
+Fields are stored as an [`IndexMap<Uuid, StructureField>`][indexmap] for the same
+reason as `Enumeration.variants` above: to guarantee a stable serialization order.
+
+[indexmap]: https://docs.rs/indexmap
 
 ## Common Components
 

@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use indexmap::IndexMap;
 
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
@@ -11,7 +11,9 @@ use super::unfrozen::{Structure, StructureField};
 pub struct Public {
   pub name: String,
   pub parent: Uuid,
-  pub fields: HashMap<Uuid, StructureField>,
+  /// `IndexMap` rather than `HashMap` so that field order is preserved during
+  /// serialization. See the unfrozen variant for the full rationale.
+  pub fields: IndexMap<Uuid, StructureField>,
 }
 
 impl Public {

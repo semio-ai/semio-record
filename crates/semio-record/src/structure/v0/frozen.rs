@@ -1,4 +1,6 @@
-use std::collections::{HashMap, HashSet};
+use std::collections::HashSet;
+
+use indexmap::IndexMap;
 
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
@@ -9,7 +11,7 @@ use crate::{
   ty::FrozenTy,
 };
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 #[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[serde(rename = "enumeration_V0_Frozen_Field")]
 pub struct StructureField {
@@ -18,13 +20,15 @@ pub struct StructureField {
   pub ty: FrozenTy,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 #[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[serde(rename = "structure_V0_Frozen")]
 pub struct Structure {
   pub parent: Uuid,
   pub name: String,
-  pub fields: HashMap<Uuid, StructureField>,
+  /// `IndexMap` rather than `HashMap` so that field order is preserved during
+  /// serialization. See the unfrozen variant for the full rationale.
+  pub fields: IndexMap<Uuid, StructureField>,
 }
 
 impl Structure {

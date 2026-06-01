@@ -1,4 +1,6 @@
-use std::collections::{HashMap, HashSet};
+use std::collections::HashSet;
+
+use indexmap::IndexMap;
 
 use serde::{Serialize, Deserialize};
 use uuid::Uuid;
@@ -20,7 +22,9 @@ pub struct EnumerationVariant {
 pub struct Enumeration {
   pub parent: Uuid,
   pub name: String,
-  pub variants: HashMap<Uuid, EnumerationVariant>,
+  /// `IndexMap` rather than `HashMap` so that variant order is preserved during
+  /// serialization. See the unfrozen variant for the full rationale.
+  pub variants: IndexMap<Uuid, EnumerationVariant>,
 }
 
 impl Enumeration {
