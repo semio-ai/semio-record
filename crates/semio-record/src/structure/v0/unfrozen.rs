@@ -1,4 +1,6 @@
-use std::collections::{HashMap, HashSet};
+use std::collections::HashSet;
+
+use indexmap::IndexMap;
 
 use serde::{Serialize, Deserialize};
 use uuid::Uuid;
@@ -8,7 +10,7 @@ use crate::{ty::UnfrozenTy, record::{View, Freezer, Freeze, Unfrozen, UnfrozenRe
 
 use super::{frozen, action::Action};
 
-#[derive(Clone, Debug, Serialize, Deserialize)]
+#[derive(Clone, Debug, Serialize, Deserialize, PartialEq)]
 #[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[serde(rename = "structure_V0_Field")]
 pub struct StructureField {
@@ -29,14 +31,18 @@ impl<F: Freezer> Freeze<F> for StructureField {
   }
 }
 
-#[derive(Clone, Debug, Serialize, Deserialize)]
+#[derive(Clone, Debug, Serialize, Deserialize, PartialEq)]
 #[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[serde(rename = "structure_V0_Private")]
 pub struct Structure {
   pub parent: Uuid,
   pub name: String,
   pub acl: Acl,
-  pub fields: HashMap<Uuid, StructureField>,
+  /// `IndexMap` rather than `HashMap` so that the insertion order of fields
+  /// is preserved during serialization. This keeps generated YAML record files
+  /// stable across runs — a plain `HashMap` produces a non-deterministic key
+  /// order that causes spurious diffs every time a module is rebuilt.
+  pub fields: IndexMap<Uuid, StructureField>,
 }
 
 impl Default for Structure {
@@ -45,7 +51,7 @@ impl Default for Structure {
       parent: Uuid::default(),
       name: "".to_string(),
       acl: Default::default(),
-      fields: HashMap::new(),
+      fields: IndexMap::new(),
     }
   }
 }
@@ -100,7 +106,7 @@ impl<F: Freezer> Freeze<F> for Structure {
   type Frozen = frozen::Structure;
 
   async fn freeze(&self, freezer: &F) -> Result<Self::Frozen, F::Error> {
-    let mut fields = HashMap::new();
+    let mut fields = IndexMap::new();
     for (id, field) in &self.fields {
       fields.insert(id.clone(), field.freeze(freezer).await?);
     }
