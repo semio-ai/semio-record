@@ -3,7 +3,7 @@ use std::collections::HashSet;
 use serde::{Serialize, Deserialize};
 use uuid::Uuid;
 
-use crate::{record::{VersionReq, UnfrozenReference, FrozenReference}, blob::BlobDependencies};
+use crate::{record::{UnfrozenReference, FrozenReference}, blob::BlobDependencies};
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 #[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]

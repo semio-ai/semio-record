@@ -3,8 +3,6 @@ use std::collections::HashMap;
 use serde::{Serialize, Deserialize};
 use uuid::Uuid;
 
-use crate::acl::Acl;
-
 use super::unfrozen::{Context, Workspace};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]

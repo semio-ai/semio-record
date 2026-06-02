@@ -72,7 +72,7 @@ impl Apply<RemoveVariant> for Enumeration {
   type Error = RemoveVariantError;
 
   fn apply(&mut self, action: &RemoveVariant) -> Result<(), Self::Error> {
-    if let None = self.variants.remove(&action.id) {
+    if let None = self.variants.shift_remove(&action.id) {
       Err(RemoveVariantError::VariantDoesNotExist)
     } else {
       Ok(())
