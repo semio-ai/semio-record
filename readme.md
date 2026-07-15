@@ -8,7 +8,7 @@ such as the [Semio CLI](https://github.com/semio-ai/semio-cli).
 These entities have properties in common.
 - They represent a versioned record in the database.
   Hence they are always referred to as **"records"**.
-- They have [the same facets (see `RecordDefn`)](src/record.rs):
+- They have [the same facets (see `RecordDefn`)](crates/semio-record/src/record.rs):
   - `Private`: the original description of the record,
     as defined by its author.
     It may contain restricted information,
@@ -34,7 +34,7 @@ These entities have properties in common.
   When they have no parent, they are said to be "root" record types.
 - They have a name. In combination with parenthood,
   names can be used to create unique paths to refer to records.
-  [Semio Client does that with its notion of `Selector`](https://github.com/semio-ai/semio-client/readme.md#selector).
+  [Semio Client does that with its notion of `Selector`](https://github.com/semio-ai/semio-client/blob/master/readme.md#selector).
 
 Each record type corresponds to a `mod` in this crate and a directory with the same name.
 For each version of the record type, a sub-directory is created,
@@ -44,7 +44,7 @@ with a `mod` for each facet inside.
 
 ### User
 
-[`User`](src/user.rs) represents users with access rights to the database.
+[`User`](crates/semio-record/src/user.rs) represents users with access rights to the database.
 This is a root record type (no parent),
 and may be the parent of any other non-root record type.
 It is meant to correspond to users known to the database server,
@@ -52,19 +52,19 @@ and with [controlled access rights](#access-control-lists).
 
 ### Organization
 
-[`Organization`](src/organization.rs) represents an organization,
+[`Organization`](crates/semio-record/src/organization.rs) represents an organization,
 under which other records should be organized.
 This is useful to regroup records under the same authority.
 
 ### Folder
 
-[`Folder`](src/folder.rs) represents a folder,
+[`Folder`](crates/semio-record/src/folder.rs) represents a folder,
 that serves as an intermediary parent to other records,
 in order to organize them conveniently.
 
 ### Enumeration
 
-[`Enumeration`](src/enumeration.rs) represents an enumeration type,
+[`Enumeration`](crates/semio-record/src/enumeration.rs) represents an enumeration type,
 with `EnumerationVariant`s capable of holding values of any other type.
 Each variant has an associated UUID.
 
@@ -76,7 +76,7 @@ time a module is rebuilt.
 
 ### Structure
 
-[`Structure`](src/structure.rs) represents a structure type,
+[`Structure`](crates/semio-record/src/structure.rs) represents a structure type,
 with `StructureField`s capable of associating values of any other type
 to named and UUID-identified attributes.
 
@@ -89,12 +89,12 @@ reason as `Enumeration.variants` above: to guarantee a stable serialization orde
 
 ### Primitive
 
-[`Primitive`](src/ty.rs) represents a primitive type,
+[`Primitive`](crates/semio-record/src/ty.rs) represents a primitive type,
 *but it is not a record type*.
 It is used by record types representing types,
 such as [`Enumeration`](#enumeration) or [`Structure`](#structure).
 All records representing types can be referred to using
-[`FrozenTy` or `UnfrozenTy`](src/ty.rs).
+[`FrozenTy` or `UnfrozenTy`](crates/semio-record/src/ty.rs).
 
 ### Access Control Lists
 
@@ -105,7 +105,7 @@ so that to reject requests from users who were not granted the permissions.
 
 ### Freezing
 
-Implement the [`Freezer`](src/record.rs) trait to interface with the
+Implement the [`Freezer`](crates/semio-record/src/record.rs) trait to interface with the
 `freeze` methods available for `Unfrozen` records.
 A freezing algorithm is already integrated in the record types,
 but it needs a database (or any sort of repository of records)
