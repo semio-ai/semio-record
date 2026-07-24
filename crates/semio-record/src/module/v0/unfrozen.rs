@@ -324,7 +324,7 @@ impl<F: Freezer> Freeze<F> for Module {
 
     let mut dependencies = Vec::with_capacity(self.dependencies.len());
     for dependency in &self.dependencies {
-      dependencies.push(freezer.freeze(dependency).await?);
+      dependencies.push(dependency.freeze(freezer).await?);
     }
 
     Ok(Self::Frozen {

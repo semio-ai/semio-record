@@ -384,7 +384,7 @@ impl<F: Freezer> Freeze<F> for UnfrozenScalar {
 
   async fn freeze(&self, freezer: &F) -> Result<Self::Frozen, F::Error> {
     Ok(FrozenScalar {
-      reference: freezer.freeze(&self.reference).await?,
+      reference: self.reference.freeze(freezer).await?,
     })
   }
 }
@@ -408,7 +408,7 @@ impl<F: Freezer> Freeze<F> for UnfrozenArray {
 
   async fn freeze(&self, freezer: &F) -> Result<Self::Frozen, F::Error> {
     Ok(FrozenArray {
-      reference: freezer.freeze(&self.reference).await?,
+      reference: self.reference.freeze(freezer).await?,
     })
   }
 }

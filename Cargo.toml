@@ -1,3 +1,3 @@
 [workspace]
 resolver = "2"
-members = ["crates/semio-record", "crates/semio-record-bind"]
+members = ["crates/semio-record"]
