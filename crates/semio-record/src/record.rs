@@ -1,11 +1,20 @@
 use std::{collections::HashSet, fmt::Display};
 
-use async_trait::async_trait;
-use derive_more::From;
 use serde::{de::DeserializeOwned, Deserialize, Serialize};
 use uuid::Uuid;
 
 use crate::{acl::Acl, blob::BlobDependencies, migrate::Migrate};
+
+// The neutral versioning + freezing vocabulary lives in arora-types, which was
+// built as a store-agnostic re-modeling of exactly these types (its serde
+// shapes are byte-compatible with ours). Reusing it keeps a single definition
+// of record references and the freeze mechanism; semio-record layers its record
+// model — actions, ACL, views, projections, the i16 dispatch — on top.
+// `Freezer` is our historical name for arora's `Resolver`; they are one trait.
+pub use arora_types::record::freeze::{Freeze, Resolver as Freezer};
+pub use arora_types::record::reference::{
+  FrozenReference, UnfrozenReference, Version, VersionReq,
+};
 
 pub const TYPE_USER: i16 = 0x0000;
 pub const TYPE_ORGANIZATION: i16 = 0x0001;
@@ -22,79 +31,10 @@ pub const TYPE_SCENE: i16 = 0x0100;
 pub const TYPE_PLATFORM: i16 = 0x0200;
 pub const TYPE_WORKSPACE: i16 = 0x0300;
 
-#[derive(Debug, From, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize)]
-#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
-pub struct Version(#[cfg_attr(feature = "schemars", schemars(with = "String"))] pub semver::Version);
-
-impl std::fmt::Display for Version {
-  fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-    write!(f, "{}", self.0)
-  }
-}
-
-impl Version {
-  pub fn parse(s: &str) -> Result<Self, semver::Error> {
-    Ok(Version(s.parse()?))
-  }
-}
-
-#[derive(Debug, From, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
-#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
-pub struct VersionReq(#[cfg_attr(feature = "schemars", schemars(with = "Option::<String>"))] pub Option<semver::VersionReq>);
-
-impl VersionReq {
-  pub fn parse(s: &str) -> Result<Self, semver::Error> {
-    Ok(Self(Some(s.parse()?)))
-  }
-}
-
-impl std::fmt::Display for VersionReq {
-  fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-    match &self.0 {
-      Some(req) => write!(f, "{}", req),
-      None => write!(f, "*"),
-    }
-  }
-}
-
-impl Into<semver::VersionReq> for VersionReq {
-  fn into(self) -> semver::VersionReq {
-    self.0.unwrap_or_default()
-  }
-}
-
 #[derive(Debug, Serialize, Deserialize)]
 #[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 pub struct Path {
   pub components: Vec<String>,
-}
-
-#[derive(
-  Debug, Serialize, Deserialize, Hash, PartialEq, Eq, Clone, PartialOrd, Ord
-)]
-#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
-#[serde(rename = "frozen_Reference", rename_all = "camelCase")]
-pub struct FrozenReference {
-  pub id: Uuid,
-  pub version: Version,
-}
-
-#[derive(Debug, Serialize, Deserialize, Hash, PartialEq, Eq, Clone)]
-#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
-#[serde(rename = "unfrozen_Reference", rename_all = "camelCase")]
-pub struct UnfrozenReference {
-  pub id: Uuid,
-  pub version_req: VersionReq,
-}
-
-impl ToString for UnfrozenReference {
-  fn to_string(&self) -> String {
-    if let Some(version_req) = &self.version_req.0 {
-      format!("{}@{}", self.id, version_req)
-    } else {
-      self.id.to_string()
-    }
-  }
 }
 
 pub trait Apply<T> {
@@ -108,20 +48,6 @@ pub trait Apply<T> {
   }
 
   fn apply(&mut self, action: &T) -> Result<(), Self::Error>;
-}
-
-#[async_trait]
-pub trait Freeze<F: Freezer> {
-  type Frozen;
-
-  async fn freeze(&self, freezer: &F) -> Result<Self::Frozen, F::Error>;
-}
-
-#[async_trait]
-pub trait Freezer: Send + Sync {
-  type Error: std::error::Error;
-
-  async fn freeze(&self, reference: &UnfrozenReference) -> Result<FrozenReference, Self::Error>;
 }
 
 pub trait View {
