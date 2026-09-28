@@ -1,6 +1,6 @@
 [package]
 name = "semio-record"
-version = "0.1.0"
+version = "1.0.0"
 edition = "2021"
 
 [lib]
@@ -10,7 +10,7 @@ crate-type = ["cdylib", "rlib"]
 
 [dependencies]
 anyhow = "1"
-arora-types = "2"
+arora-types = "3"
 async-trait = "0.1"
 chrono = "0.4"
 derive_more = "0.99"
