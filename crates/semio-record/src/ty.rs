@@ -268,6 +268,16 @@ pub struct FrozenScalar {
   pub reference: FrozenReference,
 }
 
+/// An optional value of another type expression, every version pinned: an
+/// absent value, or a present one of type `element`. The same record as
+/// arora-types' `FrozenOption`.
+#[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq)]
+#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
+#[serde(rename = "frozen_Option")]
+pub struct FrozenOption {
+  pub element: Box<FrozenTy>,
+}
+
 #[derive(Debug, Serialize, Deserialize, From, Clone, PartialEq, Eq)]
 #[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[serde(
@@ -280,6 +290,7 @@ pub enum FrozenTy {
   Primitive(Primitive),
   FrozenScalar(FrozenScalar),
   FrozenArray(FrozenArray),
+  FrozenOption(FrozenOption),
 }
 
 impl From<PrimitiveKind> for FrozenTy {
@@ -310,6 +321,13 @@ impl FrozenTy {
     }
   }
 
+  pub fn as_option(&self) -> Option<&FrozenOption> {
+    match self {
+      Self::FrozenOption(option) => Some(option),
+      _ => None,
+    }
+  }
+
   pub fn is_primitive(&self) -> bool {
     match self {
       Self::Primitive(_) => true,
@@ -329,6 +347,10 @@ impl FrozenTy {
       Self::FrozenArray(_) => true,
       _ => false,
     }
+  }
+
+  pub fn is_option(&self) -> bool {
+    matches!(self, Self::FrozenOption(_))
   }
 
   pub fn to_primitive(self) -> Option<Primitive> {
@@ -360,7 +382,8 @@ impl FrozenTy {
       Self::FrozenArray(ty) => {
         set.insert(&ty.reference);
       }
-      _ => {}
+      Self::FrozenOption(ty) => ty.element.dependencies(set),
+      Self::Primitive(_) => {}
     }
   }
 }
@@ -413,6 +436,33 @@ impl<F: Freezer> Freeze<F> for UnfrozenArray {
   }
 }
 
+/// An optional value of another type expression, versions not yet pinned: an
+/// absent value, or a present one of type `element`. The same record as
+/// arora-types' `UnfrozenOption`; written `T?`.
+#[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq)]
+#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
+#[serde(rename = "unfrozen_Option")]
+pub struct UnfrozenOption {
+  pub element: Box<UnfrozenTy>,
+}
+
+impl ToString for UnfrozenOption {
+  fn to_string(&self) -> String {
+    format!("{}?", self.element.to_string())
+  }
+}
+
+#[async_trait]
+impl<F: Freezer> Freeze<F> for UnfrozenOption {
+  type Frozen = FrozenOption;
+
+  async fn freeze(&self, freezer: &F) -> Result<Self::Frozen, F::Error> {
+    Ok(FrozenOption {
+      element: Box::new(self.element.freeze(freezer).await?),
+    })
+  }
+}
+
 #[derive(Debug, Serialize, Deserialize, From, Clone, PartialEq, Eq)]
 #[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[serde(
@@ -425,6 +475,7 @@ pub enum UnfrozenTy {
   Primitive(Primitive),
   UnfrozenScalar(UnfrozenScalar),
   UnfrozenArray(UnfrozenArray),
+  UnfrozenOption(UnfrozenOption),
 }
 
 impl From<PrimitiveKind> for UnfrozenTy {
@@ -455,6 +506,13 @@ impl UnfrozenTy {
     }
   }
 
+  pub fn as_option(&self) -> Option<&UnfrozenOption> {
+    match self {
+      Self::UnfrozenOption(option) => Some(option),
+      _ => None,
+    }
+  }
+
   pub fn is_primitive(&self) -> bool {
     match self {
       Self::Primitive(_) => true,
@@ -474,6 +532,10 @@ impl UnfrozenTy {
       Self::UnfrozenArray(_) => true,
       _ => false,
     }
+  }
+
+  pub fn is_option(&self) -> bool {
+    matches!(self, Self::UnfrozenOption(_))
   }
 
   pub fn to_primitive(self) -> Option<Primitive> {
@@ -505,7 +567,8 @@ impl UnfrozenTy {
       Self::UnfrozenArray(ty) => {
         set.insert(&ty.reference);
       }
-      _ => {}
+      Self::UnfrozenOption(ty) => ty.element.dependencies(set),
+      Self::Primitive(_) => {}
     }
   }
 }
@@ -519,6 +582,7 @@ impl<F: Freezer> Freeze<F> for UnfrozenTy {
       Self::Primitive(primitive) => Ok(FrozenTy::Primitive(primitive.clone())),
       Self::UnfrozenScalar(scalar) => Ok(FrozenTy::FrozenScalar(scalar.freeze(freezer).await?)),
       Self::UnfrozenArray(array) => Ok(FrozenTy::FrozenArray(array.freeze(freezer).await?)),
+      Self::UnfrozenOption(option) => Ok(FrozenTy::FrozenOption(option.freeze(freezer).await?)),
     }
   }
 }
@@ -527,6 +591,12 @@ impl FromStr for UnfrozenTy {
   type Err = ();
 
   fn from_str(s: &str) -> Result<Self, Self::Err> {
+    // `T?`: an optional of the type `T` spells.
+    if let Some(element) = s.strip_suffix('?') {
+      return Ok(UnfrozenTy::UnfrozenOption(UnfrozenOption {
+        element: Box::new(element.parse()?),
+      }));
+    }
     let array = s.ends_with("[]");
     let s = if array { &s[..s.len() - 2] } else { s };
     let mut iter = s.split('@');
@@ -655,6 +725,7 @@ impl ToString for UnfrozenTy {
       Self::Primitive(primitive) => primitive.to_string(),
       Self::UnfrozenScalar(scalar) => scalar.to_string(),
       Self::UnfrozenArray(array) => array.to_string(),
+      Self::UnfrozenOption(option) => option.to_string(),
     }
   }
 }
@@ -670,6 +741,60 @@ mod test {
     assert_eq!(
       super::UnfrozenTy::from_str("u8[]").unwrap(),
       super::UnfrozenTy::Primitive(super::PrimitiveKind::ArrayU8.into())
+    );
+  }
+
+  #[test]
+  fn an_optional_is_written_with_a_trailing_question_mark() {
+    for spelling in ["f32?", "str[]?", "006867d6-7898-4d11-8a8a-471135f66aed@>1.0.0?"] {
+      let ty = super::UnfrozenTy::from_str(spelling).unwrap();
+      assert!(ty.is_option(), "{spelling}");
+      assert_eq!(ty.to_string(), spelling);
+    }
+    assert_eq!(
+      super::UnfrozenTy::from_str("u8?").unwrap(),
+      super::UnfrozenTy::UnfrozenOption(super::UnfrozenOption {
+        element: Box::new(super::PrimitiveKind::U8.into()),
+      })
+    );
+  }
+
+  #[test]
+  fn an_optional_depends_on_its_element() {
+    let ty = super::UnfrozenTy::from_str("006867d6-7898-4d11-8a8a-471135f66aed@>1.0.0?").unwrap();
+    let mut dependencies = std::collections::HashSet::new();
+    ty.dependencies(&mut dependencies);
+    assert_eq!(dependencies.len(), 1);
+  }
+
+  /// A record holding an optional type reads and writes the same JSON as
+  /// arora-types' record vocabulary, so either side reads the other's.
+  #[test]
+  fn an_optional_matches_the_arora_record_shape() {
+    use arora_types::record::ty as arora;
+    let reference = super::FrozenReference {
+      id: super::Uuid::from_str("006867d6-7898-4d11-8a8a-471135f66aed").unwrap(),
+      version: arora_types::record::Version(semver::Version::new(1, 2, 0)),
+    };
+    let ours = super::FrozenTy::FrozenOption(super::FrozenOption {
+      element: Box::new(super::FrozenTy::FrozenScalar(super::FrozenScalar {
+        reference: reference.clone(),
+      })),
+    });
+    let theirs = arora::FrozenTy::FrozenOption(arora::FrozenOption {
+      element: Box::new(arora::FrozenTy::FrozenScalar(arora::FrozenScalar { reference })),
+    });
+    let json = serde_json::to_value(&ours).unwrap();
+    assert_eq!(json, serde_json::to_value(&theirs).unwrap());
+    assert_eq!(serde_json::from_value::<super::FrozenTy>(json).unwrap(), ours);
+
+    let unfrozen = super::UnfrozenTy::from_str("f32?").unwrap();
+    let arora_unfrozen = arora::UnfrozenTy::UnfrozenOption(arora::UnfrozenOption {
+      element: Box::new(arora::PrimitiveKind::F32.into()),
+    });
+    assert_eq!(
+      serde_json::to_value(&unfrozen).unwrap(),
+      serde_json::to_value(&arora_unfrozen).unwrap()
     );
   }
 
