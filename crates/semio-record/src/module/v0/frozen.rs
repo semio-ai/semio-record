@@ -31,6 +31,8 @@ impl Parameter {
 pub struct Function {
   pub parameters: HashMap<Uuid, Parameter>,
   pub parameter_ordering: Vec<Uuid>,
+  /// Frozen functions the store holds under `returnTy` still read.
+  #[serde(rename = "returnType", alias = "returnTy")]
   pub return_ty: FrozenTy,
 }
 
